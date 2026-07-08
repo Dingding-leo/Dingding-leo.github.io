@@ -1,14 +1,22 @@
-/* 基础变量：深色、科技感、渐变 */
+/* =========================================
+   AUSTIN's LAB - MINIMALIST TECH / CYBER THEME 
+   ========================================= */
+
 :root {
-  --bg-color: #050505;
-  --text-main: #f4f4f5;
-  --text-muted: #a1a1aa;
-  --accent-color: #00d2ff;
-  --accent-gradient: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
-  --card-bg: rgba(255, 255, 255, 0.03);
-  --card-border: rgba(255, 255, 255, 0.08);
-  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --bg-color: #030305;
+  --text-main: #f0f4f8;
+  --text-muted: #8a9bb2;
+  
+  /* Cyber / Tech Accents */
+  --neon-blue: #00f0ff;
+  --neon-purple: #b026ff;
+  --neon-glow: rgba(0, 240, 255, 0.4);
+  
+  --card-bg: rgba(10, 15, 25, 0.65);
+  --card-border: rgba(0, 240, 255, 0.2);
+  
+  --font-sans: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "Fira Code", Menlo, Monaco, Consolas, monospace;
 }
 
 * {
@@ -26,36 +34,55 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* 动态背景发光效果 */
+/* -----------------------------------------
+   CYBER GRID BACKGROUND
+   ----------------------------------------- */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  /* Thin grid lines */
+  background-image: 
+    linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+  background-size: 60px 60px;
+  background-position: center top;
+  z-index: -2;
+  /* Fade out edges so it's not overwhelming */
+  -webkit-mask-image: radial-gradient(ellipse at 50% 50%, black 10%, transparent 80%);
+  mask-image: radial-gradient(ellipse at 50% 50%, black 10%, transparent 80%);
+  /* Slow scrolling animation */
+  animation: gridMove 20s linear infinite;
+}
+
+@keyframes gridMove {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(60px); }
+}
+
+/* Optional glowing orbs behind the grid */
 .bg-glow {
-  position: absolute;
+  position: fixed;
   border-radius: 50%;
   filter: blur(120px);
-  z-index: -1;
-  opacity: 0.5;
-  animation: float 10s infinite alternate ease-in-out;
+  z-index: -3;
+  opacity: 0.4;
 }
 
 .blob-1 {
-  top: -10%;
-  left: -10%;
-  width: 50vw;
-  height: 50vw;
-  background: rgba(58, 123, 213, 0.15);
+  top: 10%;
+  left: -5%;
+  width: 40vw;
+  height: 40vw;
+  background: rgba(0, 240, 255, 0.15);
 }
 
 .blob-2 {
-  bottom: 20%;
-  right: -10%;
-  width: 40vw;
-  height: 40vw;
-  background: rgba(0, 210, 255, 0.1);
-  animation-delay: -5s;
-}
-
-@keyframes float {
-  0% { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(30px, 50px) scale(1.1); }
+  bottom: -10%;
+  right: -5%;
+  width: 45vw;
+  height: 45vw;
+  background: rgba(176, 38, 255, 0.1);
 }
 
 .container {
@@ -64,18 +91,18 @@ body {
   padding: 0 24px;
 }
 
-/* Glassmorphism 导航栏 */
+/* -----------------------------------------
+   NAVIGATION
+   ----------------------------------------- */
 nav {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   padding: 20px 0;
   z-index: 100;
-  background: rgba(5, 5, 5, 0.6);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(3, 3, 5, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(0, 240, 255, 0.1);
 }
 
 .nav-container {
@@ -89,22 +116,21 @@ nav {
 
 nav .logo {
   font-weight: 700;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   text-decoration: none;
-  color: var(--text-main);
-  letter-spacing: -0.5px;
-  position: relative;
+  color: #fff;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
 }
 
+nav .logo::before {
+  content: "[ ";
+  color: var(--neon-blue);
+}
 nav .logo::after {
-  content: '';
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  background: var(--accent-color);
-  border-radius: 50%;
-  bottom: 4px;
-  right: -10px;
+  content: " ]";
+  color: var(--neon-blue);
 }
 
 nav ul {
@@ -116,112 +142,139 @@ nav ul {
 nav a {
   text-decoration: none;
   color: var(--text-muted);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
   transition: all 0.3s ease;
 }
 
 nav a:hover {
-  color: #fff;
-  text-shadow: 0 0 10px rgba(255,255,255,0.3);
+  color: var(--neon-blue);
+  text-shadow: 0 0 8px var(--neon-glow);
 }
 
-/* Hero Section */
+/* -----------------------------------------
+   HERO SECTION
+   ----------------------------------------- */
 .hero {
-  padding: 180px 0 100px;
-  border-bottom: 1px solid var(--card-border);
+  padding: 160px 0 100px;
+  border-bottom: 1px solid rgba(0, 240, 255, 0.1);
   margin-bottom: 80px;
 }
 
 .hero h1 {
-  font-size: 4rem;
-  font-weight: 800;
+  font-size: 4.5rem;
+  font-weight: 900;
   margin-bottom: 15px;
-  letter-spacing: -1.5px;
-  background: linear-gradient(to right, #ffffff, #a1a1aa);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  letter-spacing: -2px;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
+}
+
+.hero h1 span {
+  color: var(--neon-blue);
 }
 
 .hero h2 {
-  font-size: 1.5rem;
-  font-weight: 400;
-  color: var(--text-muted);
+  font-size: 1.2rem;
+  font-weight: 500;
+  font-family: var(--font-mono);
+  color: var(--neon-purple);
   margin-bottom: 30px;
-  line-height: 1.4;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 .hero p {
   font-size: 1.1rem;
   max-width: 650px;
-  color: #d4d4d8;
+  color: var(--text-muted);
+  border-left: 2px solid var(--neon-blue);
+  padding-left: 15px;
 }
 
-/* 章节通用样式 */
+/* -----------------------------------------
+   SECTIONS & CARDS
+   ----------------------------------------- */
 section {
   margin-bottom: 100px;
 }
 
 .section-title {
-  font-size: 2rem;
+  font-size: 1.6rem;
   font-weight: 700;
   margin-bottom: 40px;
-  letter-spacing: -0.5px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+  color: #fff;
 }
 
-/* 高级感卡片 */
+.section-title::before {
+  content: "// ";
+  color: var(--neon-purple);
+}
+
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 24px;
 }
 
+/* Tech Glassmorphism Card */
 .project-card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  border-radius: 16px;
+  border-radius: 8px;
   padding: 30px;
   backdrop-filter: blur(10px);
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
 }
 
-/* 卡片 Hover 发光效果 */
+/* Cyber accent line top */
 .project-card::before {
   content: "";
   position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: var(--accent-gradient);
-  opacity: 0;
-  transition: opacity 0.4s ease;
+  top: 0; left: 0; width: 100%; height: 2px;
+  background: var(--neon-blue);
+  box-shadow: 0 0 10px var(--neon-blue);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
 }
 
 .project-card:hover {
-  transform: translateY(-8px);
-  border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 210, 255, 0.1);
-  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-5px);
+  border-color: rgba(0, 240, 255, 0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 240, 255, 0.15);
+  background: rgba(15, 25, 40, 0.8);
 }
 
 .project-card:hover::before {
-  opacity: 1;
+  transform: scaleX(1);
 }
 
 .project-title {
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   font-weight: 700;
   margin-bottom: 12px;
   color: #fff;
+  letter-spacing: 1px;
 }
 
 .project-desc {
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: var(--text-muted);
 }
 
-/* 极简博客列表 */
+/* -----------------------------------------
+   LOGS / NOTES LIST
+   ----------------------------------------- */
 .notes-list {
   list-style: none;
 }
@@ -234,38 +287,42 @@ section {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 24px;
+  padding: 20px 24px;
   background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-left: 3px solid var(--card-border);
+  border-radius: 4px;
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .note-link:hover {
-  transform: scale(1.01) translateX(10px);
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 240, 255, 0.05);
+  border-color: rgba(0, 240, 255, 0.3);
+  border-left: 3px solid var(--neon-blue);
+  box-shadow: inset 200px 0 0 rgba(0, 240, 255, 0.02);
 }
 
 .note-title {
   color: #fff;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 500;
 }
 
 .note-date {
-  color: var(--text-muted);
-  font-size: 0.9rem;
+  color: var(--neon-purple);
+  font-size: 0.85rem;
   font-family: var(--font-mono);
 }
 
-/* Now 列表 */
+/* -----------------------------------------
+   NOW LIST
+   ----------------------------------------- */
 .now-list {
   list-style: none;
   background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 16px;
+  border: 1px dashed var(--card-border);
+  border-radius: 8px;
   padding: 30px 40px;
 }
 
@@ -273,8 +330,8 @@ section {
   position: relative;
   padding-left: 30px;
   margin-bottom: 20px;
-  font-size: 1.1rem;
-  color: #d4d4d8;
+  font-size: 1rem;
+  color: var(--text-muted);
 }
 
 .now-list li:last-child {
@@ -282,30 +339,34 @@ section {
 }
 
 .now-list li::before {
-  content: "";
+  content: ">";
   position: absolute;
   left: 0;
-  top: 10px;
-  width: 8px;
-  height: 8px;
-  background: var(--accent-gradient);
-  border-radius: 50%;
-  box-shadow: 0 0 10px var(--accent-color);
+  top: 0;
+  font-family: var(--font-mono);
+  color: var(--neon-blue);
+  font-weight: bold;
 }
 
-/* Footer */
+/* -----------------------------------------
+   FOOTER
+   ----------------------------------------- */
 footer {
   text-align: center;
   padding: 60px 0;
-  color: var(--text-muted);
-  font-size: 0.9rem;
+  color: rgba(255,255,255,0.2);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  text-transform: uppercase;
 }
 
-/* Scroll Reveal 动画类 */
+/* -----------------------------------------
+   SCROLL REVEAL ANIMATIONS
+   ----------------------------------------- */
 .reveal {
   opacity: 0;
-  transform: translateY(30px);
-  transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+  transform: translateY(20px);
+  transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .reveal.active {
@@ -313,57 +374,73 @@ footer {
   transform: translateY(0);
 }
 
-/* 博客详情页样式 */
+/* -----------------------------------------
+   POST DETAILS (BLOG PAGES)
+   ----------------------------------------- */
 .post-header {
   margin: 150px 0 60px;
+  border-bottom: 1px dashed var(--card-border);
+  padding-bottom: 30px;
 }
 
 .post-title {
-  font-size: 3rem;
+  font-size: 2.5rem;
   font-weight: 800;
   margin-bottom: 15px;
-  letter-spacing: -1px;
+  letter-spacing: -0.5px;
+  color: #fff;
 }
 
 .post-meta {
-  color: var(--accent-color);
+  color: var(--neon-blue);
   font-family: var(--font-mono);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  text-transform: uppercase;
 }
 
 .post-content {
-  font-size: 1.15rem;
-  color: #d4d4d8;
+  font-size: 1.1rem;
+  color: var(--text-muted);
 }
 
 .post-content h2 {
   color: #fff;
-  margin: 50px 0 25px;
-  font-size: 1.8rem;
-  font-weight: 700;
+  margin: 50px 0 20px;
+  font-size: 1.5rem;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+}
+
+.post-content h2::before {
+  content: "# ";
+  color: var(--neon-purple);
 }
 
 .back-link {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   margin-top: 60px;
-  padding: 12px 24px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--card-border);
-  border-radius: 30px;
-  color: #fff;
+  padding: 10px 20px;
+  background: transparent;
+  border: 1px solid var(--neon-blue);
+  color: var(--neon-blue);
+  font-family: var(--font-mono);
   text-decoration: none;
-  font-weight: 500;
+  font-size: 0.9rem;
+  text-transform: uppercase;
   transition: all 0.3s ease;
 }
 
 .back-link:hover {
-  background: #fff;
+  background: var(--neon-blue);
   color: #000;
+  box-shadow: 0 0 15px var(--neon-glow);
 }
 
 @media (max-width: 768px) {
-  .hero h1 { font-size: 3rem; }
+  .hero h1 { font-size: 2.8rem; }
   .projects-grid { grid-template-columns: 1fr; }
-  .note-link { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .note-link { flex-direction: column; align-items: flex-start; gap: 8px; }
   .nav-container { flex-direction: column; gap: 15px; }
+  body::before { background-size: 40px 40px; }
 }
