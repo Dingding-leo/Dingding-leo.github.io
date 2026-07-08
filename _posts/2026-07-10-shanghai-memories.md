@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Postcards from Shanghai"
+title: "魔都漫游：一半是烟火，一半是赛博霓虹"
 reading_time: 5
 image: /assets/images/shanghai/enhanced_bund_panorama.jpg
 ---
