@@ -662,6 +662,7 @@ section {
   position: relative;
   box-shadow: var(--shadow-sm);
   aspect-ratio: 4/3;
+  display: block; /* It's an anchor tag now */
 }
 
 /* Stagger the heights and aspect ratios for a more organic look */
@@ -678,8 +679,41 @@ section {
   transition: transform 0.6s var(--ease-out-expo);
 }
 
+.gallery-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  backdrop-filter: blur(2px);
+}
+
+.gallery-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  /* Hollow text effect */
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.9);
+  
+  transform: translateY(20px);
+  transition: transform 0.4s var(--ease-out-expo);
+}
+
 .gallery-item:hover img {
   transform: scale(1.05);
+}
+
+.gallery-item:hover .gallery-overlay {
+  opacity: 1;
+}
+
+.gallery-item:hover .gallery-title {
+  transform: translateY(0);
 }
 
 /* =========================================
