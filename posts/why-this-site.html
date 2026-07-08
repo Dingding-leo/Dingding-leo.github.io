@@ -4,26 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Why I’m building this public lab - Austin's Lab</title>
-    <!-- 相对于当前文件路径，跳回上一级目录引用 CSS -->
     <link rel="stylesheet" href="../style.css">
 </head>
 <body>
-    <div class="container">
-        <!-- 导航栏 -->
-        <nav>
+    <div class="bg-glow blob-1"></div>
+    <div class="bg-glow blob-2"></div>
+
+    <nav>
+        <div class="nav-container">
             <a href="../index.html" class="logo">Austin's Lab</a>
             <ul>
                 <li><a href="../index.html#projects">Projects</a></li>
                 <li><a href="../index.html#notes">Notes</a></li>
                 <li><a href="../index.html#now">Now</a></li>
             </ul>
-        </nav>
+        </div>
+    </nav>
 
-        <!-- 文章主体内容 -->
-        <article>
+    <div class="container">
+        <article class="reveal">
             <header class="post-header">
                 <h1 class="post-title">Why I’m building this public lab</h1>
-                <div class="post-meta">Published on 2026-07-08</div>
+                <div class="post-meta">Published on 07 / 08 / 2026</div>
             </header>
             
             <div class="post-content">
@@ -38,11 +40,10 @@
             </div>
         </article>
 
-        <a href="../index.html" class="back-link">← Back to home</a>
+        <a href="../index.html" class="back-link reveal">← Back to home</a>
 
-        <!-- Footer -->
-        <footer>
-            <p>&copy; <span id="year"></span> Austin · Built with GitHub Pages</p>
+        <footer class="reveal">
+            <p>&copy; <span id="year"></span> Austin Liu. All systems online.</p>
         </footer>
     </div>
     

@@ -4,31 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Austin's Lab</title>
-    <!-- 引入自定义 CSS，无外部 CDN 依赖 -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <!-- 导航栏 -->
-        <nav>
+    <!-- 动态发光背景 -->
+    <div class="bg-glow blob-1"></div>
+    <div class="bg-glow blob-2"></div>
+
+    <!-- 导航栏 -->
+    <nav>
+        <div class="nav-container">
             <a href="index.html" class="logo">Austin's Lab</a>
             <ul>
                 <li><a href="#projects">Projects</a></li>
                 <li><a href="#notes">Notes</a></li>
                 <li><a href="#now">Now</a></li>
             </ul>
-        </nav>
+        </div>
+    </nav>
 
+    <div class="container">
         <!-- Hero: 简介区域 -->
-        <header class="hero">
-            <h1>Austin's Lab</h1>
+        <header class="hero reveal">
+            <h1>Building systems.</h1>
             <h2>Dental student exploring AI, coding, finance, and practical systems.</h2>
-            <p>This is where I keep projects, notes, experiments, and useful systems I’m building.</p>
+            <p>This is where I keep projects, notes, experiments, and useful systems I’m building. Welcome to the lab.</p>
         </header>
 
         <!-- Projects: 项目展示 -->
-        <section id="projects">
-            <h3 class="section-title">Projects</h3>
+        <section id="projects" class="reveal">
+            <h3 class="section-title">Featured Projects</h3>
             <div class="projects-grid">
                 
                 <div class="project-card">
@@ -42,36 +47,36 @@
                 </div>
 
                 <div class="project-card">
-                    <div class="project-title">Dental Study Systems</div>
-                    <div class="project-desc">Future tools and notes for dental revision, OSCE prep, and evidence-based dentistry.</div>
+                    <div class="project-title">Dental Systems</div>
+                    <div class="project-desc">Future tools and notes for dental revision, OSCE prep, and EBD.</div>
                 </div>
 
             </div>
         </section>
 
         <!-- Notes: 博客/笔记列表 -->
-        <section id="notes">
-            <h3 class="section-title">Notes & Logs</h3>
+        <section id="notes" class="reveal">
+            <h3 class="section-title">Logs & Notes</h3>
             <ul class="notes-list">
                 
                 <li class="note-item">
                     <a href="posts/why-this-site.html" class="note-link">
                         <span class="note-title">Why I’m building this public lab</span>
-                        <span class="note-date">2026-07-08</span>
+                        <span class="note-date">07 / 08 / 2026</span>
                     </a>
                 </li>
 
                 <li class="note-item">
                     <a href="posts/project-management-101.html" class="note-link">
                         <span class="note-title">Project management 101 for solo builders</span>
-                        <span class="note-date">2026-07-01</span>
+                        <span class="note-date">07 / 01 / 2026</span>
                     </a>
                 </li>
 
                 <li class="note-item">
                     <a href="posts/quant-trading-reset.html" class="note-link">
                         <span class="note-title">Resetting my quantitative trading project</span>
-                        <span class="note-date">2026-06-25</span>
+                        <span class="note-date">06 / 25 / 2026</span>
                     </a>
                 </li>
 
@@ -79,22 +84,21 @@
         </section>
 
         <!-- Now: 当前正在做的事情 -->
-        <section id="now">
-            <h3 class="section-title">Now</h3>
+        <section id="now" class="reveal">
+            <h3 class="section-title">What I'm doing now</h3>
             <ul class="now-list">
                 <li>Learning GitHub properly and organizing my workflow</li>
-                <li>Building a clean, distraction-free personal homepage</li>
+                <li>Building a premium, distraction-free personal homepage</li>
                 <li>Turning ideas into small, verifiable projects</li>
             </ul>
         </section>
 
         <!-- Footer -->
-        <footer>
-            <p>&copy; <span id="year"></span> Austin · Built with GitHub Pages</p>
+        <footer class="reveal">
+            <p>&copy; <span id="year"></span> Austin Liu. All systems online.</p>
         </footer>
     </div>
 
-    <!-- 引入自定义 JavaScript -->
     <script src="script.js"></script>
 </body>
 </html>
