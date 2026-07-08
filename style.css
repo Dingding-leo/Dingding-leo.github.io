@@ -888,17 +888,34 @@ footer {
   text-align: center;
 }
 
+.post-header {
+  max-width: 680px;
+  margin: 0 auto 40px;
+  text-align: center;
+}
+
 .post-title {
   font-size: 3.2rem;
   font-weight: 800;
   margin-bottom: 16px;
   letter-spacing: -0.035em;
   color: var(--text-main);
+  line-height: 1.2;
 }
 
 .post-meta {
   color: var(--text-muted);
   font-size: 0.95rem;
+}
+
+.post-hero-image {
+  display: block;
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto 40px auto;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  object-fit: cover;
 }
 
 .post-content {
@@ -907,6 +924,15 @@ footer {
   max-width: 680px;
   margin: 0 auto;
   line-height: 1.85;
+}
+
+.post-content img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 40px auto;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .post-content p {
