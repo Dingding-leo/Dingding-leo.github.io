@@ -3,14 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project management 101 for solo builders - Austin's Lab</title>
+    <title>Project management 101 for solo builders — Austin's Lab</title>
+    <meta name="description" content="How to scope small, track ruthlessly, and actually ship projects when you're building alone.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚗️</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../style.css">
 </head>
 <body>
-    <nav>
+    <nav id="navbar">
         <div class="nav-container">
             <a href="../index.html" class="logo">Austin's Lab</a>
-            <ul>
+            <button class="hamburger" id="hamburger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+            <ul id="navLinks">
+                <li><a href="../index.html#about">About</a></li>
                 <li><a href="../index.html#projects">Projects</a></li>
                 <li><a href="../index.html#notes">Notes</a></li>
                 <li><a href="../index.html#now">Now</a></li>
@@ -22,25 +29,25 @@
         <article>
             <header class="post-header reveal">
                 <h1 class="post-title">Project management 101 for solo builders</h1>
-                <div class="post-meta">Published on July 1, 2026</div>
+                <div class="post-meta">July 1, 2026 · 4 min read</div>
             </header>
             
             <div class="post-content reveal delay-1">
-                <p>When you are building projects alone—whether it's an app, a research paper, or a study system—you are both the manager and the executioner. It's incredibly easy to get distracted by shiny new ideas and abandon the old ones.</p>
+                <p>When you are building projects alone — whether it's an app, a research paper, or a study system — you are both the manager and the executioner. It's incredibly easy to get distracted by shiny new ideas and abandon the old ones.</p>
                 
                 <h2>The core principles</h2>
-                <p>1. <strong>Scope small:</strong> Define exactly what the "done" state looks like before you start typing code or researching. If it takes longer than 2 weeks, it's too big.</p>
-                <p>2. <strong>Track ruthlessly:</strong> Keep a simple checklist. You don't need Jira. A markdown file or a piece of paper is often enough for solo work.</p>
-                <p>3. <strong>Ship it:</strong> The project isn't real until someone else can see it. Deploy it, publish it, or print it out.</p>
+                <p><strong>Scope small.</strong> Define exactly what the "done" state looks like before you start typing code or researching. If it takes longer than 2 weeks, it's too big.</p>
+                <p><strong>Track ruthlessly.</strong> Keep a simple checklist. You don't need Jira. A markdown file or a piece of paper is often enough for solo work.</p>
+                <p><strong>Ship it.</strong> The project isn't real until someone else can see it. Deploy it, publish it, or print it out.</p>
 
                 <p>I'm still learning this, but forcing myself to build small, verifiable projects has been a game changer.</p>
             </div>
         </article>
 
-        <a href="../index.html" class="back-link reveal delay-2">Back to home</a>
+        <a href="../index.html#notes" class="back-link reveal delay-2">← Back to notes</a>
 
         <footer class="reveal delay-3">
-            <p>&copy; <span id="year"></span> Austin Liu. All rights reserved.</p>
+            <p class="footer-text">&copy; <span id="year"></span> Austin Liu. Built with curiosity.</p>
         </footer>
     </div>
     
