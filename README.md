@@ -1,48 +1,62 @@
-# Austin's Lab - Personal Homepage
+# Austin's Lab
 
-This is the source code for my personal lab, portfolio, and public notebook, hosted on GitHub Pages. It is built purely with standard HTML, CSS, and vanilla JS to keep it simple, fast, and easy to maintain.
+My personal laboratory, portfolio, and public notebook. Built with Jekyll and hosted on GitHub Pages.
 
-## Deployment to GitHub Pages
+**Live site:** [Dingding-leo.github.io](https://Dingding-leo.github.io)
 
-1. Navigate to your repository settings on GitHub.
-2. Go to **Pages** (under the "Code and automation" section).
-3. Under **Build and deployment**, set the Source to **Deploy from a branch**.
-4. Select the `main` branch and `/ (root)` folder, then save.
-5. In a few minutes, the site will be live at `https://Dingding-leo.github.io`.
+## Tech Stack
 
-## How to add a new Blog Post / Note
+- **Static Site Generator:** Jekyll (kramdown markdown, Liquid templates)
+- **Frontend:** Vanilla HTML, CSS (custom properties, glassmorphism), vanilla JS
+- **Plugins:** jekyll-sitemap, jekyll-seo-tag
+- **Hosting:** GitHub Pages (auto-deploy on push to `main`)
 
-1. Create a new `.html` file inside the `posts/` folder (e.g., `posts/my-new-idea.html`). You can copy an existing file like `why-this-site.html` as a template.
-2. Open `index.html`.
-3. Locate the `<!-- Notes: 博客/笔记列表 -->` section.
-4. Add a new `<li>` element to the list pointing to your new file:
+## Project Structure
 
-```html
-<li class="note-item">
-    <a href="posts/my-new-idea.html" class="note-link">
-        <span class="note-title">Title of my new idea</span>
-        <span class="note-date">YYYY-MM-DD</span>
-    </a>
-</li>
+```
+├── _config.yml          # Jekyll configuration
+├── _layouts/            # Page templates (default, page, post)
+├── _includes/           # Reusable components (head, header, footer)
+├── _posts/              # Blog posts (Markdown with frontmatter)
+├── assets/              # Images, backgrounds, gallery photos
+├── index.html           # Homepage (hero section)
+├── about.html           # About page with animated stats
+├── projects.html        # Project showcase
+├── notes.html           # Blog post listing (Jekyll loop)
+├── moments.html         # Travel photo gallery
+├── now.html             # What I'm currently doing
+├── style.css            # All styles (Apple-inspired light theme)
+└── script.js            # Page loader, scroll reveal, mouse spotlight, counters, nav
 ```
 
-## How to update personal info
-
-* **Hero section / About**: Open `index.html` and modify the text inside `<header class="hero">`.
-* **Projects**: Open `index.html` and modify the cards inside `<section id="projects">`.
-* **Now section**: Modify the list items inside `<section id="now">`.
-
-## Common Git Commands for Maintenance
-
-Whenever you make changes to files on your computer, run these commands in the terminal to push them to your live website:
+## Local Development
 
 ```bash
-# 1. Stage all changes
-git add .
+# Install Jekyll and bundler (requires Ruby)
+gem install bundler jekyll
 
-# 2. Commit your changes with a descriptive message
-git commit -m "Add a new blog post"
+# Serve locally
+bundle exec jekyll serve
 
-# 3. Push to GitHub (This automatically triggers a GitHub Pages deployment)
-git push
+# Visit http://localhost:4000
 ```
+
+## Adding a Blog Post
+
+Create a new Markdown file in `_posts/` with the naming convention `YYYY-MM-DD-slug.md`:
+
+```markdown
+---
+layout: post
+title: "Your Post Title"
+reading_time: 3
+---
+
+Your content here...
+```
+
+Jekyll automatically picks it up — no manual list editing needed.
+
+## Deployment
+
+Push to `main`. GitHub Pages builds and deploys automatically.
