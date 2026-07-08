@@ -2,7 +2,7 @@
 layout: post
 title: "魔都漫游：一半是烟火，一半是赛博霓虹"
 reading_time: 5
-image: /assets/images/shanghai/enhanced_bund_panorama.jpg
+image: /assets/gallery/shanghai.jpg
 ---
 
 *上海，一座古典与魔幻赛博朋克交织的城市。这是我的旅途纪实。*
