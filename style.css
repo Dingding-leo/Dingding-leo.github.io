@@ -53,7 +53,6 @@ body {
   background-color: var(--bg-color);
   color: var(--text-main);
   line-height: 1.6;
-  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -891,6 +890,7 @@ footer {
 .post-header {
   max-width: 680px;
   margin: 0 auto 40px;
+  padding-top: 140px; /* Clear fixed nav */
   text-align: center;
 }
 
