@@ -3,6 +3,19 @@ layout: page
 title: Moments
 permalink: /moments/
 ---
+<style>
+body {
+    background: linear-gradient(-45deg, #0a0a0c, #161625, #100f14, #0a0a0c);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+}
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+</style>
+
 <div class="gallery-grid">
     <a href="{{ "/notes/" | relative_url }}" class="gallery-item reveal delay-1">
         <img src="{{ "/assets/gallery/japan.jpg" | relative_url }}" alt="Kyoto Bamboo Forest" loading="lazy">
@@ -21,15 +34,14 @@ permalink: /moments/
         <div class="gallery-overlay"><h3 class="gallery-title">Coffee</h3></div>
     </a>
     
-    <!-- Shanghai Trip Album -->
-    <a href="{{ site.baseurl }}{% post_url 2026-07-08-shanghai-memories %}" class="gallery-item reveal delay-1">
-        <div class="album-collage">
-            <img src="{{ "/assets/images/shanghai/enhanced_bund_panorama.jpg" | relative_url }}" alt="Shanghai Bund" loading="lazy">
-            <img src="{{ "/assets/images/shanghai/enhanced_disney_castle.jpg" | relative_url }}" alt="Disneyland" loading="lazy">
-            <img src="{{ "/assets/images/shanghai/enhanced_jingan_temple.png" | relative_url }}" alt="Jingan Temple" loading="lazy">
-            <img src="{{ "/assets/images/shanghai/enhanced_lujiazui_towers.jpg" | relative_url }}" alt="Lujiazui" loading="lazy">
+    <!-- Shanghai Trip Album (Photo Stack) -->
+    <a href="{{ site.baseurl }}{% post_url 2026-07-08-shanghai-memories %}" class="gallery-item album-card reveal delay-1">
+        <div class="album-stack">
+            <img src="{{ "/assets/images/shanghai/enhanced_bund_panorama.jpg" | relative_url }}" class="stack-img img-bottom" alt="Shanghai Bund" loading="lazy">
+            <img src="{{ "/assets/images/shanghai/enhanced_disney_castle.jpg" | relative_url }}" class="stack-img img-middle" alt="Disneyland" loading="lazy">
+            <img src="{{ "/assets/images/shanghai/enhanced_lujiazui_towers.jpg" | relative_url }}" class="stack-img img-top" alt="Lujiazui" loading="lazy">
         </div>
-        <div class="gallery-overlay">
+        <div class="gallery-overlay album-overlay">
             <h3 class="gallery-title" style="text-align: center; display: flex; flex-direction: column; gap: 8px;">
                 魔都漫游
                 <span style="font-size: 1rem; letter-spacing: 2px; -webkit-text-stroke: 0px; color: rgba(255,255,255,0.9); font-weight: 500;">SHANGHAI ALBUM</span>
