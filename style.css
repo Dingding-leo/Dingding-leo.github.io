@@ -370,40 +370,6 @@ nav a:hover {
    ========================================= */
 section {
   padding: 120px 0;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Section with ambient background image */
-.section-with-bg {
-  position: relative;
-}
-
-.section-bg-image {
-  position: absolute;
-  top: -10%; left: -15%;
-  width: 60%;
-  height: 120%;
-  opacity: 0.15;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.section-bg-image.section-bg-right {
-  left: auto;
-  right: -15%;
-}
-
-.section-bg-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: blur(40px) saturate(1.5);
-}
-
-.section-with-bg > *:not(.section-bg-image) {
-  position: relative;
-  z-index: 1;
 }
 
 .section-title {
@@ -473,7 +439,7 @@ section {
    ========================================= */
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 24px;
 }
 
@@ -502,9 +468,19 @@ section {
 
 .project-card-image {
   width: 100%;
-  height: 200px;
+  height: 220px;
   overflow: hidden;
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  position: relative;
+}
+
+/* Soft gradient overlay so dark images blend into the white card body */
+.project-card-image::after {
+  content: "";
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 60px;
+  background: linear-gradient(to bottom, transparent, var(--surface));
+  pointer-events: none;
 }
 
 .project-card-image img {
