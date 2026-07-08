@@ -6,3 +6,6 @@ url: "https://Dingding-leo.github.io"
 permalink: /posts/:title/
 markdown: kramdown
 theme: jekyll-theme-blank
+plugins:
+  - jekyll-sitemap
+  - jekyll-seo-tag
