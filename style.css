@@ -1,22 +1,21 @@
 /* =========================================
-   AUSTIN's LAB - MINIMALIST TECH / CYBER THEME 
+   AUSTIN's LAB - APPLE-STYLE PREMIUM DARK 
    ========================================= */
 
 :root {
-  --bg-color: #030305;
-  --text-main: #f0f4f8;
-  --text-muted: #8a9bb2;
+  --bg-color: #000000;
+  --text-main: #f5f5f7;
+  --text-muted: #86868b;
   
-  /* Cyber / Tech Accents */
-  --neon-blue: #00f0ff;
-  --neon-purple: #b026ff;
-  --neon-glow: rgba(0, 240, 255, 0.4);
+  --surface: #141415;
+  --surface-hover: #1c1c1e;
+  --surface-border: rgba(255, 255, 255, 0.1);
   
-  --card-bg: rgba(10, 15, 25, 0.65);
-  --card-border: rgba(0, 240, 255, 0.2);
+  --accent: #2997ff; /* Apple blue */
+  --gradient-text: linear-gradient(90deg, #ffb6ff, #b344ff, #00d4ff);
   
-  --font-sans: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, "Fira Code", Menlo, Monaco, Consolas, monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Consolas, monospace;
 }
 
 * {
@@ -29,309 +28,243 @@ body {
   font-family: var(--font-sans);
   background-color: var(--bg-color);
   color: var(--text-main);
-  line-height: 1.7;
+  line-height: 1.5;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
-}
-
-/* -----------------------------------------
-   CYBER GRID BACKGROUND
-   ----------------------------------------- */
-body::before {
-  content: "";
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  /* Thin grid lines */
-  background-image: 
-    linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
-  background-size: 60px 60px;
-  background-position: center top;
-  z-index: -2;
-  /* Fade out edges so it's not overwhelming */
-  -webkit-mask-image: radial-gradient(ellipse at 50% 50%, black 10%, transparent 80%);
-  mask-image: radial-gradient(ellipse at 50% 50%, black 10%, transparent 80%);
-  /* Slow scrolling animation */
-  animation: gridMove 20s linear infinite;
-}
-
-@keyframes gridMove {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(60px); }
-}
-
-/* Optional glowing orbs behind the grid */
-.bg-glow {
-  position: fixed;
-  border-radius: 50%;
-  filter: blur(120px);
-  z-index: -3;
-  opacity: 0.4;
-}
-
-.blob-1 {
-  top: 10%;
-  left: -5%;
-  width: 40vw;
-  height: 40vw;
-  background: rgba(0, 240, 255, 0.15);
-}
-
-.blob-2 {
-  bottom: -10%;
-  right: -5%;
-  width: 45vw;
-  height: 45vw;
-  background: rgba(176, 38, 255, 0.1);
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .container {
-  max-width: 900px;
+  max-width: 980px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 30px;
 }
 
 /* -----------------------------------------
-   NAVIGATION
+   NAVIGATION (Apple-style frosted glass)
    ----------------------------------------- */
 nav {
   position: fixed;
   top: 0; left: 0; right: 0;
-  padding: 20px 0;
+  height: 60px;
+  display: flex;
+  align-items: center;
   z-index: 100;
-  background: rgba(3, 3, 5, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .nav-container {
-  max-width: 900px;
+  width: 100%;
+  max-width: 980px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 30px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 nav .logo {
-  font-weight: 700;
+  font-weight: 600;
   font-size: 1.1rem;
   text-decoration: none;
   color: #fff;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  font-family: var(--font-mono);
-}
-
-nav .logo::before {
-  content: "[ ";
-  color: var(--neon-blue);
-}
-nav .logo::after {
-  content: " ]";
-  color: var(--neon-blue);
+  letter-spacing: -0.2px;
 }
 
 nav ul {
   list-style: none;
   display: flex;
-  gap: 30px;
+  gap: 32px;
 }
 
 nav a {
   text-decoration: none;
   color: var(--text-muted);
   font-size: 0.85rem;
-  font-weight: 500;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  transition: all 0.3s ease;
+  font-weight: 400;
+  letter-spacing: -0.1px;
+  transition: color 0.3s ease;
 }
 
 nav a:hover {
-  color: var(--neon-blue);
-  text-shadow: 0 0 8px var(--neon-glow);
+  color: #fff;
 }
 
 /* -----------------------------------------
    HERO SECTION
    ----------------------------------------- */
 .hero {
-  padding: 160px 0 100px;
-  border-bottom: 1px solid rgba(0, 240, 255, 0.1);
-  margin-bottom: 80px;
+  padding: 220px 0 140px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .hero h1 {
-  font-size: 4.5rem;
-  font-weight: 900;
+  font-size: 5rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
   margin-bottom: 15px;
-  letter-spacing: -2px;
-  text-transform: uppercase;
-  color: #fff;
-  text-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
+  line-height: 1.05;
 }
 
+/* 渐变流光文字效果 */
 .hero h1 span {
-  color: var(--neon-blue);
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% auto;
+  animation: shine 5s linear infinite;
+}
+
+@keyframes shine {
+  to { background-position: 200% center; }
 }
 
 .hero h2 {
-  font-size: 1.2rem;
-  font-weight: 500;
-  font-family: var(--font-mono);
-  color: var(--neon-purple);
-  margin-bottom: 30px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 24px;
+  letter-spacing: -0.015em;
 }
 
 .hero p {
-  font-size: 1.1rem;
-  max-width: 650px;
+  font-size: 1.25rem;
+  font-weight: 400;
   color: var(--text-muted);
-  border-left: 2px solid var(--neon-blue);
-  padding-left: 15px;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 /* -----------------------------------------
-   SECTIONS & CARDS
+   SECTIONS
    ----------------------------------------- */
 section {
-  margin-bottom: 100px;
+  padding: 120px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+section:last-of-type {
+  border-bottom: none;
 }
 
 .section-title {
-  font-size: 1.6rem;
+  font-size: 2.5rem;
   font-weight: 700;
-  margin-bottom: 40px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  font-family: var(--font-mono);
-  color: #fff;
-}
-
-.section-title::before {
-  content: "// ";
-  color: var(--neon-purple);
-}
-
-.projects-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 24px;
-}
-
-/* Tech Glassmorphism Card */
-.project-card {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 8px;
-  padding: 30px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Cyber accent line top */
-.project-card::before {
-  content: "";
-  position: absolute;
-  top: 0; left: 0; width: 100%; height: 2px;
-  background: var(--neon-blue);
-  box-shadow: 0 0 10px var(--neon-blue);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.4s ease;
-}
-
-.project-card:hover {
-  transform: translateY(-5px);
-  border-color: rgba(0, 240, 255, 0.5);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 240, 255, 0.15);
-  background: rgba(15, 25, 40, 0.8);
-}
-
-.project-card:hover::before {
-  transform: scaleX(1);
-}
-
-.project-title {
-  font-size: 1.3rem;
-  font-weight: 700;
-  margin-bottom: 12px;
-  color: #fff;
-  letter-spacing: 1px;
-}
-
-.project-desc {
-  font-size: 0.95rem;
-  color: var(--text-muted);
+  margin-bottom: 60px;
+  letter-spacing: -0.02em;
+  text-align: center;
 }
 
 /* -----------------------------------------
-   LOGS / NOTES LIST
+   CARDS (with Mouse Spotlight Effect)
+   ----------------------------------------- */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 24px;
+}
+
+.project-card, .note-link, .now-list {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 24px;
+  padding: 40px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s ease;
+  text-decoration: none;
+  display: block;
+}
+
+/* 鼠标跟随发光效果的核心层 */
+.project-card::before, .note-link::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(
+    800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(255, 255, 255, 0.06),
+    transparent 40%
+  );
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.project-card:hover::before, .note-link:hover::before {
+  opacity: 1;
+}
+
+.project-card:hover, .note-link:hover {
+  transform: scale(1.02);
+  background: var(--surface-hover);
+}
+
+.project-title, .note-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+  position: relative;
+  z-index: 2;
+}
+
+.project-desc {
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  position: relative;
+  z-index: 2;
+}
+
+/* -----------------------------------------
+   NOTES LIST
    ----------------------------------------- */
 .notes-list {
   list-style: none;
-}
-
-.note-item {
-  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .note-link {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
-  background: var(--card-bg);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-left: 3px solid var(--card-border);
-  border-radius: 4px;
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-
-.note-link:hover {
-  background: rgba(0, 240, 255, 0.05);
-  border-color: rgba(0, 240, 255, 0.3);
-  border-left: 3px solid var(--neon-blue);
-  box-shadow: inset 200px 0 0 rgba(0, 240, 255, 0.02);
+  padding: 30px 40px;
+  border-radius: 20px;
 }
 
 .note-title {
-  color: #fff;
-  font-size: 1.1rem;
-  font-weight: 500;
+  margin-bottom: 0;
 }
 
 .note-date {
-  color: var(--neon-purple);
-  font-size: 0.85rem;
-  font-family: var(--font-mono);
+  color: var(--text-muted);
+  font-size: 0.95rem;
 }
 
 /* -----------------------------------------
-   NOW LIST
+   NOW SECTION
    ----------------------------------------- */
 .now-list {
-  list-style: none;
-  background: var(--card-bg);
-  border: 1px dashed var(--card-border);
-  border-radius: 8px;
-  padding: 30px 40px;
+  padding: 50px;
 }
 
 .now-list li {
+  font-size: 1.15rem;
+  color: var(--text-muted);
+  margin-bottom: 24px;
   position: relative;
   padding-left: 30px;
-  margin-bottom: 20px;
-  font-size: 1rem;
-  color: var(--text-muted);
 }
 
 .now-list li:last-child {
@@ -339,13 +272,15 @@ section {
 }
 
 .now-list li::before {
-  content: ">";
+  content: "";
   position: absolute;
   left: 0;
-  top: 0;
-  font-family: var(--font-mono);
-  color: var(--neon-blue);
-  font-weight: bold;
+  top: 8px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--text-main);
+  opacity: 0.2;
 }
 
 /* -----------------------------------------
@@ -354,93 +289,88 @@ section {
 footer {
   text-align: center;
   padding: 60px 0;
-  color: rgba(255,255,255,0.2);
-  font-family: var(--font-mono);
+  color: #515154;
   font-size: 0.85rem;
-  text-transform: uppercase;
 }
 
 /* -----------------------------------------
-   SCROLL REVEAL ANIMATIONS
+   SMOOTH SCROLL REVEAL ANIMATIONS (Apple Style)
    ----------------------------------------- */
+/* 初始状态：略微缩小，透明，靠下 */
 .reveal {
   opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+  transform: translateY(40px) scale(0.96);
+  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
 }
 
-.reveal.active {
+/* 进入视口状态 */
+.reveal.in-view {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
+
+/* Staggered animation delays for items in grid/list */
+.reveal.delay-1 { transition-delay: 0.1s; }
+.reveal.delay-2 { transition-delay: 0.2s; }
+.reveal.delay-3 { transition-delay: 0.3s; }
 
 /* -----------------------------------------
    POST DETAILS (BLOG PAGES)
    ----------------------------------------- */
 .post-header {
-  margin: 150px 0 60px;
-  border-bottom: 1px dashed var(--card-border);
-  padding-bottom: 30px;
+  margin: 180px 0 80px;
+  text-align: center;
 }
 
 .post-title {
-  font-size: 2.5rem;
-  font-weight: 800;
-  margin-bottom: 15px;
-  letter-spacing: -0.5px;
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  letter-spacing: -0.03em;
   color: #fff;
 }
 
 .post-meta {
-  color: var(--neon-blue);
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  text-transform: uppercase;
+  color: var(--text-muted);
+  font-size: 1rem;
 }
 
 .post-content {
-  font-size: 1.1rem;
-  color: var(--text-muted);
+  font-size: 1.2rem;
+  color: #a1a1a6;
+  max-width: 700px;
+  margin: 0 auto;
 }
 
 .post-content h2 {
   color: #fff;
-  margin: 50px 0 20px;
-  font-size: 1.5rem;
-  font-family: var(--font-mono);
-  text-transform: uppercase;
-}
-
-.post-content h2::before {
-  content: "# ";
-  color: var(--neon-purple);
+  margin: 60px 0 25px;
+  font-size: 1.8rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 .back-link {
-  display: inline-flex;
-  align-items: center;
-  margin-top: 60px;
-  padding: 10px 20px;
-  background: transparent;
-  border: 1px solid var(--neon-blue);
-  color: var(--neon-blue);
-  font-family: var(--font-mono);
+  display: block;
+  text-align: center;
+  margin: 80px auto 0;
+  color: var(--accent);
   text-decoration: none;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  transition: all 0.3s ease;
+  font-size: 1.1rem;
+  transition: color 0.3s ease;
 }
 
 .back-link:hover {
-  background: var(--neon-blue);
-  color: #000;
-  box-shadow: 0 0 15px var(--neon-glow);
+  text-decoration: underline;
 }
 
 @media (max-width: 768px) {
-  .hero h1 { font-size: 2.8rem; }
+  .hero h1 { font-size: 3.2rem; }
+  .hero h2 { font-size: 1.3rem; }
+  .section-title { font-size: 2rem; }
   .projects-grid { grid-template-columns: 1fr; }
-  .note-link { flex-direction: column; align-items: flex-start; gap: 8px; }
-  .nav-container { flex-direction: column; gap: 15px; }
-  body::before { background-size: 40px 40px; }
+  .note-link { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .nav-container { flex-direction: row; gap: 15px; }
+  nav ul { display: none; } /* On very small screens, maybe hide links or make a burger menu, but for now just hide */
 }
