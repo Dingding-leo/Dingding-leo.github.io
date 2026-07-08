@@ -370,6 +370,40 @@ nav a:hover {
    ========================================= */
 section {
   padding: 120px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Section with ambient background image */
+.section-with-bg {
+  position: relative;
+}
+
+.section-bg-image {
+  position: absolute;
+  top: -10%; left: -15%;
+  width: 60%;
+  height: 120%;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.section-bg-image.section-bg-right {
+  left: auto;
+  right: -15%;
+}
+
+.section-bg-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(40px) saturate(1.5);
+}
+
+.section-with-bg > *:not(.section-bg-image) {
+  position: relative;
+  z-index: 1;
 }
 
 .section-title {
@@ -447,7 +481,6 @@ section {
   background: var(--surface);
   border: 1px solid var(--surface-border);
   border-radius: var(--radius-lg);
-  padding: 36px;
   position: relative;
   overflow: hidden;
   transition: transform 0.4s var(--ease-out-expo), box-shadow 0.4s ease;
@@ -455,6 +488,38 @@ section {
   display: flex;
   flex-direction: column;
   box-shadow: var(--shadow-sm);
+}
+
+/* Card WITHOUT image — original padding */
+.project-card:not(.has-image) {
+  padding: 36px;
+}
+
+/* Card WITH hero image */
+.project-card.has-image {
+  padding: 0;
+}
+
+.project-card-image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.project-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s var(--ease-out-expo);
+}
+
+.project-card:hover .project-card-image img {
+  transform: scale(1.08);
+}
+
+.project-card-body {
+  padding: 28px 32px 32px;
 }
 
 /* Mouse Spotlight */
