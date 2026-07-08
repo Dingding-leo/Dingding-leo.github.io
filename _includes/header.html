@@ -1,0 +1,26 @@
+<!-- Page Load Animation -->
+<div class="page-loader" id="pageLoader">
+    <div class="loader-content">
+        <div class="loader-logo">A.</div>
+        <div class="loader-bar"><div class="loader-progress"></div></div>
+    </div>
+</div>
+
+<!-- Navigation -->
+<nav id="navbar">
+    <div class="nav-container">
+        <a href="{{ "/" | relative_url }}" class="logo">Austin's Lab</a>
+        
+        <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+            <span></span><span></span><span></span>
+        </button>
+
+        <ul id="navLinks">
+            <li><a href="{{ "/about/" | relative_url }}">About</a></li>
+            <li><a href="{{ "/projects/" | relative_url }}">Projects</a></li>
+            <li><a href="{{ "/notes/" | relative_url }}">Notes</a></li>
+            <li><a href="{{ "/moments/" | relative_url }}">Moments</a></li>
+            <li><a href="{{ "/now/" | relative_url }}">Now</a></li>
+        </ul>
+    </div>
+</nav>

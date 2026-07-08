@@ -1,0 +1,19 @@
+---
+layout: default
+---
+<article>
+    <header class="post-header reveal">
+        <h1 class="post-title">{{ page.title }}</h1>
+        <div class="post-meta">{{ page.date | date: "%B %-d, %Y" }} · {{ page.reading_time | default: "3" }} min read</div>
+    </header>
+    
+    {% if page.image %}
+    <img src="{{ page.image | relative_url }}" alt="{{ page.title }}" class="post-hero-image reveal delay-1">
+    {% endif %}
+
+    <div class="post-content reveal delay-2">
+        {{ content }}
+    </div>
+</article>
+
+<a href="{{ "/notes/" | relative_url }}" class="back-link reveal delay-3">← Back to notes</a>

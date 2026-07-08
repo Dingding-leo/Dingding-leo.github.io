@@ -1,0 +1,21 @@
+---
+layout: page
+title: Notes
+permalink: /notes/
+---
+<ul class="notes-list">
+    {% for post in site.posts %}
+    <li class="note-item reveal delay-{% cycle '1', '2', '3' %}">
+        <a href="{{ post.url | relative_url }}" class="note-link">
+            <div class="note-content">
+                <span class="note-title">{{ post.title }}</span>
+                <span class="note-excerpt">{{ post.excerpt | strip_html | truncatewords: 20 }}</span>
+            </div>
+            <div class="note-meta">
+                <span class="note-date">{{ post.date | date: "%B %-d, %Y" }}</span>
+                <span class="note-reading-time">{{ post.reading_time | default: "3" }} min read</span>
+            </div>
+        </a>
+    </li>
+    {% endfor %}
+</ul>
