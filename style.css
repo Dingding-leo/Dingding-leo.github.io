@@ -34,6 +34,27 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Stunning ambient background image for the top of the page */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 110vh;
+  background-image: 
+    linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 60%, #000000 100%), 
+    url('assets/bg.jpg');
+  background-size: cover;
+  background-position: center top;
+  z-index: -1;
+  pointer-events: none;
+  animation: bgFadeIn 2s ease-out;
+}
+
+@keyframes bgFadeIn {
+  from { opacity: 0; transform: scale(1.05); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 .container {
   max-width: 980px;
   margin: 0 auto;
