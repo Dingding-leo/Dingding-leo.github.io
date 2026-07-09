@@ -1127,6 +1127,20 @@ footer {
 
   .scroll-indicator { display: none; }
   .now-card { padding: 32px; }
+  .post-hero-image { max-width: 100%; border-radius: var(--radius-md); }
+  .hero::before { width: 300px; height: 300px; }
+  
+  .post-hero-image { max-width: 100%; border-radius: var(--radius-md); }
+}
+
+/* Now page link styling */
+.now-list a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+.now-list a:hover {
+  text-decoration: underline;
 }
 
 @media (max-width: 480px) {
