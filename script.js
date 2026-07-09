@@ -35,19 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // =========================================
     // 1. PAGE LOADER & TRANSITIONS
     // =========================================
-    const loader = document.getElementById('pageLoader');
-    if (loader) {
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                loader.classList.add('loaded');
-            }, 800);
-        });
-        if (document.readyState === 'complete') {
-            setTimeout(() => loader.classList.add('loaded'), 800);
-        }
-    }
-
-    // =========================================
     // 2. AUTO YEAR
     // =========================================
     const yearSpan = document.getElementById('year');
