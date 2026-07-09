@@ -237,25 +237,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // =========================================
-    // 9. CUSTOM CURSOR
-    // =========================================
-    const cursor = document.getElementById('cursorGlow');
-    if (cursor) {
-        // Disable on touch devices
-        if (window.matchMedia("(pointer: fine)").matches) {
-            document.addEventListener('mousemove', e => {
-                cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
-            });
-
-            // Hover effects
-            const interactables = document.querySelectorAll('a, button, .project-card, .note-link');
-            interactables.forEach(el => {
-                el.addEventListener('mouseenter', () => cursor.classList.add('cursor-hover'));
-                el.addEventListener('mouseleave', () => cursor.classList.remove('cursor-hover'));
-            });
-        } else {
-            cursor.style.display = 'none'; // Hide on touch
-        }
-    }
 });
