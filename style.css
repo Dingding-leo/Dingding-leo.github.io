@@ -70,19 +70,6 @@ body {
   overflow-x: hidden;
 }
 
-/* Subtle grain texture overlay */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 9997;
-  pointer-events: none;
-  opacity: 0.025;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 128px 128px;
-}
-
 /* Hero Background Image */
 body::before {
   content: "";
@@ -181,6 +168,8 @@ nav {
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   transition: box-shadow 0.3s ease;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 nav.scrolled {
@@ -284,6 +273,8 @@ nav a:hover, nav a.active {
   pointer-events: none;
   z-index: -1;
   animation: heroGlow 6s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
 @keyframes heroGlow {
