@@ -11,7 +11,7 @@
 
   --surface: #fffdf9;
   --surface-hover: #faf8f5;
-  --surface-border: #e8e4dd;
+  --surface-border: rgba(180, 150, 100, 0.12);
 
   --accent: #d4a853;
   --accent-light: rgba(212, 168, 83, 0.15);
@@ -25,10 +25,10 @@
   --radius-md: 20px;
   --radius-lg: 24px;
 
-  --shadow-sm: 0 4px 12px rgba(0,0,0,0.03);
-  --shadow-md: 0 8px 24px rgba(0,0,0,0.04);
-  --shadow-lg: 0 20px 40px rgba(0,0,0,0.05);
-  --shadow-hover: 0 24px 48px rgba(0,0,0,0.06);
+  --shadow-sm: rgba(180,150,100,0.04) 0px 10px 15px -10px, rgba(0,0,0,0.02) 0px 4px 6px -4px;
+  --shadow-md: rgba(180,150,100,0.06) 0px 30px 45px -30px, rgba(0,0,0,0.04) 0px 18px 36px -18px;
+  --shadow-lg: rgba(180,150,100,0.12) 0px 50px 75px -30px, rgba(0,0,0,0.08) 0px 30px 60px -30px;
+  --shadow-hover: rgba(180,150,100,0.10) 0px 40px 60px -30px, rgba(0,0,0,0.06) 0px 24px 48px -24px;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -261,7 +261,7 @@ nav a:hover, nav a.active {
    HERO
    ========================================= */
 .hero {
-  padding: 200px 0 120px;
+  padding: 220px 0 140px;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -294,10 +294,10 @@ nav a:hover, nav a.active {
 .hero h1 {
   font-size: 5.5rem;
   font-weight: 800;
-  letter-spacing: -0.045em;
+  letter-spacing: -0.05em;
   margin-bottom: 16px;
   line-height: 1.05;
-  text-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  text-shadow: 0 4px 24px rgba(180, 150, 100, 0.10);
 }
 
 .hero h1 span {
@@ -373,7 +373,7 @@ nav a:hover, nav a.active {
   text-decoration: none;
   font-size: 0.95rem;
   font-weight: 600;
-  transition: all 0.4s var(--ease-out-expo);
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
   cursor: pointer;
 }
 
@@ -384,8 +384,8 @@ nav a:hover, nav a.active {
 }
 
 .primary-btn:hover {
-  transform: translateY(-3px) scale(1.03);
-  box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 25px rgba(180, 150, 100, 0.2), 0 0 0 4px rgba(212, 168, 83, 0.15);
 }
 
 .secondary-btn {
@@ -395,9 +395,9 @@ nav a:hover, nav a.active {
 }
 
 .secondary-btn:hover {
-  border-color: rgba(0, 0, 0, 0.35);
-  transform: translateY(-3px);
-  box-shadow: 0 12px 25px rgba(0,0,0,0.06);
+  border-color: var(--accent);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 25px rgba(180, 150, 100, 0.1), 0 0 0 4px rgba(212, 168, 83, 0.1);
 }
 
 /* Scroll Indicator */
@@ -441,16 +441,17 @@ nav a:hover, nav a.active {
    SECTIONS
    ========================================= */
 section {
-  padding: 120px 0;
+  padding: 140px 0;
 }
 
 .section-title {
   font-size: 2.8rem;
   font-weight: 800;
   margin-bottom: 60px;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
   text-align: center;
   color: var(--text-main);
+  text-shadow: 0 2px 8px rgba(180, 150, 100, 0.08);
 }
 
 /* =========================================
@@ -481,13 +482,14 @@ section {
   border: 1px solid var(--surface-border);
   border-radius: var(--radius-md);
   padding: 28px 32px;
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.3s var(--ease-out-expo), box-shadow 0.3s ease;
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transition: transform 0.3s var(--ease-out-expo), box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .stat-card:hover {
   transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  border-color: rgba(212, 168, 83, 0.3);
 }
 
 .stat-number {
@@ -521,11 +523,11 @@ section {
   border-radius: var(--radius-lg);
   position: relative;
   overflow: hidden;
-  transition: transform 0.4s var(--ease-out-expo), box-shadow 0.4s ease;
+  transition: transform 0.4s var(--ease-out-expo), box-shadow 0.4s ease, border-color 0.4s ease;
   text-decoration: none;
   display: flex;
   flex-direction: column;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 /* Card WITHOUT image — original padding */
@@ -592,7 +594,8 @@ section {
 
 .project-card:hover {
   transform: translateY(-8px) scale(1.01);
-  box-shadow: var(--shadow-hover);
+  box-shadow: var(--shadow-hover), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  border-color: rgba(212, 168, 83, 0.3);
 }
 
 .project-icon {
@@ -665,15 +668,16 @@ section {
   border: 1px solid var(--surface-border);
   border-radius: var(--radius-md);
   text-decoration: none;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.5);
   position: relative;
   overflow: hidden;
-  transition: transform 0.4s var(--ease-out-expo), box-shadow 0.4s ease;
+  transition: transform 0.4s var(--ease-out-expo), box-shadow 0.4s ease, border-color 0.4s ease;
 }
 
 .note-link:hover {
   transform: translateY(-4px) scale(1.005);
-  box-shadow: var(--shadow-hover);
+  box-shadow: var(--shadow-hover), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  border-color: rgba(212, 168, 83, 0.3);
 }
 
 .note-content {
@@ -861,7 +865,12 @@ section {
   border: 1px solid var(--surface-border);
   border-radius: var(--radius-lg);
   padding: 48px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transition: border-color 0.3s ease;
+}
+
+.now-card:hover {
+  border-color: rgba(212, 168, 83, 0.3);
 }
 
 .now-updated {
@@ -1139,9 +1148,6 @@ footer {
   text-decoration: none;
   font-weight: 600;
 }
-.now-list a:hover {
-  text-decoration: underline;
-}
 
 @media (max-width: 480px) {
   .hero h1 { font-size: 2.5rem; }
@@ -1215,6 +1221,20 @@ a:hover {
   color: var(--accent);
 }
 
+.post-content a, .about-text a, .now-list a, .footer-links a {
+  text-decoration: none;
+  background-image: linear-gradient(rgba(212, 168, 83, 0.6), rgba(212, 168, 83, 0.6));
+  background-size: 0% 1px;
+  background-repeat: no-repeat;
+  background-position: left bottom;
+  transition: background-size 0.3s cubic-bezier(0.25, 1, 0.5, 1), color 0.3s ease;
+}
+.post-content a:hover, .about-text a:hover, .now-list a:hover, .footer-links a:hover {
+  color: var(--accent);
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-size: 100% 1px;
+}
+
 /* =========================================
    DARK MODE
    ========================================= */
@@ -1231,10 +1251,10 @@ a:hover {
   --accent-light: rgba(224, 184, 104, 0.12);
   --gradient-text: linear-gradient(135deg, #e8907a, #e0b868);
 
-  --shadow-sm: 0 4px 12px rgba(0,0,0,0.3);
-  --shadow-md: 0 8px 24px rgba(0,0,0,0.4);
-  --shadow-lg: 0 20px 40px rgba(0,0,0,0.5);
-  --shadow-hover: 0 24px 48px rgba(0,0,0,0.5);
+  --shadow-sm: rgba(200, 160, 100, 0.04) 0px 10px 15px -10px, rgba(0, 0, 0, 0.2) 0px 4px 6px -4px;
+  --shadow-md: rgba(200, 160, 100, 0.08) 0px 30px 45px -30px, rgba(0, 0, 0, 0.25) 0px 18px 36px -18px;
+  --shadow-lg: rgba(200, 160, 100, 0.1) 0px 50px 75px -30px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+  --shadow-hover: rgba(200, 160, 100, 0.12) 0px 40px 60px -30px, rgba(0, 0, 0, 0.35) 0px 24px 48px -24px;
 }
 
 [data-theme="dark"] body::before {
