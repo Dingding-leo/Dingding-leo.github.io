@@ -29,10 +29,30 @@
 
     <!-- Early Theme Script to prevent FOUC -->
     <script>
-        const storedTheme = localStorage.getItem('theme');
-        if (storedTheme === 'dark' || (!storedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.setAttribute('data-theme', 'dark');
-        }
+        (function() {
+            const stored = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+            
+            function applyTheme() {
+                const s = localStorage.getItem('theme');
+                if (s === 'dark' || s === 'light') {
+                    document.documentElement.setAttribute('data-theme', s);
+                } else if (prefersDark.matches) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                }
+            }
+            
+            applyTheme();
+            
+            // Live system theme changes (only when user hasn't manually picked)
+            prefersDark.addEventListener('change', function() {
+                if (!localStorage.getItem('theme')) {
+                    applyTheme();
+                }
+            });
+        })();
     </script>
 
     <!-- JSON-LD SEO -->

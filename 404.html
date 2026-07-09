@@ -3,33 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 — Page Not Found | Austin's Lab</title>
+    <title>404 — Austin</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚗️</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=5">
+    <script>
+        (function() {
+            const s = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+            if (s === 'dark' || s === 'light') document.documentElement.setAttribute('data-theme', s);
+            else if (prefersDark.matches) document.documentElement.setAttribute('data-theme', 'dark');
+        })();
+    </script>
 </head>
 <body>
-    <nav id="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="logo">Austin's Lab</a>
-            <ul id="navLinks">
-                <li><a href="index.html#projects">Projects</a></li>
-                <li><a href="index.html#notes">Notes</a></li>
-                <li><a href="index.html#now">Now</a></li>
-            </ul>
-        </div>
-    </nav>
-
     <div class="container">
         <div class="error-page">
             <div class="error-code">404</div>
-            <p class="error-message">This page doesn't exist — yet.</p>
-            <a href="index.html" class="glass-btn primary-btn">Go Home</a>
+            <p class="error-message">This page wandered off somewhere warm. Maybe it is having a coffee.</p>
+            <a href="/" class="glass-btn primary-btn">Take me home</a>
         </div>
     </div>
-
-    <script src="script.js"></script>
 </body>
 </html>
