@@ -1,20 +1,71 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // =========================================
-    // 1. PAGE LOADER
+    // 0. DARK MODE TOGGLE
+    // =========================================
+    const themeToggle = document.getElementById('themeToggle');
+    const sunIcon = document.querySelector('.sun-icon');
+    const moonIcon = document.querySelector('.moon-icon');
+
+    function updateThemeIcon(theme) {
+        if (!sunIcon || !moonIcon) return;
+        if (theme === 'dark') {
+            sunIcon.style.display = 'none';
+            moonIcon.style.display = 'block';
+        } else {
+            sunIcon.style.display = 'block';
+            moonIcon.style.display = 'none';
+        }
+    }
+
+    // Initialize icon based on current theme (set in head.html)
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    updateThemeIcon(currentTheme);
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            let theme = document.documentElement.getAttribute('data-theme');
+            let newTheme = theme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        });
+    }
+
+    // =========================================
+    // 1. PAGE LOADER & TRANSITIONS
     // =========================================
     const loader = document.getElementById('pageLoader');
     if (loader) {
         window.addEventListener('load', () => {
             setTimeout(() => {
                 loader.classList.add('loaded');
-            }, 1300); // 等进度条动画跑完
+            }, 800);
         });
-        // Fallback：如果 load 事件已经 fire 了
         if (document.readyState === 'complete') {
-            setTimeout(() => loader.classList.add('loaded'), 1300);
+            setTimeout(() => loader.classList.add('loaded'), 800);
         }
     }
+
+    // Smooth Page Transitions
+    const transitionOverlay = document.querySelector('.page-transition-overlay');
+    document.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', e => {
+            const href = link.getAttribute('href');
+            // Intercept only internal links
+            if (href && href.startsWith('/') && !href.startsWith('#') && link.target !== '_blank' && !e.ctrlKey && !e.metaKey) {
+                e.preventDefault();
+                if (transitionOverlay) {
+                    transitionOverlay.classList.add('active');
+                    setTimeout(() => {
+                        window.location.href = href;
+                    }, 400);
+                } else {
+                    window.location.href = href;
+                }
+            }
+        });
+    });
 
     // =========================================
     // 2. AUTO YEAR
@@ -23,40 +74,102 @@ document.addEventListener('DOMContentLoaded', () => {
     if (yearSpan) yearSpan.textContent = new Date().getFullYear();
 
     // =========================================
-    // 3. SCROLL REVEAL (Apple-Style)
+    // 3. SCROLL REVEAL (Enhanced)
     // =========================================
     const observerOptions = { root: null, rootMargin: '0px 0px -60px 0px', threshold: 0.1 };
+    
+    // Auto-stagger logic for elements appearing at the same time
+    let revealQueue = [];
+    let revealTimer = null;
+
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.classList.add('in-view');
+                revealQueue.push(entry.target);
                 observer.unobserve(entry.target);
             }
         });
+
+        if (revealQueue.length > 0 && !revealTimer) {
+            revealTimer = setTimeout(() => {
+                revealQueue.forEach((el, index) => {
+                    setTimeout(() => {
+                        el.classList.add('in-view');
+                    }, index * 100); // 100ms stagger
+                });
+                revealQueue = [];
+                revealTimer = null;
+            }, 50);
+        }
     }, observerOptions);
 
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
     // =========================================
-    // 4. MOUSE SPOTLIGHT ON CARDS
+    // 4. MOUSE SPOTLIGHT & 3D TILT
     // =========================================
     const cards = document.querySelectorAll('.project-card, .note-link');
     cards.forEach(card => {
         card.addEventListener('mousemove', e => {
             const rect = card.getBoundingClientRect();
-            card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
-            card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Spotlight
+            card.style.setProperty('--mouse-x', `${x}px`);
+            card.style.setProperty('--mouse-y', `${y}px`);
+
+            // 3D Tilt
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = ((y - centerY) / centerY) * -4; // Max rotation 4deg
+            const rotateY = ((x - centerX) / centerX) * 4;
+            
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
         });
     });
 
     // =========================================
-    // 5. NAV SHADOW ON SCROLL
+    // 5. NAV SHADOW & READING PROGRESS & PARALLAX
     // =========================================
     const navbar = document.getElementById('navbar');
-    if (navbar) {
-        window.addEventListener('scroll', () => {
-            navbar.classList.toggle('scrolled', window.scrollY > 50);
-        }, { passive: true });
+    const progressBar = document.getElementById('readingProgressBar');
+    const backToTopBtn = document.getElementById('backToTop');
+    const heroBg = document.querySelector('.hero-parallax-bg'); // If implemented
+
+    window.addEventListener('scroll', () => {
+        const scrollY = window.scrollY;
+        
+        // Nav
+        if (navbar) {
+            navbar.classList.toggle('scrolled', scrollY > 50);
+        }
+
+        // Reading Progress
+        if (progressBar) {
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollY / docHeight) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        // Back to top
+        if (backToTopBtn) {
+            if (scrollY > 300) {
+                backToTopBtn.classList.add('visible');
+            } else {
+                backToTopBtn.classList.remove('visible');
+            }
+        }
+    }, { passive: true });
+
+    if (backToTopBtn) {
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
     }
 
     // =========================================
@@ -69,7 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
             hamburger.classList.toggle('active');
             navLinks.classList.toggle('open');
         });
-        // 点击链接后自动关闭菜单
         navLinks.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', () => {
                 hamburger.classList.remove('active');
@@ -102,7 +214,6 @@ document.addEventListener('DOMContentLoaded', () => {
         function update(currentTime) {
             const elapsed = currentTime - startTime;
             const progress = Math.min(elapsed / duration, 1);
-            // Ease out cubic
             const eased = 1 - Math.pow(1 - progress, 3);
             const current = Math.round(start + (end - start) * eased);
             el.textContent = current;
@@ -112,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================
-    // 8. SMOOTH ANCHOR SCROLL (for Safari)
+    // 8. SMOOTH ANCHOR SCROLL
     // =========================================
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
@@ -125,4 +236,26 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // =========================================
+    // 9. CUSTOM CURSOR
+    // =========================================
+    const cursor = document.getElementById('cursorGlow');
+    if (cursor) {
+        // Disable on touch devices
+        if (window.matchMedia("(pointer: fine)").matches) {
+            document.addEventListener('mousemove', e => {
+                cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
+            });
+
+            // Hover effects
+            const interactables = document.querySelectorAll('a, button, .project-card, .note-link');
+            interactables.forEach(el => {
+                el.addEventListener('mouseenter', () => cursor.classList.add('cursor-hover'));
+                el.addEventListener('mouseleave', () => cursor.classList.remove('cursor-hover'));
+            });
+        } else {
+            cursor.style.display = 'none'; // Hide on touch
+        }
+    }
 });

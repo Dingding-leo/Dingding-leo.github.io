@@ -1,10 +1,18 @@
 title: Austin's Lab
 description: >-
-  Austin Liu's personal laboratory. A dental student exploring AI, coding, quantitative finance, and practical systems.
+  Austin Liu's personal laboratory. A dental student exploring AI, coding, quantitative finance, and practical systems. Welcome to my digital garden and portfolio.
 baseurl: ""
 url: "https://Dingding-leo.github.io"
 permalink: /posts/:title/
 markdown: kramdown
+
+author:
+  name: "Austin Liu"
+  email: "Austinliu234@gmail.com"
+
+social:
+  github: "Dingding-leo"
+
 plugins:
   - jekyll-sitemap
   - jekyll-seo-tag
