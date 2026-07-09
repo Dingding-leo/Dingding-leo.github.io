@@ -50,6 +50,7 @@ h1, h2, .section-title, .hero h1, .project-title {
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 /* Custom Scrollbar */
@@ -66,6 +67,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   position: relative;
+  overflow-x: hidden;
 }
 
 /* Subtle grain texture overlay */
@@ -318,6 +320,29 @@ nav a:hover, nav a.active {
   color: var(--text-muted);
   margin-bottom: 20px;
   letter-spacing: -0.01em;
+}
+
+/* Typewriter cursor on tagline */
+.hero h2::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 1.2em;
+  margin-left: 4px;
+  margin-bottom: -2px;
+  background: var(--accent);
+  animation: cursorBlink 0.8s infinite;
+  vertical-align: middle;
+  opacity: 0;
+}
+
+.hero h2.in-view::after {
+  opacity: 1;
+}
+
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 .hero p {
@@ -1124,6 +1149,57 @@ footer {
 
 /* Fallback if JS fails to load */
 noscript .page-loader { display: none; }
+
+/* =========================================
+   IMAGE FADE-IN
+   ========================================= */
+img {
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+img.loaded {
+  opacity: 1;
+}
+
+/* =========================================
+   GALLERY IMMERSIVE
+   ========================================= */
+.gallery-item {
+  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.5s ease;
+}
+.gallery-item:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+}
+.gallery-item:hover img {
+  transform: scale(1.06);
+}
+
+/* =========================================
+   FLOATING ANIMATIONS
+   ========================================= */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.back-to-top.visible {
+  animation: float 3s ease-in-out infinite;
+}
+
+.scroll-indicator {
+  animation: float 2.5s ease-in-out infinite;
+}
+
+/* =========================================
+   LINK WARMTH
+   ========================================= */
+a {
+  transition: color 0.3s ease;
+}
+a:hover {
+  color: var(--accent);
+}
 
 /* =========================================
    DARK MODE
