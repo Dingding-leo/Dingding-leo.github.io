@@ -1267,23 +1267,6 @@ a:hover {
    UX ENHANCEMENTS
    ========================================= */
 
-/* =========================================
-   DARK MODE
-   ========================================= */
-.page-transition-overlay {
-  position: fixed;
-  inset: 0;
-  background: var(--bg-color);
-  z-index: 9998;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.4s ease;
-}
-.page-transition-overlay.active {
-  opacity: 1;
-  pointer-events: all;
-}
-
 /* Reading Progress Bar */
 .reading-progress-bar {
   position: fixed;

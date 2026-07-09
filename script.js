@@ -47,26 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Smooth Page Transitions
-    const transitionOverlay = document.querySelector('.page-transition-overlay');
-    document.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', e => {
-            const href = link.getAttribute('href');
-            // Intercept only internal links
-            if (href && href.startsWith('/') && !href.startsWith('#') && link.target !== '_blank' && !e.ctrlKey && !e.metaKey) {
-                e.preventDefault();
-                if (transitionOverlay) {
-                    transitionOverlay.classList.add('active');
-                    setTimeout(() => {
-                        window.location.href = href;
-                    }, 400);
-                } else {
-                    window.location.href = href;
-                }
-            }
-        });
-    });
-
     // =========================================
     // 2. AUTO YEAR
     // =========================================
