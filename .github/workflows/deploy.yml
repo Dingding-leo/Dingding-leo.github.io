@@ -29,6 +29,15 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
+      - name: Verify KnightLab export
+        run: |
+          test -f out/KnightLab/index.html
+          test -f out/KnightLab/test.html
+          test -f out/KnightLab/manifest.webmanifest
+          test -f out/KnightLab/registerSW.js
+          test -f out/KnightLab/sw.js
+          grep -q '/KnightLab/assets/' out/KnightLab/index.html
+          grep -q '"start_url":"/KnightLab/"' out/KnightLab/manifest.webmanifest
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
