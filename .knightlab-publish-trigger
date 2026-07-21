@@ -1,3 +1,5 @@
 Publish KnightLab from Dingding-leo/KnightLab main.
-Requested: 2026-07-21T13:15:00Z
+Requested: 2026-07-21T13:34:00Z
 Target: public/KnightLab
+Source commit: 17291668d243b7ca212d8dc5a1ccd925a3c78a59
+Reason: enforce square board cells
