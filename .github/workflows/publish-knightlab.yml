@@ -62,8 +62,9 @@ jobs:
           test -f source/dist/manifest.webmanifest
           grep -q '/KnightLab/' source/dist/index.html
 
-      - name: Stage inside Next.js public assets
+      - name: Refresh site checkout and stage generated assets
         run: |
+          git -C site pull --rebase origin main
           rm -rf site/public/KnightLab
           mkdir -p site/public/KnightLab
           cp -R source/dist/. site/public/KnightLab/
@@ -80,4 +81,5 @@ jobs:
             exit 0
           fi
           git commit -m 'deploy: publish KnightLab web preview'
+          git pull --rebase origin main
           git push
