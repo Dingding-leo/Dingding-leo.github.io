@@ -62,19 +62,19 @@ jobs:
           test -f source/dist/manifest.webmanifest
           grep -q '/KnightLab/' source/dist/index.html
 
-      - name: Publish into the existing user Pages site
+      - name: Stage inside Next.js public assets
         run: |
-          rm -rf site/KnightLab
-          mkdir -p site/KnightLab
-          cp -R source/dist/. site/KnightLab/
-          cp source/dist/index.html site/KnightLab/404.html
+          rm -rf site/public/KnightLab
+          mkdir -p site/public/KnightLab
+          cp -R source/dist/. site/public/KnightLab/
+          cp source/dist/index.html site/public/KnightLab/404.html
 
       - name: Commit generated preview
         working-directory: site
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add KnightLab
+          git add public/KnightLab
           if git diff --cached --quiet; then
             echo 'KnightLab preview is already current.'
             exit 0
