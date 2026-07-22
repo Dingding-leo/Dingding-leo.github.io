@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: publish-knightlab-preview
@@ -91,3 +92,11 @@ jobs:
           git commit -m 'deploy: publish KnightLab web preview'
           git pull --rebase origin main
           git push
+
+      # A commit made with GITHUB_TOKEN does not itself invoke this separate
+      # workflow. Dispatch it explicitly so the generated subpath artifact is
+      # always the Pages deployment, not merely a repository update.
+      - name: Deploy the updated Pages artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run .github/workflows/deploy.yml --repo "$GITHUB_REPOSITORY" --ref main
