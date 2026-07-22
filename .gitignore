@@ -2,4 +2,7 @@ node_modules/
 .next/
 out/
 dist/
+output/
+.playwright-cli/
+tsconfig.tsbuildinfo
 .DS_Store

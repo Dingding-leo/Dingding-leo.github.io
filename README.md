@@ -1,62 +1,41 @@
-# Austin's Lab
+# Austin Liu — Personal Space
 
-My personal laboratory, portfolio, and public notebook. Built with Jekyll and hosted on GitHub Pages.
+A personal website for notes, travel moments, dental school, and the products I build. The current project collection includes KnightClub, ScholarBank, Denki, and this site itself.
 
-**Live site:** [Dingding-leo.github.io](https://Dingding-leo.github.io)
+**Live site:** [dingding-leo.github.io](https://dingding-leo.github.io)
 
-## Tech Stack
+## Stack
 
-- **Static Site Generator:** Jekyll (kramdown markdown, Liquid templates)
-- **Frontend:** Vanilla HTML, CSS (custom properties, glassmorphism), vanilla JS
-- **Plugins:** jekyll-sitemap, jekyll-seo-tag
-- **Hosting:** GitHub Pages (auto-deploy on push to `main`)
+- Next.js 15 with the App Router and static export
+- React 19 and TypeScript
+- Framer Motion for restrained page transitions
+- next-themes for light and dark colour modes
+- GitHub Pages and OpenAI Sites deployment targets
 
-## Project Structure
-
-```
-├── _config.yml          # Jekyll configuration
-├── _layouts/            # Page templates (default, page, post)
-├── _includes/           # Reusable components (head, header, footer)
-├── _posts/              # Blog posts (Markdown with frontmatter)
-├── assets/              # Images, backgrounds, gallery photos
-├── index.html           # Homepage (hero section)
-├── about.html           # About page with animated stats
-├── projects.html        # Project showcase
-├── notes.html           # Blog post listing (Jekyll loop)
-├── moments.html         # Travel photo gallery
-├── now.html             # What I'm currently doing
-├── style.css            # All styles (Apple-inspired light theme)
-└── script.js            # Page loader, scroll reveal, mouse spotlight, counters, nav
-```
-
-## Local Development
+## Local development
 
 ```bash
-# Install Jekyll and bundler (requires Ruby)
-gem install bundler jekyll
-
-# Serve locally
-bundle exec jekyll serve
-
-# Visit http://localhost:4000
+npm install
+npm run dev
 ```
 
-## Adding a Blog Post
+Open [http://localhost:3000](http://localhost:3000).
 
-Create a new Markdown file in `_posts/` with the naming convention `YYYY-MM-DD-slug.md`:
+## Validation
 
-```markdown
----
-layout: post
-title: "Your Post Title"
-reading_time: 3
----
-
-Your content here...
+```bash
+npx tsc --noEmit
+npm run build
 ```
 
-Jekyll automatically picks it up — no manual list editing needed.
+The production build is exported to `out/`. Pushes to `main` run the same build in CI and deploy the exported site to GitHub Pages.
 
-## Deployment
+## Main structure
 
-Push to `main`. GitHub Pages builds and deploys automatically.
+```text
+app/                 Next.js routes and global styles
+components/          Shared navigation, home sections, and content pages
+config/site.ts       Navigation and project data
+public/assets/       Project previews and travel photography
+scripts/             Additional Sites packaging
+```
