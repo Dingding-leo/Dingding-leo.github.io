@@ -1,0 +1,8 @@
+KnightClub browser engine: Stockfish.js 18.0.8 (Stockfish 18 Lite, single-threaded)
+Licence: GNU General Public License version 3
+Exact corresponding source:
+https://github.com/nmrugg/stockfish.js/tree/93c994592dcf3b4b21052ab925e9b534df9c0918
+JavaScript SHA-256: 5243fd9b276cab7dfe3ad1d43ab9ead73568fac76468c614242977a210c4a391
+WebAssembly SHA-256: a8fbc05ec6920b56d7485826dcb02c5ffd2826bcbf751cf973046f237a9096f1
+
+The generated browser assets in this directory come from the pinned stockfish npm package.
