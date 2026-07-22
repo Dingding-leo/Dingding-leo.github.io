@@ -34,7 +34,6 @@ jobs:
           test -f out/KnightLab/index.html
           test -f out/KnightLab/test.html
           test -f out/KnightLab/manifest.webmanifest
-          test -f out/KnightLab/registerSW.js
           test -f out/KnightLab/sw.js
           grep -q '/KnightLab/assets/' out/KnightLab/index.html
           grep -q '"start_url":"/KnightLab/"' out/KnightLab/manifest.webmanifest

@@ -26,10 +26,10 @@ jobs:
         with:
           path: site
 
-      - name: Check out KnightLab
+      - name: Check out KnightClub
         uses: actions/checkout@v4
         with:
-          repository: Dingding-leo/KnightLab
+          repository: Dingding-leo/KnightClub
           ref: main
           path: source
 
@@ -40,9 +40,9 @@ jobs:
 
       - name: Install dependencies
         working-directory: source
-        run: npm install --no-audit --no-fund
+        run: npm ci
 
-      - name: Verify KnightLab
+      - name: Verify KnightClub
         working-directory: source
         run: |
           npm run lint
@@ -52,30 +52,38 @@ jobs:
       - name: Build for the project subpath
         working-directory: source
         env:
-          KNIGHTLAB_BASE: /KnightLab/
-        run: npm run build
+          KNIGHTCLUB_BASE: /KnightLab/
+        run: npm run build:pages
 
       - name: Validate release root
         run: |
-          test -f source/dist/index.html
-          test -f source/dist/test.html
-          test -f source/dist/manifest.webmanifest
-          grep -q '/KnightLab/' source/dist/index.html
+          test -f source/dist/client/index.html
+          test -f source/dist/client/test.html
+          test -f source/dist/client/manifest.webmanifest
+          test -f source/dist/client/sw.js
+          test -f source/dist/client/stockfish/stockfish-18-lite-single.wasm
+          grep -q '/KnightLab/assets/' source/dist/client/index.html
+          grep -q '"start_url":"/KnightLab/"' source/dist/client/manifest.webmanifest
+          ! grep -q '/KnightClub/' source/dist/client/index.html
 
       - name: Refresh site checkout and stage generated assets
         run: |
           git -C site pull --rebase origin main
           rm -rf site/public/KnightLab
           mkdir -p site/public/KnightLab
-          cp -R source/dist/. site/public/KnightLab/
-          cp source/dist/index.html site/public/KnightLab/404.html
+          cp -R source/dist/client/. site/public/KnightLab/
+          cp source/dist/client/index.html site/public/KnightLab/404.html
 
       - name: Commit generated preview
         working-directory: site
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add public/KnightLab
+          git add -- public/KnightLab
+          if git diff --cached --name-only | grep -qv '^public/KnightLab/'; then
+            echo 'Refusing to publish files outside public/KnightLab.' >&2
+            exit 1
+          fi
           if git diff --cached --quiet; then
             echo 'KnightLab preview is already current.'
             exit 0
