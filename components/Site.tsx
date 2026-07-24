@@ -669,7 +669,7 @@ function Adelaide() {
               Quiet evenings. Campus days. Coffee after study. Food with
               friends. Living locally while thinking long-term.
             </p>
-            <Button href="#contact">Share a recommendation</Button>
+            <Button href="#contact">Get in touch</Button>
           </Reveal>
           <Reveal className="city-card">
             <div className="city-map">
@@ -969,11 +969,16 @@ function Gallery() {
     <section id="gallery" className="section">
       <Container>
         <Reveal>
-          <SectionHeader
-            kicker="09 / Moments"
-            title="A few things worth keeping."
-            copy="A gallery of the places I've been — real photos from real moments."
-          />
+          <div className="featured-projects-head">
+            <SectionHeader
+              kicker="09 / Moments"
+              title="A few things worth keeping."
+              copy="A gallery of the places I've been — real photos from real moments."
+            />
+            <a className="text-link" href="/moments">
+              View all moments <ArrowUpRight size={16} aria-hidden="true" />
+            </a>
+          </div>
         </Reveal>
         <div className="gallery">
           {galleryItems.map(({ title, image, href }, index) => (
@@ -1019,11 +1024,16 @@ function Journal() {
     <section id="journal" className="section section-soft">
       <Container>
         <Reveal>
-          <SectionHeader
-            kicker="10 / Journal"
-            title="Notes from the in-between."
-            copy="Field notes from places, projects, and the ordinary days that are worth remembering."
-          />
+          <div className="featured-projects-head">
+            <SectionHeader
+              kicker="10 / Journal"
+              title="Notes from the in-between."
+              copy="Field notes from places, projects, and the ordinary days that are worth remembering."
+            />
+            <a className="text-link" href="/notes">
+              View all notes <ArrowUpRight size={16} aria-hidden="true" />
+            </a>
+          </div>
         </Reveal>
         <div className="journal-grid">
           {journalItems.map((item, index) => (
