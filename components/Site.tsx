@@ -7,7 +7,6 @@ import {
   useRef,
   useState,
 } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { ThemeProvider, useTheme } from 'next-themes';
 import { usePathname } from 'next/navigation';
 import {
@@ -25,6 +24,7 @@ import {
   MapPin,
   Menu,
   Moon,
+  MessageCircle,
   PenLine,
   Search,
   Sun,
@@ -44,16 +44,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
 }
 
-const fade = {
-  hidden: { opacity: 0, y: 24, filter: 'blur(8px)' },
-  show: {
-    opacity: 1,
-    y: 0,
-    filter: 'blur(0px)',
-    transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] as const },
-  },
-};
-
 export function Container({
   children,
   className = '',
@@ -71,19 +61,7 @@ function Reveal({
   children: React.ReactNode;
   className?: string;
 }) {
-  const reduceMotion = useReducedMotion();
-
-  return (
-    <motion.div
-      className={className}
-      variants={fade}
-      initial={reduceMotion ? false : 'hidden'}
-      whileInView="show"
-      viewport={{ once: true, margin: '-80px' }}
-    >
-      {children}
-    </motion.div>
-  );
+  return <div className={className}>{children}</div>;
 }
 
 export function SectionHeader({
@@ -326,15 +304,24 @@ export function Nav() {
         </div>
       </header>
 
-      <AnimatePresence>
-        {open && (
-          <motion.nav
+      {open && (
+        <>
+          <div
+            className="mobile-backdrop"
+            onClick={() => setOpen(false)}
+            aria-hidden="true"
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 28,
+              background: 'rgba(0,0,0,.35)',
+              backdropFilter: 'blur(3px)',
+            }}
+          />
+          <nav
             id="mobile-navigation"
             className="mobile-nav"
             aria-label="Mobile navigation"
-            initial={{ opacity: 0, y: -12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
           >
             {site.nav.map((item) => (
               <a
@@ -348,70 +335,63 @@ export function Nav() {
                 <ChevronRight size={17} aria-hidden="true" />
               </a>
             ))}
-          </motion.nav>
-        )}
-      </AnimatePresence>
+          </nav>
+        </>
+      )}
 
-      <AnimatePresence>
-        {palette && (
-          <motion.div
-            className="palette-backdrop"
-            onClick={() => closePalette()}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+      {palette && (
+        <div
+          className="palette-backdrop"
+          onClick={() => closePalette()}
+        >
+          <div
+            className="palette"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Search site pages"
+            onClick={(event) => event.stopPropagation()}
+            onKeyDown={trapDialogFocus}
           >
-            <motion.div
-              className="palette"
-              role="dialog"
-              aria-modal="true"
-              aria-label="Search site pages"
-              onClick={(event) => event.stopPropagation()}
-              onKeyDown={trapDialogFocus}
-              initial={{ y: 20, scale: 0.98 }}
-              animate={{ y: 0, scale: 1 }}
-            >
-              <div className="palette-search">
-                <Search size={18} aria-hidden="true" />
-                <label className="sr-only" htmlFor="site-search">
-                  Search pages
-                </label>
-                <input
-                  id="site-search"
-                  autoFocus
-                  value={query}
-                  placeholder="Jump to a page..."
-                  onChange={(event) => setQuery(event.target.value)}
-                />
-                <button
-                  className="palette-close"
-                  type="button"
-                  onClick={() => closePalette()}
-                  aria-label="Close search"
+            <div className="palette-search">
+              <Search size={18} aria-hidden="true" />
+              <label className="sr-only" htmlFor="site-search">
+                Search pages
+              </label>
+              <input
+                id="site-search"
+                autoFocus
+                value={query}
+                placeholder="Jump to a page..."
+                onChange={(event) => setQuery(event.target.value)}
+              />
+              <button
+                className="palette-close"
+                type="button"
+                onClick={() => closePalette()}
+                aria-label="Close search"
+              >
+                ESC
+              </button>
+            </div>
+            <div className="palette-results" aria-live="polite">
+              {filteredNav.map((item) => (
+                <a
+                  className={isActive(item) ? 'active' : ''}
+                  key={item.label}
+                  href={item.href}
+                  onClick={() => closePalette(false)}
                 >
-                  ESC
-                </button>
-              </div>
-              <div className="palette-results" aria-live="polite">
-                {filteredNav.map((item) => (
-                  <a
-                    className={isActive(item) ? 'active' : ''}
-                    key={item.label}
-                    href={item.href}
-                    onClick={() => closePalette(false)}
-                  >
-                    <span>{item.label}</span>
-                    <ArrowUpRight size={16} aria-hidden="true" />
-                  </a>
-                ))}
-                {!filteredNav.length && (
-                  <p className="palette-empty">No matching page. Try “Projects”.</p>
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                  <span>{item.label}</span>
+                  <ArrowUpRight size={16} aria-hidden="true" />
+                </a>
+              ))}
+              {!filteredNav.length && (
+                <p className="palette-empty">No matching page. Try “Projects”.</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
@@ -441,41 +421,20 @@ function Hero() {
       <Container>
         <div className="hero-grid">
           <div>
-            <motion.p
-              className="eyebrow"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
+            <p className="eyebrow">
               Personal space / 2026
-            </motion.p>
-            <motion.h1
-              initial="hidden"
-              animate="show"
-              variants={{
-                hidden: { opacity: 0, y: 30 },
-                show: {
-                  opacity: 1,
-                  y: 0,
-                  transition: { duration: 1, delay: 0.15 },
-                },
-              }}
-            >
+            </p>
+            <h1>
               Austin
               <br />
               <em>Liu</em>
-            </motion.h1>
-            <motion.p
-              className="hero-copy"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.55 }}
-            >
-              A personal space for dental school, daily life, growth, and the
-              useful things I build along the way.
-            </motion.p>
+            </h1>
+            <p className="hero-copy">
+              Dental student, builder, collector of small moments. This is
+              where I keep the things that matter.
+            </p>
             <div className="hero-actions">
-              <Button>Explore my life</Button>
+              <Button href="#about">Read my story</Button>
               <Button secondary href="/projects">
                 See my projects
               </Button>
@@ -805,6 +764,18 @@ type StudyTab = keyof typeof studyViews;
 function Study() {
   const [tab, setTab] = useState<StudyTab>('Weekly rhythm');
   const view = studyViews[tab];
+  const tabs = Object.keys(studyViews) as StudyTab[];
+
+  const handleTabKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, idx: number) => {
+    let nextIdx = idx;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') nextIdx = (idx + 1) % tabs.length;
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') nextIdx = (idx - 1 + tabs.length) % tabs.length;
+    else if (e.key === 'Home') nextIdx = 0;
+    else if (e.key === 'End') nextIdx = tabs.length - 1;
+    else return;
+    e.preventDefault();
+    setTab(tabs[nextIdx]);
+  };
 
   return (
     <section id="study" className="section">
@@ -817,14 +788,16 @@ function Study() {
               copy="A flexible system for doing the work, remembering what matters, and keeping enough energy for the rest of life."
             />
             <div className="tabs" role="tablist" aria-label="Study system views">
-              {(Object.keys(studyViews) as StudyTab[]).map((item) => (
+              {tabs.map((item, idx) => (
                 <button
                   className={tab === item ? 'active' : ''}
                   key={item}
                   type="button"
                   role="tab"
                   aria-selected={tab === item}
+                  tabIndex={tab === item ? 0 : -1}
                   onClick={() => setTab(item)}
+                  onKeyDown={(e) => handleTabKeyDown(e, idx)}
                 >
                   {item}
                 </button>
@@ -1138,8 +1111,31 @@ function Contact() {
 }
 
 export function SitePage() {
+  const [showTop, setShowTop] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const onScroll = () => {
+      setShowTop(window.scrollY > 600);
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      setProgress(docHeight > 0 ? Math.min((scrollTop / docHeight) * 100, 100) : 0);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
     <>
+      <div
+        className="reading-progress"
+        role="progressbar"
+        aria-valuenow={Math.round(progress)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label="Page scroll progress"
+        style={{ width: `${progress}%` }}
+      />
       <Nav />
       <main id="main-content">
         <Hero />
@@ -1155,6 +1151,63 @@ export function SitePage() {
         <Journal />
         <Contact />
       </main>
+
+      {showTop && (
+        <div className="floating-actions">
+          <a
+            className="float-btn"
+            href="#contact"
+            aria-label="Contact Austin"
+          >
+            <MessageCircle size={18} />
+            <span className="float-label">Contact</span>
+          </a>
+          <button
+            className="float-btn"
+            type="button"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            aria-label="Back to top"
+          >
+            <ArrowUp size={18} />
+          </button>
+        </div>
+      )}
+    </>
+  );
+}
+
+export function NoteLayout({
+  kicker,
+  title,
+  lede,
+  children,
+}: {
+  kicker: string;
+  title: string;
+  lede: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <>
+      <Nav />
+      <main id="main-content" className="legacy-page article-page">
+        <section className="legacy-hero">
+          <div className="container">
+            <p className="eyebrow">{kicker}</p>
+            <h1>{title}</h1>
+            <p className="lede">{lede}</p>
+          </div>
+        </section>
+        <article className="container article-content">{children}</article>
+      </main>
+      <footer className="article-footer">
+        <div className="container">
+          <a href="/notes" className="text-link">
+            &larr; Back to notes
+          </a>
+          <span>&copy; 2026 Austin Liu</span>
+        </div>
+      </footer>
     </>
   );
 }
