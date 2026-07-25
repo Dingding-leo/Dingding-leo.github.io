@@ -36,8 +36,8 @@ export const projects: Project[] = [
     imageAlt: 'KnightClub chess board and local Stockfish game controls',
     tags: ['React', 'Tauri', 'Rust', 'Stockfish'],
     status: 'Live',
-    liveUrl: '/KnightLab/',
-    repoUrl: 'https://github.com/Dingding-leo/KnightLab',
+    liveUrl: 'https://dingding-leo.github.io/KnightClub/',
+    repoUrl: 'https://github.com/Dingding-leo/KnightClub',
     featured: true,
   },
   {
