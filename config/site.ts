@@ -54,14 +54,16 @@ export const projects: Project[] = [
   },
   {
     title: 'Denki',
-    tagline: 'A calmer way to remember what matters.',
+    tagline: 'Focused review, timed by memory.',
     description:
-      'A spaced-repetition flashcard studio for serious learners, built to organise knowledge systematically and retain it long-term.',
-    image: '/assets/denki.jpg',
-    imageAlt: 'Denki flashcard learning concept artwork',
-    tags: ['Learning', 'Productivity', 'JavaScript'],
-    status: 'Open source',
+      'Create, import, and review flashcards with FSRS scheduling, offline storage, focused study sessions, a built-in scratchpad, and clear progress insights.',
+    image: '/assets/projects/denki.jpg',
+    imageAlt: 'Layered flashcards arranged along a calm spaced-repetition review timeline',
+    tags: ['React', 'FSRS', 'IndexedDB', 'PWA'],
+    status: 'Live',
+    liveUrl: 'https://dingding-leo.github.io/Denki/',
     repoUrl: 'https://github.com/Dingding-leo/Denki',
+    featured: true,
   },
   {
     title: 'Austin Liu / Personal space',
