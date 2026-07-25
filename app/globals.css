@@ -63,7 +63,12 @@ html.light{--muted:#555c53;--accent:#7d3a22}
 .featured-project-image,.project-image,.legacy-photo{aspect-ratio:auto}
 .featured-project-image{aspect-ratio:16/10}
 .project-image{aspect-ratio:16/10}
-.legacy-photo{aspect-ratio:4/3}
+.legacy-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}
+.legacy-photo{width:100%;min-width:0;height:auto;aspect-ratio:4/3}
+.legacy-photo.photo-1,.legacy-photo.photo-2{height:auto}
+@media(max-width:800px){
+  .legacy-gallery{grid-template-columns:minmax(0,1fr)}
+}
 .project-summary{display:flex;flex-wrap:wrap;gap:9px;margin:-28px 0 34px}
 .project-summary span{padding:9px 12px;border:1px solid var(--line);border-radius:99px;color:var(--muted);font:11px var(--font-mono)}
 .legacy-projects .legacy-project:nth-child(3){grid-column:auto;display:block}
