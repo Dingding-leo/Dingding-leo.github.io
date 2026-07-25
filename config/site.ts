@@ -49,7 +49,7 @@ export const projects: Project[] = [
     imageAlt: 'ScholarBank scholarship preparation practice interface',
     tags: ['Next.js', 'Cloudflare D1', 'Drizzle', 'Education'],
     status: 'Live',
-    liveUrl: 'https://scholarbank-melbourne.austinliu234.chatgpt.site',
+    liveUrl: 'https://mul.tjren.site/',
     featured: true,
   },
   {
