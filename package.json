@@ -1,6 +1,7 @@
 {
   "name": "austin-liu-space",
   "version": "1.0.0",
+  "description": "Personal site and project showcase built with Next.js 15, React 19, and static export.",
   "private": true,
   "scripts": {
     "dev": "next dev",
