@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  Fragment,
   useCallback,
   useEffect,
   useMemo,
@@ -35,6 +36,41 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { projects, site, type NavItem } from '@/config/site';
+import { noteBySlug, notes } from '@/config/notes';
+
+type SearchItem = {
+  label: string;
+  href: string;
+  group: 'Pages' | 'Notes' | 'Projects';
+  hint?: string;
+  keywords?: string;
+};
+
+const searchGroups: SearchItem['group'][] = ['Pages', 'Notes', 'Projects'];
+
+const searchIndex: SearchItem[] = [
+  ...site.nav.map((item) => ({
+    label: item.label,
+    href: item.href,
+    group: 'Pages' as const,
+  })),
+  ...notes.map((note) => ({
+    label: note.title,
+    href: `/notes/${note.slug}`,
+    group: 'Notes' as const,
+    hint: note.label,
+    keywords: [note.localTitle, note.excerpt, note.label, note.dateLabel]
+      .filter(Boolean)
+      .join(' '),
+  })),
+  ...projects.map((project) => ({
+    label: project.title,
+    href: '/projects',
+    group: 'Projects' as const,
+    hint: project.status,
+    keywords: [project.tagline, project.tags.join(' ')].join(' '),
+  })),
+];
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -209,11 +245,17 @@ export function Nav() {
 
   const filteredNav = useMemo(() => {
     const value = query.trim().toLowerCase();
-    if (!value) return site.nav;
-    return site.nav.filter((item) => item.label.toLowerCase().includes(value));
+    if (!value) return searchIndex.filter((item) => item.group === 'Pages');
+    return searchIndex.filter((item) =>
+      [item.label, item.hint, item.keywords]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+        .includes(value),
+    );
   }, [query]);
 
-  const isActive = (item: NavItem) => {
+  const isActive = (item: Pick<NavItem, 'href'>) => {
     const currentPath = normalisePath(pathname || '/');
     if (item.href === '/#contact') {
       return currentPath === '/' && hash === '#contact';
@@ -348,7 +390,7 @@ export function Nav() {
             className="palette"
             role="dialog"
             aria-modal="true"
-            aria-label="Search site pages"
+            aria-label="Search pages, notes, and projects"
             onClick={(event) => event.stopPropagation()}
             onKeyDown={trapDialogFocus}
           >
@@ -361,7 +403,7 @@ export function Nav() {
                 id="site-search"
                 autoFocus
                 value={query}
-                placeholder="Jump to a page..."
+                placeholder="Search pages, notes, projects..."
                 onChange={(event) => setQuery(event.target.value)}
               />
               <button
@@ -374,19 +416,36 @@ export function Nav() {
               </button>
             </div>
             <div className="palette-results" aria-live="polite">
-              {filteredNav.map((item) => (
-                <a
-                  className={isActive(item) ? 'active' : ''}
-                  key={item.label}
-                  href={item.href}
-                  onClick={() => closePalette(false)}
-                >
-                  <span>{item.label}</span>
-                  <ArrowUpRight size={16} aria-hidden="true" />
-                </a>
-              ))}
+              {searchGroups.map((group) => {
+                const items = filteredNav.filter((item) => item.group === group);
+                if (!items.length) return null;
+                return (
+                  <Fragment key={group}>
+                    {query.trim() !== '' && (
+                      <p className="palette-group">{group}</p>
+                    )}
+                    {items.map((item) => (
+                      <a
+                        className={isActive(item) ? 'active' : ''}
+                        key={`${group}-${item.href}-${item.label}`}
+                        href={item.href}
+                        onClick={() => closePalette(false)}
+                      >
+                        <span>{item.label}</span>
+                        {item.hint ? (
+                          <small className="palette-hint">{item.hint}</small>
+                        ) : (
+                          <ArrowUpRight size={16} aria-hidden="true" />
+                        )}
+                      </a>
+                    ))}
+                  </Fragment>
+                );
+              })}
               {!filteredNav.length && (
-                <p className="palette-empty">No matching page. Try “Projects”.</p>
+                <p className="palette-empty">
+                  No matches. Try “notes”, a place, or a project name.
+                </p>
               )}
             </div>
           </div>
@@ -998,26 +1057,14 @@ function Gallery() {
   );
 }
 
-const journalItems = [
-  {
-    title: 'Shanghai Memories',
-    copy: 'Classical streets, everyday warmth, and a city lit by cyberpunk neon.',
-    href: '/notes/shanghai-memories',
-    time: '5 min read',
-  },
-  {
-    title: 'The Great Ocean Road',
-    copy: 'A slow drive through salt air, rainforest, and the edge of summer.',
-    href: '/notes/great-ocean-road',
-    time: '4 min read',
-  },
-  {
-    title: 'A First Sydney Chapter',
-    copy: 'Sandstone quadrangles, harbour light, and an early Australian memory.',
-    href: '/notes/sydney',
-    time: '4 min read',
-  },
-];
+const journalItems = notes
+  .filter((note) => note.featured)
+  .map((note) => ({
+    title: note.title,
+    copy: note.excerpt,
+    href: `/notes/${note.slug}`,
+    time: note.readingTime,
+  }));
 
 function Journal() {
   return (
@@ -1187,28 +1234,54 @@ export function SitePage() {
 }
 
 export function NoteLayout({
-  kicker,
-  title,
-  lede,
+  slug,
   children,
 }: {
-  kicker: string;
-  title: string;
-  lede: string;
+  slug: string;
   children: React.ReactNode;
 }) {
+  const note = noteBySlug(slug);
+  const index = notes.findIndex((item) => item.slug === slug);
+  const previous = index > 0 ? notes[index - 1] : null;
+  const next = index < notes.length - 1 ? notes[index + 1] : null;
+
   return (
     <>
       <Nav />
       <main id="main-content" className="legacy-page article-page">
         <section className="legacy-hero">
           <div className="container">
-            <p className="eyebrow">{kicker}</p>
-            <h1>{title}</h1>
-            <p className="lede">{lede}</p>
+            <p className="eyebrow">{note.kicker}</p>
+            <h1>{note.pageTitle}</h1>
+            <p className="lede">{note.lede}</p>
+            <p className="article-meta">
+              <span>{note.dateLabel}</span>
+              <span aria-hidden="true">·</span>
+              <span>{note.readingTime}</span>
+            </p>
           </div>
         </section>
         <article className="container article-content">{children}</article>
+        {(previous || next) && (
+          <nav className="container note-pagination" aria-label="More notes">
+            {previous ? (
+              <a className="note-page-link" href={`/notes/${previous.slug}`}>
+                <span>&larr; Previous note</span>
+                <strong>{previous.title}</strong>
+              </a>
+            ) : (
+              <span aria-hidden="true" />
+            )}
+            {next ? (
+              <a className="note-page-link next" href={`/notes/${next.slug}`}>
+                <span>Next note &rarr;</span>
+                <strong>{next.title}</strong>
+              </a>
+            ) : (
+              <span aria-hidden="true" />
+            )}
+          </nav>
+        )}
       </main>
       <footer className="article-footer">
         <div className="container">

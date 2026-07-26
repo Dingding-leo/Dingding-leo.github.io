@@ -6,3 +6,5 @@ output/
 .playwright-cli/
 tsconfig.tsbuildinfo
 .DS_Store
+.agents/
+.claude/

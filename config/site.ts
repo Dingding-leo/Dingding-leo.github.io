@@ -69,7 +69,7 @@ export const projects: Project[] = [
     title: 'Austin Liu / Personal space',
     tagline: 'The site you are exploring now.',
     description:
-      'A warm, animated home for dental school, daily life, field notes, and the useful experiments I am building along the way.',
+      'A warm, honest corner of the internet for dental school, daily life, field notes, and the useful experiments I am building along the way.',
     image: '/assets/projects-bg.jpg',
     imageAlt: 'Soft abstract shapes representing Austin Liu\'s personal website',
     tags: ['Next.js', 'Design', 'Accessibility'],
@@ -80,6 +80,7 @@ export const projects: Project[] = [
 
 export const site = {
   name: 'Austin Liu',
+  url: 'https://dingding-leo.github.io',
   email: 'austinliu234@gmail.com',
   location: 'Adelaide, Australia',
   description:

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Nav } from '@/components/Site';
 import { projects, type Project } from '@/config/site';
+import { notes as allNotes } from '@/config/notes';
 
 const reveal = {
   hidden: { opacity: 0, y: 20 },
@@ -292,57 +293,14 @@ function ProjectCard({ project }: { project: Project }) {
   );
 }
 
-const notes = [
-  {
-    title: '魔都漫游：一半是烟火，一半是赛博霓虹',
-    excerpt: '上海，一座古典与魔幻赛博朋克交织的城市。这是我的旅途纪实。',
-    label: 'Shanghai',
-    time: '5 min read',
-    href: '/notes/shanghai-memories',
-  },
-  {
-    title: 'The Great Ocean Road',
-    excerpt: 'Salt air, rainforest, long roads, and a landscape that asks you to slow down.',
-    label: 'Victoria',
-    time: '4 min read',
-    href: '/notes/great-ocean-road',
-  },
-  {
-    title: 'A First Sydney Chapter',
-    excerpt: 'Sandstone quadrangles, harbour light, and an early memory of life in Australia.',
-    label: 'Sydney',
-    time: '4 min read',
-    href: '/notes/sydney',
-  },
-  {
-    title: 'Adelaide, Slowly',
-    excerpt: 'Riverbank walks, campus routines, and a city that leaves enough room to grow.',
-    label: 'Adelaide',
-    time: '3 min read',
-    href: '/notes/adelaide',
-  },
-  {
-    title: 'Melbourne in Two Moods',
-    excerpt: 'St Kilda sunsets, Dandenong mornings, and a city that keeps changing pace.',
-    label: 'Melbourne',
-    time: '3 min read',
-    href: '/notes/melbourne',
-  },
-  {
-    title: 'Forty-Eight Hours in Beijing',
-    excerpt: 'A quick chapter of big landmarks, loud theme parks, and late-evening light.',
-    label: 'Beijing',
-    time: '3 min read',
-    href: '/notes/beijing',
-  },
-  {
-    title: 'Warm Days in Cairns',
-    excerpt: 'Barron Gorge, marina mornings, and a winter week that felt like summer.',
-    label: 'Cairns',
-    time: '3 min read',
-    href: '/notes/cairns',
-  },
-];
+const notes = allNotes.map((note) => ({
+  title: note.localTitle ?? note.title,
+  excerpt: note.localExcerpt ?? note.excerpt,
+  label: note.label,
+  time: note.readingTime,
+  date: note.dateLabel,
+  href: `/notes/${note.slug}`,
+}));
 
 export function NotesPage() {
   return (
@@ -369,6 +327,7 @@ export function NotesPage() {
             </div>
             <div className="note-meta">
               <span>{note.label}</span>
+              <span>{note.date}</span>
               <span>
                 <Clock size={13} /> {note.time}
               </span>
