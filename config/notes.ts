@@ -8,6 +8,8 @@ export type Note = {
   excerpt: string;
   /** Display excerpt on the notes index when it differs from the canonical excerpt. */
   localExcerpt?: string;
+  /** BCP 47 language tag for localTitle/localExcerpt when they are not English. */
+  localLang?: string;
   /** The note page's own headline. */
   pageTitle: string;
   kicker: string;
@@ -28,6 +30,7 @@ export const notes: Note[] = [
     localTitle: '魔都漫游：一半是烟火，一半是赛博霓虹',
     excerpt: 'Classical streets, everyday warmth, and a city lit by cyberpunk neon.',
     localExcerpt: '上海，一座古典与魔幻赛博朋克交织的城市。这是我的旅途纪实。',
+    localLang: 'zh-Hans',
     pageTitle: 'Magic in the madness.',
     kicker: 'Notes / Shanghai',
     lede: 'Disney by day, streets by night. Shanghai doesn’t give you a moment to breathe.',

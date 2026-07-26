@@ -1,4 +1,4 @@
-import { NoteLayout } from '@/components/Site';
+import { ArticleImage, NoteLayout } from '@/components/Site';
 import { noteMetadata } from '@/config/notes';
 
 export const metadata = noteMetadata('great-ocean-road');
@@ -6,7 +6,7 @@ export const metadata = noteMetadata('great-ocean-road');
 export default function Page() {
   return (
     <NoteLayout slug="great-ocean-road">
-      <p>December 22, 2024. Summer break, a full tank of petrol, and the Great Ocean Road stretching ahead. Sometimes the best trips are the ones you don't over-plan.</p><h2>The Twelve Apostles</h2><p>Port Campbell National Park. You've seen the photos a hundred times, but standing there in person — the wind pushing against you, the Southern Ocean stretching to Antarctica, those limestone stacks rising out of the water — it's different. Quieter. Bigger.</p><img src="/assets/gallery/great-ocean-road.jpg" alt="Twelve Apostles" loading="lazy"/><h2>Great Otway National Park</h2><p>Further inland, the landscape shifts. The Otway rainforest is dense and cool — tree ferns, ancient myrtle beech, the smell of damp earth. A completely different world from the windswept coast just twenty minutes away.</p><img src="/assets/gallery/gor-otway.jpg" alt="Great Otway National Park" loading="lazy"/><p>One day, one road, two completely different Australias.</p>
+      <p>December 22, 2024. Summer break, a full tank of petrol, and the Great Ocean Road stretching ahead. Sometimes the best trips are the ones you don't over-plan.</p><h2>The Twelve Apostles</h2><p>Port Campbell National Park. You've seen the photos a hundred times, but standing there in person — the wind pushing against you, the Southern Ocean stretching to Antarctica, those limestone stacks rising out of the water — it's different. Quieter. Bigger.</p><ArticleImage src="/assets/gallery/great-ocean-road.jpg" alt="Twelve Apostles"/><h2>Great Otway National Park</h2><p>Further inland, the landscape shifts. The Otway rainforest is dense and cool — tree ferns, ancient myrtle beech, the smell of damp earth. A completely different world from the windswept coast just twenty minutes away.</p><ArticleImage src="/assets/gallery/gor-otway.jpg" alt="Great Otway National Park"/><p>One day, one road, two completely different Australias.</p>
     </NoteLayout>
   );
 }

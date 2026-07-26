@@ -296,6 +296,7 @@ function ProjectCard({ project }: { project: Project }) {
 const notes = allNotes.map((note) => ({
   title: note.localTitle ?? note.title,
   excerpt: note.localExcerpt ?? note.excerpt,
+  lang: note.localTitle ? note.localLang : undefined,
   label: note.label,
   time: note.readingTime,
   date: note.dateLabel,
@@ -321,7 +322,7 @@ export function NotesPage() {
             variants={reveal}
           >
             <div className="note-index">{String(index + 1).padStart(2, '0')}</div>
-            <div className="note-main">
+            <div className="note-main" lang={note.lang}>
               <h2>{note.title}</h2>
               <p>{note.excerpt}</p>
             </div>

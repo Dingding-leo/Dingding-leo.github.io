@@ -74,10 +74,40 @@ const searchIndex: SearchItem[] = [
 ];
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'production') return;
+    if (!('serviceWorker' in navigator)) return;
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }, []);
+
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
       {children}
     </ThemeProvider>
+  );
+}
+
+export function ArticleImage({
+  src,
+  alt,
+  thumbWidth = 800,
+  fullWidth = 1920,
+}: {
+  src: string;
+  alt: string;
+  thumbWidth?: number;
+  fullWidth?: number;
+}) {
+  const thumb = src.replace(/\.jpg$/, '_thumb.jpg');
+  return (
+    <img
+      src={src}
+      srcSet={`${thumb} ${thumbWidth}w, ${src} ${fullWidth}w`}
+      sizes="(max-width: 828px) 100vw, 780px"
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+    />
   );
 }
 
@@ -203,6 +233,18 @@ export function Nav() {
     const updateHash = () => setHash(window.location.hash);
     const onKeyDown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        setPalette(true);
+      }
+      if (
+        event.key === '/' &&
+        !event.metaKey &&
+        !event.ctrlKey &&
+        !(event.target instanceof HTMLElement &&
+          (event.target.tagName === 'INPUT' ||
+            event.target.tagName === 'TEXTAREA' ||
+            event.target.isContentEditable))
+      ) {
         event.preventDefault();
         setPalette(true);
       }
@@ -1105,6 +1147,54 @@ function Journal() {
   );
 }
 
+function ContactForm() {
+  const [name, setName] = useState('');
+  const [message, setMessage] = useState('');
+
+  const submit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const subject = encodeURIComponent(
+      name.trim() ? `Hello from ${name.trim()}` : 'Hello from your website',
+    );
+    const body = encodeURIComponent(message.trim());
+    window.location.href = `mailto:${site.email}?subject=${subject}&body=${body}`;
+  };
+
+  return (
+    <form className="contact-form" onSubmit={submit}>
+      <label>
+        <span>Your name</span>
+        <input
+          type="text"
+          name="name"
+          autoComplete="name"
+          placeholder="How should I address you?"
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+        />
+      </label>
+      <label>
+        <span>Message</span>
+        <textarea
+          name="message"
+          rows={4}
+          required
+          placeholder="A hello, a question, a food recommendation..."
+          value={message}
+          onChange={(event) => setMessage(event.target.value)}
+        />
+      </label>
+      <button type="submit">
+        Draft the email <ArrowUpRight size={15} aria-hidden="true" />
+      </button>
+      <p className="contact-form-note">
+        Opens your own mail app with the message ready to send — nothing is
+        stored on this site.
+      </p>
+    </form>
+  );
+}
+
 function Contact() {
   const [copied, setCopied] = useState(false);
 
@@ -1151,6 +1241,7 @@ function Contact() {
                   <Github size={19} />
                 </a>
               </div>
+              <ContactForm />
             </div>
           </div>
         </Reveal>
@@ -1289,8 +1380,36 @@ export function NoteLayout({
   const previous = index > 0 ? notes[index - 1] : null;
   const next = index < notes.length - 1 ? notes[index + 1] : null;
 
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'BlogPosting',
+        headline: note.title,
+        description: note.lede,
+        image: `${site.url}${note.image}`,
+        datePublished: note.date,
+        inLanguage: 'en-AU',
+        author: { '@type': 'Person', name: site.name, url: site.url },
+        mainEntityOfPage: `${site.url}/notes/${note.slug}/`,
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: `${site.url}/` },
+          { '@type': 'ListItem', position: 2, name: 'Notes', item: `${site.url}/notes/` },
+          { '@type': 'ListItem', position: 3, name: note.title },
+        ],
+      },
+    ],
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
       <Nav />
       <main id="main-content" className="legacy-page article-page">
         <section className="legacy-hero">
