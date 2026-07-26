@@ -28,6 +28,7 @@ import {
   MessageCircle,
   PenLine,
   Search,
+  Share2,
   Sun,
   Utensils,
   Users,
@@ -1233,6 +1234,49 @@ export function SitePage() {
   );
 }
 
+function NoteShare({ title }: { title: string }) {
+  const [copied, setCopied] = useState(false);
+  const [canShare, setCanShare] = useState(false);
+
+  useEffect(() => {
+    setCanShare(typeof navigator !== 'undefined' && !!navigator.share);
+  }, []);
+
+  const copyLink = async () => {
+    if (!navigator.clipboard) return;
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  const share = async () => {
+    try {
+      await navigator.share({ title, url: window.location.href });
+    } catch {
+      // user dismissed the share sheet
+    }
+  };
+
+  return (
+    <div className="container article-share">
+      <button type="button" onClick={copyLink}>
+        {copied ? <Check size={15} /> : <Copy size={15} />}
+        <span aria-live="polite">{copied ? 'Link copied' : 'Copy link'}</span>
+      </button>
+      {canShare && (
+        <button type="button" onClick={share}>
+          <Share2 size={15} />
+          <span>Share</span>
+        </button>
+      )}
+    </div>
+  );
+}
+
 export function NoteLayout({
   slug,
   children,
@@ -1262,6 +1306,7 @@ export function NoteLayout({
           </div>
         </section>
         <article className="container article-content">{children}</article>
+        <NoteShare title={note.title} />
         {(previous || next) && (
           <nav className="container note-pagination" aria-label="More notes">
             {previous ? (
