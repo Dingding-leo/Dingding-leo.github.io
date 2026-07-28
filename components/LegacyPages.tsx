@@ -85,38 +85,61 @@ export function AboutPage() {
       title="A public notebook, still in progress."
       copy="A little more context about the person behind the notes, projects, and experiments."
     >
-      <div className="legacy-split">
-        <motion.div
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true }}
-          variants={reveal}
+      <motion.div 
+        initial={{ opacity: 0 }} 
+        animate={{ opacity: 1 }} 
+        transition={{ staggerChildren: 0.15 }}
+      >
+        <motion.div 
+          className="legacy-split"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
-          <p className="legacy-lead">
-            I&apos;m Austin — a dental student at university with a deep interest
-            in technology, artificial intelligence, and quantitative systems.
-            I believe the best way to learn is to build, and the best way to
-            build is to ship.
-          </p>
-          <p>
-            This site is my public notebook. It&apos;s not a portfolio designed to
-            impress — it&apos;s a working laboratory where I document what I&apos;m
-            learning, what I&apos;m building, and what I&apos;m thinking about.
-          </p>
+          <div>
+            <p className="legacy-lead">
+              A dentistry student who builds software. Born in China, studying in
+              Australia. Currently exploring the intersection of design, code, and
+              healthcare.
+            </p>
+            <div className="legacy-stats mt-10">
+              <div className="stat-card">
+                <span>Location</span>
+                <strong>ADL</strong>
+                <span className="text-[10px] text-zinc-400">South Australia</span>
+              </div>
+              <div className="stat-card">
+                <span>Discipline</span>
+                <strong>BDS</strong>
+                <span className="text-[10px] text-zinc-400">Year 3 / Clinical</span>
+              </div>
+              <div className="stat-card">
+                <span>Code</span>
+                <strong>TS</strong>
+                <span className="text-[10px] text-zinc-400">React / Next.js</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <p className="mb-6">
+              My background is a bit unconventional. I spend half my week in the
+              clinic learning how to restore teeth, and the other half in my code
+              editor building tools I wish existed.
+            </p>
+            <p className="mb-6">
+              I believe the most interesting work happens at the boundaries between
+              disciplines. The precision and manual dexterity required in dentistry
+              translates surprisingly well to the discipline of writing maintainable
+              code and crafting intuitive interfaces.
+            </p>
+            <p>
+              When I&apos;m not studying or coding, I&apos;m probably taking photos
+              somewhere, reading design books, or trying to understand web3 primitives
+              like Soroban smart contracts.
+            </p>
+          </div>
         </motion.div>
-        <div className="legacy-stats">
-          <Stat number={String(projects.length).padStart(2, '0')} label="Listed projects" />
-          <Stat number="05" label="Fields of study" />
-          <Stat number="∞" label="Things to learn" />
-        </div>
-      </div>
-      <div className="legacy-callout">
-        <Star size={18} />
-        <span>
-          Precision in dentistry, curiosity in technology, and enough room for
-          ordinary life.
-        </span>
-      </div>
+      </motion.div>
     </Wrap>
   );
 }
@@ -188,32 +211,30 @@ export function MomentsPage() {
       title="A few things worth remembering."
       copy="Places I've been, things I've seen, and the small moments that stay with you."
     >
-      <div className="legacy-gallery">
-        {items.map((item, index) => (
+      <motion.div 
+        className="legacy-gallery" 
+        initial={{ opacity: 0 }} 
+        animate={{ opacity: 1 }} 
+        transition={{ staggerChildren: 0.15 }}
+      >
+        {items.map((item, i) => (
           <motion.a
-            className={`legacy-photo photo-${index}`}
             href={item.href}
             key={item.title}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true }}
-            variants={reveal}
+            className={`legacy-photo ${i < 2 ? 'photo-' + (i + 1) : 'photo-sm'}`}
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           >
-            <img
-              src={item.image}
-              alt={item.title}
-              loading={index < 2 ? 'eager' : 'lazy'}
-              decoding="async"
-            />
+            <img src={item.image} alt={item.title} />
             <div>
-              <span className="eyebrow">Moment / 0{index + 1}</span>
               <h2>{item.title}</h2>
               <p>{item.copy}</p>
             </div>
-            <ArrowUpRight size={18} aria-hidden="true" />
+            <ArrowUpRight size={24} aria-hidden="true" color="rgba(255,255,255,0.7)" />
           </motion.a>
         ))}
-      </div>
+      </motion.div>
     </Wrap>
   );
 }
@@ -316,45 +337,48 @@ const notes = allNotes.map((note) => ({
 }));
 
 export function NotesPage() {
+  const container = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { staggerChildren: 0.1 } }
+  };
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } }
+  };
+
   return (
     <Wrap
       kicker="Notes / 04"
       title="Things I&apos;ve been thinking about."
       copy="Field notes from places, projects, and the ordinary days that are worth keeping."
     >
-      <div className="notes-list">
+      <motion.div variants={container} initial="hidden" animate="show" className="notes-list">
         {notes.map((note, index) => (
           <motion.a
-            className="legacy-note"
+            className="legacy-note group"
             href={note.href}
             key={note.title}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true }}
-            variants={reveal}
+            variants={item}
           >
-            <div className="note-index">{String(index + 1).padStart(2, '0')}</div>
-            <div className="note-main" lang={note.lang}>
+            <div className="note-index group-hover:text-amber-600 transition-colors">{String(index + 1).padStart(2, '0')}</div>
+            <div className="note-main group-hover:translate-x-2 transition-transform duration-300" lang={note.lang}>
               <h2>{note.title}</h2>
               <p>{note.excerpt}</p>
             </div>
-            <div className="note-meta">
+            <div className="note-meta opacity-60 group-hover:opacity-100 transition-opacity">
               <span>{note.label}</span>
               <span>{note.date}</span>
               <span>
                 <Clock size={13} /> {note.time}
               </span>
             </div>
-            <ArrowUpRight size={18} aria-hidden="true" />
+            <ArrowUpRight size={18} aria-hidden="true" className="opacity-0 -translate-x-2 translate-y-2 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-300 text-amber-600" />
           </motion.a>
         ))}
-      </div>
+      </motion.div>
     </Wrap>
   );
-}
-
-
-export function LibraryPage() {
+}export function LibraryPage() {
   const container = {
     hidden: { opacity: 0 },
     show: {
