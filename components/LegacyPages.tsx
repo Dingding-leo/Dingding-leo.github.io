@@ -15,6 +15,7 @@ import {
 import { Nav } from '@/components/Site';
 import { projects, type Project } from '@/config/site';
 import { notes as allNotes } from '@/config/notes';
+import { books, movies } from '@/config/media';
 
 const reveal = {
   hidden: { opacity: 0, y: 20 },
@@ -341,44 +342,67 @@ export function NotesPage() {
   );
 }
 
-export function NowPage() {
+export function LibraryPage() {
   return (
     <Wrap
-      kicker="Now / 05"
-      title="What I&apos;m doing now."
-      copy="A current snapshot, updated as the season changes."
+      kicker="Library / 05"
+      title="Digital Bookshelf & Cinema."
+      copy="A collection of books I've read and movies I've watched recently."
     >
-      <div className="now-card legacy-now">
-        <div className="now-updated">Last updated: July 2026</div>
-        <ul>
-          <li>
-            <BookOpen size={18} /> Studying dentistry and preparing for clinical
-            rotations
-          </li>
-          <li>
-            <PenLine size={18} /> Shipping and refining KnightClub and
-            ScholarBank
-          </li>
-          <li>
-            <Tags size={18} /> Organising GitHub and documenting useful projects
-          </li>
-          <li>
-            <MapPin size={18} /> Reading about systems thinking,
-            decision-making, and compounding
-          </li>
-        </ul>
-      </div>
-      <div className="legacy-bottom-grid">
-        <div>
-          <span className="eyebrow">A small note</span>
-          <p className="legacy-lead">
-            The current priority is simple: learn properly, make useful things,
-            and keep a life outside the screen.
-          </p>
-        </div>
-        <a className="button" href="/#contact">
-          Say hello <ArrowUpRight size={16} />
-        </a>
+      <div className="mt-12 space-y-16">
+        <section>
+          <h2 className="text-2xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-6">
+            Books
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {books.map((book) => (
+              <div key={book.title} className="flex flex-col group">
+                <div className="aspect-[2/3] relative overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 mb-3 shadow-[0_4px_12px_rgba(0,0,0,0.05)] dark:shadow-none transition-transform duration-300 group-hover:-translate-y-1">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={book.coverImage} alt={book.title} className="object-cover w-full h-full" />
+                </div>
+                <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100 leading-tight">
+                  {book.title}
+                </h3>
+                <p className="text-xs text-amber-600 dark:text-amber-500 mt-1">
+                  {book.creator}
+                </p>
+                {book.comment && (
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-2 line-clamp-2">
+                    "{book.comment}"
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-6">
+            Movies
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {movies.map((movie) => (
+              <div key={movie.title} className="flex flex-col group">
+                <div className="aspect-[2/3] relative overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 mb-3 shadow-[0_4px_12px_rgba(0,0,0,0.05)] dark:shadow-none transition-transform duration-300 group-hover:-translate-y-1">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={movie.coverImage} alt={movie.title} className="object-cover w-full h-full" />
+                </div>
+                <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100 leading-tight">
+                  {movie.title}
+                </h3>
+                <p className="text-xs text-amber-600 dark:text-amber-500 mt-1">
+                  {movie.creator}
+                </p>
+                {movie.comment && (
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-2 line-clamp-2">
+                    "{movie.comment}"
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
     </Wrap>
   );
