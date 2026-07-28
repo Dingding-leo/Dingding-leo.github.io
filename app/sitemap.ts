@@ -11,7 +11,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${site.url}/projects/`, priority: 0.9 },
     { url: `${site.url}/moments/`, priority: 0.7 },
     { url: `${site.url}/notes/`, priority: 0.8 },
+    { url: `${site.url}/library/`, priority: 0.5 },
     { url: `${site.url}/now/`, priority: 0.6 },
+    { url: `${site.url}/contact/`, priority: 0.6 },
   ];
 
   const noteEntries: MetadataRoute.Sitemap = notes.map((note) => ({

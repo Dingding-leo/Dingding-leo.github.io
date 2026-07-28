@@ -13,7 +13,7 @@ import {
   Tags,
 } from 'lucide-react';
 import { Nav } from '@/components/Site';
-import { projects, type Project } from '@/config/site';
+import { projects, site, type Project } from '@/config/site';
 import { notes as allNotes } from '@/config/notes';
 import { books, movies } from '@/config/media';
 
@@ -98,9 +98,9 @@ export function AboutPage() {
         >
           <div>
             <p className="legacy-lead">
-              A dentistry student who builds software. Born in China, studying in
-              Australia. Currently exploring the intersection of design, code, and
-              healthcare.
+              A builder and traveller from China, now based in Adelaide — making
+              small digital tools, collecting places, and keeping a public record
+              of the things that hold my attention.
             </p>
             <div className="legacy-stats mt-10">
               <div className="stat-card">
@@ -109,9 +109,9 @@ export function AboutPage() {
                 <span className="text-[10px] text-zinc-400">South Australia</span>
               </div>
               <div className="stat-card">
-                <span>Discipline</span>
-                <strong>BDS</strong>
-                <span className="text-[10px] text-zinc-400">Year 3 / Clinical</span>
+                <span>Practice</span>
+                <strong>MAKE</strong>
+                <span className="text-[10px] text-zinc-400">Design / writing / code</span>
               </div>
               <div className="stat-card">
                 <span>Code</span>
@@ -122,20 +122,20 @@ export function AboutPage() {
           </div>
           <div>
             <p className="mb-6">
-              My background is a bit unconventional. I spend half my week in the
-              clinic learning how to restore teeth, and the other half in my code
-              editor building tools I wish existed.
+              I like work that begins with a real question: could this be calmer,
+              clearer, or more useful? That has led me from interface details and
+              prototypes to photographs, short notes, and long walks with a camera.
             </p>
             <p className="mb-6">
-              I believe the most interesting work happens at the boundaries between
-              disciplines. The precision and manual dexterity required in dentistry
-              translates surprisingly well to the discipline of writing maintainable
-              code and crafting intuitive interfaces.
+              This site is less a résumé than a field notebook. Projects show how I
+              think through a problem; Moments are a way of paying closer attention;
+              Notes are where unfinished ideas get a little room to breathe.
             </p>
             <p>
-              When I&apos;m not studying or coding, I&apos;m probably taking photos
-              somewhere, reading design books, or trying to understand web3 primitives
-              like Soroban smart contracts.
+              Dentistry is one important room in that wider life: a discipline I am
+              studying seriously, and one that has taught me patience, care, and the
+              value of getting the small things right. Outside it, I&apos;m usually
+              reading, building, travelling, or looking for the next blue hour.
             </p>
           </div>
         </motion.div>
@@ -474,8 +474,8 @@ export function ContactPage() {
     >
       <div className="legacy-contact mt-8">
         <p className="mb-4">Feel free to drop me an email:</p>
-        <a className="email inline-flex items-center gap-2 text-xl font-medium hover:text-amber-600 transition-colors" href="mailto:contact@austinliu.com">
-          contact@austinliu.com
+        <a className="email inline-flex items-center gap-2 text-xl font-medium hover:text-amber-600 transition-colors" href={`mailto:${site.email}`}>
+          {site.email}
           <ArrowUpRight size={18} aria-hidden="true" />
         </a>
       </div>

@@ -216,3 +216,47 @@ body{background:#fff;color:#111}
     object-fit: contain !important;
     background: #131210 !important;
 }
+
+/* Legacy Moments: the grid owns the dimensions; photos fill those boxes.
+   This avoids the previous contain-mode letterboxing while keeping each card
+   inside its responsive grid track. */
+.legacy-photo {
+  height: auto;
+  aspect-ratio: 4 / 3;
+  min-width: 0;
+}
+.legacy-photo.photo-1,
+.legacy-photo.photo-2 {
+  height: auto;
+}
+.legacy-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  background: transparent;
+}
+.legacy-photo.photo-1 img { object-position: 50% 50%; }
+.legacy-photo.photo-2 img { object-position: 50% 45%; }
+
+/* The Last Blue Hour root state */
+html.blue-hour-page {
+  scroll-behavior: smooth;
+  overflow-x: clip;
+  background: #06101b;
+  color-scheme: dark;
+}
+html.blue-hour-page body {
+  overflow-x: clip;
+  background: #06101b;
+}
+html[data-blue-hour-entry="open"] body {
+  overflow: hidden;
+}
+html[data-blue-hour-entered="yes"]
+  [role="dialog"][aria-labelledby="blue-hour-entry-title"] {
+  visibility: hidden;
+}
+@media(prefers-reduced-motion:reduce){
+  html.blue-hour-page{scroll-behavior:auto}
+}

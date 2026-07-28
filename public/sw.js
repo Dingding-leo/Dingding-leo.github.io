@@ -1,5 +1,5 @@
 /* Offline support: network-first for pages, stale-while-revalidate for assets. */
-const CACHE = 'al-site-v1';
+const CACHE = 'al-blue-hour-v2';
 
 self.addEventListener('install', () => {
   self.skipWaiting();

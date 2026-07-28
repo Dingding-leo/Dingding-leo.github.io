@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 const mono = DM_Mono({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-mono' });
 const playfair = Playfair_Display({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-serif' });
 
-const siteTitle = 'Austin Liu — Dental Student in Adelaide';
+const siteTitle = 'Austin Liu — The Last Blue Hour';
 
 export const metadata: Metadata = {
   title: {
@@ -28,15 +28,22 @@ export const metadata: Metadata = {
     title: siteTitle,
     description: site.description,
     type: 'website',
-    siteName: 'Austin Liu — Personal Space',
+    siteName: 'The Last Blue Hour',
     locale: 'en_AU',
-    images: ['/assets/projects-bg.jpg'],
+    images: [
+      {
+        url: '/og.png',
+        width: 1200,
+        height: 630,
+        alt: 'The Last Blue Hour — Austin Liu',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: siteTitle,
     description: site.description,
-    images: ['/assets/projects-bg.jpg'],
+    images: ['/og.png'],
   },
 };
 
@@ -44,7 +51,7 @@ export const viewport = {
   width: 'device-width',
   initialScale: 1,
   themeColor: [
-    { media: '(prefers-color-scheme: dark)', color: '#0c0e0d' },
+    { media: '(prefers-color-scheme: dark)', color: '#06101b' },
     { media: '(prefers-color-scheme: light)', color: '#f3eee5' },
   ],
 };
@@ -58,7 +65,14 @@ const structuredData = {
       name: site.name,
       url: site.url,
       email: `mailto:${site.email}`,
-      jobTitle: 'Dental Student',
+      description: site.identity,
+      knowsAbout: [
+        'Product design',
+        'Software development',
+        'Photography',
+        'Writing',
+        'Dentistry',
+      ],
       address: { '@type': 'PostalAddress', addressLocality: 'Adelaide', addressCountry: 'AU' },
       sameAs: [site.github],
     },
@@ -66,7 +80,8 @@ const structuredData = {
       '@type': 'WebSite',
       '@id': `${site.url}/#website`,
       url: site.url,
-      name: 'Austin Liu — Personal Space',
+      name: 'The Last Blue Hour',
+      alternateName: 'Austin Liu — Personal Space',
       description: site.description,
       publisher: { '@id': `${site.url}/#person` },
       inLanguage: 'en-AU',
@@ -78,6 +93,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${mono.variable} ${playfair.variable}`}>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{var seen=sessionStorage.getItem('blue-hour-entered')==='yes';if(seen){document.documentElement.dataset.blueHourEntered='yes'}else if(location.pathname==='/'){document.documentElement.dataset.blueHourEntry='open'}}catch(_){}})();",
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}

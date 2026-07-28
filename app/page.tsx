@@ -1,2 +1,5 @@
-import { SitePage } from '@/components/Site';
-export default function Page(){return <SitePage/>}
+import { BlueHourSite } from '@/components/blue-hour/BlueHourSite';
+
+export default function Page() {
+  return <BlueHourSite />;
+}
