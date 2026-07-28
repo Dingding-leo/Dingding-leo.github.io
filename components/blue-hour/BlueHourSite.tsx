@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -252,168 +251,6 @@ function ChapterTitle({
       </p>
       {children}
     </motion.header>
-  );
-}
-
-function Entry({
-  visible,
-  onSound,
-  onSilent,
-}: {
-  visible: boolean;
-  onSound: () => void;
-  onSilent: () => void;
-}) {
-  const primary = useRef<HTMLButtonElement>(null);
-  const secondary = useRef<HTMLButtonElement>(null);
-  const reducedMotion = useReducedMotion();
-  const modalState = useRef<{
-    previousOverflow: string;
-    siblings: Array<{
-      element: HTMLElement;
-      inert: boolean;
-      ariaHidden: string | null;
-    }>;
-  } | null>(null);
-
-  const releaseModal = useCallback(() => {
-    const state = modalState.current;
-    if (state) {
-      document.body.style.overflow = state.previousOverflow;
-      state.siblings.forEach(({ element, inert, ariaHidden }) => {
-        element.inert = inert;
-        if (ariaHidden === null) element.removeAttribute('aria-hidden');
-        else element.setAttribute('aria-hidden', ariaHidden);
-      });
-      modalState.current = null;
-    }
-    document.documentElement.dataset.blueHourEntered = 'yes';
-    delete document.documentElement.dataset.blueHourEntry;
-    window.requestAnimationFrame(() => {
-      document.getElementById('main-content')?.focus({ preventScroll: true });
-    });
-  }, []);
-
-  useEffect(() => {
-    if (
-      !visible ||
-      document.documentElement.dataset.blueHourEntered === 'yes'
-    ) {
-      return;
-    }
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    const dialog = primary.current?.closest<HTMLElement>('[role="dialog"]');
-    const siblings = dialog?.parentElement
-      ? Array.from(dialog.parentElement.children)
-          .filter((element) => element !== dialog)
-          .map((element) => {
-            const htmlElement = element as HTMLElement;
-            const state = {
-              element: htmlElement,
-              inert: htmlElement.inert,
-              ariaHidden: htmlElement.getAttribute('aria-hidden'),
-            };
-            htmlElement.inert = true;
-            htmlElement.setAttribute('aria-hidden', 'true');
-            return state;
-          })
-      : [];
-    modalState.current = { previousOverflow, siblings };
-    const timer = window.requestAnimationFrame(() => primary.current?.focus());
-    return () => window.cancelAnimationFrame(timer);
-  }, [visible]);
-
-  useEffect(() => () => releaseModal(), [releaseModal]);
-
-  return (
-    <AnimatePresence onExitComplete={releaseModal}>
-      {visible && (
-        <motion.div
-          className={styles.entry}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="blue-hour-entry-title"
-          onKeyDown={(event) => {
-            if (event.key === 'Escape') {
-              event.preventDefault();
-              onSilent();
-              return;
-            }
-            if (event.key !== 'Tab') return;
-            if (event.shiftKey && document.activeElement === primary.current) {
-              event.preventDefault();
-              secondary.current?.focus();
-            } else if (!event.shiftKey && document.activeElement === secondary.current) {
-              event.preventDefault();
-              primary.current?.focus();
-            }
-          }}
-          initial={false}
-          exit={{
-            opacity: 0,
-            transition: {
-              duration: reducedMotion ? 0 : 1.1,
-              delay: reducedMotion ? 0 : 0.2,
-            },
-          }}
-        >
-          <picture className={styles.entryImage} aria-hidden="true">
-            <source
-              type="image/avif"
-              srcSet="/assets/blue-hour/lighthouse-720.avif 720w, /assets/blue-hour/lighthouse-1200.avif 1200w, /assets/blue-hour/lighthouse-1672.avif 1672w"
-              sizes="100vw"
-            />
-            <source
-              type="image/webp"
-              srcSet="/assets/blue-hour/lighthouse-720.webp 720w, /assets/blue-hour/lighthouse-1200.webp 1200w, /assets/blue-hour/lighthouse-1672.webp 1672w"
-              sizes="100vw"
-            />
-            <img
-              src="/assets/blue-hour/lighthouse-1672.jpg"
-              alt=""
-              width={1672}
-              height={941}
-              fetchPriority="high"
-              decoding="sync"
-            />
-          </picture>
-          <div className={styles.entryShade} aria-hidden="true" />
-          <motion.div
-            className={styles.entryContent}
-            initial={false}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: reducedMotion ? 0 : 1.15,
-              delay: reducedMotion ? 0 : 0.25,
-              ease: [0.16, 1, 0.3, 1],
-            }}
-          >
-            <p>Adelaide · 19:31 · After rain</p>
-            <h1 id="blue-hour-entry-title">
-              Enter the
-              <br />
-              <em>blue hour</em>
-            </h1>
-            <span className={styles.entryChinese}>进入最后的蓝调时刻</span>
-            <div className={styles.entryActions}>
-              <button ref={primary} type="button" onClick={onSound}>
-                Enter with sound
-                <span aria-hidden="true">↗</span>
-              </button>
-              <button ref={secondary} type="button" onClick={onSilent}>
-                Enter silently
-              </button>
-            </div>
-            <small>Original generative ambience · headphones optional</small>
-          </motion.div>
-          <div className={styles.entryMeasure} aria-hidden="true">
-            <span>THE LAST BLUE HOUR</span>
-            <span>01 — 05</span>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
   );
 }
 
@@ -750,10 +587,12 @@ export function BlueHourSite() {
   const reducedMotion = useReducedMotion();
   const [active, setActive] = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [entered, setEntered] = useState(false);
   const chapterNodes = useRef<Array<HTMLElement | null>>([]);
   const root = useRef<HTMLDivElement>(null);
   const pointerFrame = useRef(0);
+  const audioStartRef = useRef<() => Promise<boolean>>(async () => false);
+  const audioPlayingRef = useRef(false);
+  const audioStartAttempting = useRef(false);
   const { scrollYProgress } = useScroll();
   const smoothProgress = useSpring(scrollYProgress, {
     stiffness: 80,
@@ -768,8 +607,76 @@ export function BlueHourSite() {
   );
 
   useEffect(() => {
-    const seen = window.sessionStorage.getItem('blue-hour-entered') === 'yes';
-    setEntered(seen);
+    audioStartRef.current = audio.start;
+    audioPlayingRef.current = audio.isPlaying;
+  }, [audio.isPlaying, audio.start]);
+
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem('blue-hour-sound') === 'off') return;
+    } catch {
+      // Storage can be unavailable in strict privacy modes; sound can still run.
+    }
+
+    const cleanup = () => {
+      window.removeEventListener('pointerdown', onGesture, true);
+      window.removeEventListener('keydown', onGesture, true);
+    };
+
+    const onGesture = (event: PointerEvent | KeyboardEvent) => {
+      if (audioPlayingRef.current) {
+        cleanup();
+        return;
+      }
+
+      const target = event.target;
+      if (
+        target instanceof Element &&
+        target.closest('[data-blue-hour-audio-toggle]')
+      ) {
+        return;
+      }
+
+      if (event instanceof KeyboardEvent) {
+        if (
+          event.repeat ||
+          event.ctrlKey ||
+          event.metaKey ||
+          event.altKey ||
+          !['Enter', ' '].includes(event.key)
+        ) {
+          return;
+        }
+        if (
+          target instanceof HTMLElement &&
+          (target.isContentEditable ||
+            ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))
+        ) {
+          return;
+        }
+      }
+
+      if (audioStartAttempting.current) return;
+      audioStartAttempting.current = true;
+      void audioStartRef
+        .current()
+        .then((started) => {
+          if (started) cleanup();
+        })
+        .catch(() => {
+          // Keep the listener armed for the next eligible interaction.
+        })
+        .finally(() => {
+          audioStartAttempting.current = false;
+        });
+    };
+
+    window.addEventListener('pointerdown', onGesture, {
+      capture: true,
+      passive: true,
+    });
+    window.addEventListener('keydown', onGesture, true);
+    return cleanup;
   }, []);
 
   useEffect(() => {
@@ -800,12 +707,6 @@ export function BlueHourSite() {
       html.classList.remove('blue-hour-page');
     };
   }, []);
-
-  const enter = (withSound: boolean) => {
-    window.sessionStorage.setItem('blue-hour-entered', 'yes');
-    setEntered(true);
-    if (withSound) audio.start().catch(() => {});
-  };
 
   const selectChapter = (index: number) => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -840,11 +741,6 @@ export function BlueHourSite() {
         onMouseMove={onPointerMove}
         style={{ '--active-chapter': active } as React.CSSProperties}
       >
-      <Entry
-        visible={!entered}
-        onSound={() => enter(true)}
-        onSilent={() => enter(false)}
-      />
       <SceneBackdrop active={active} />
       <motion.div
         className={styles.globalProgress}
@@ -874,7 +770,7 @@ export function BlueHourSite() {
             <motion.div
               className={styles.heroCopy}
               initial={{ opacity: 0, y: 36 }}
-              animate={entered ? { opacity: 1, y: 0 } : { opacity: 0, y: 36 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{
                 duration: reducedMotion ? 0 : 1.1,
                 delay: reducedMotion ? 0 : 0.35,
@@ -908,7 +804,7 @@ export function BlueHourSite() {
             <motion.aside
               className={`${styles.fieldNote} ${styles.heroFieldNote}`}
               initial={{ opacity: 0, rotate: -3, y: 20 }}
-              animate={entered ? { opacity: 1, rotate: -1.5, y: 0 } : {}}
+              animate={{ opacity: 1, rotate: -1.5, y: 0 }}
               transition={{
                 duration: reducedMotion ? 0 : 0.8,
                 delay: reducedMotion ? 0 : 1,

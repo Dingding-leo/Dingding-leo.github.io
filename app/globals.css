@@ -250,13 +250,6 @@ html.blue-hour-page body {
   overflow-x: clip;
   background: #06101b;
 }
-html[data-blue-hour-entry="open"] body {
-  overflow: hidden;
-}
-html[data-blue-hour-entered="yes"]
-  [role="dialog"][aria-labelledby="blue-hour-entry-title"] {
-  visibility: hidden;
-}
 @media(prefers-reduced-motion:reduce){
   html.blue-hour-page{scroll-behavior:auto}
 }

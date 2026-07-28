@@ -94,12 +94,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${mono.variable} ${playfair.variable}`}>
         <script
-          dangerouslySetInnerHTML={{
-            __html:
-              "(function(){try{var seen=sessionStorage.getItem('blue-hour-entered')==='yes';if(seen){document.documentElement.dataset.blueHourEntered='yes'}else if(location.pathname==='/'){document.documentElement.dataset.blueHourEntry='open'}}catch(_){}})();",
-          }}
-        />
-        <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
