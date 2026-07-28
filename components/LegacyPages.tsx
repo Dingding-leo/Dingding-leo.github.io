@@ -463,3 +463,22 @@ export function NotesPage() {
   );
 }
 
+
+
+export function ContactPage() {
+  return (
+    <Wrap
+      kicker="Say hello / 11"
+      title="Let's keep in touch."
+      copy="For study chats, food recommendations, collaborations, or simply saying hello."
+    >
+      <div className="legacy-contact mt-8">
+        <p className="mb-4">Feel free to drop me an email:</p>
+        <a className="email inline-flex items-center gap-2 text-xl font-medium hover:text-amber-600 transition-colors" href="mailto:contact@austinliu.com">
+          contact@austinliu.com
+          <ArrowUpRight size={18} aria-hidden="true" />
+        </a>
+      </div>
+    </Wrap>
+  );
+}

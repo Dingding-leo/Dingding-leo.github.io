@@ -1298,7 +1298,7 @@ export function SitePage() {
         <FeaturedProjects />
         <Gallery />
         <Journal />
-        <Contact />
+        
       </main>
 
       {showTop && (
