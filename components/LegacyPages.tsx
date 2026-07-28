@@ -262,14 +262,17 @@ export function ProjectsPage() {
       </motion.div>
       <motion.div variants={container} initial="hidden" animate="show" className="legacy-projects">
         {projects.map((project) => (
-          <motion.div variants={item} key={project.title}>
-            <ProjectCard project={project} />
-          </motion.div>
+          <ProjectCard project={project} key={project.title} />
         ))}
       </motion.div>
     </Wrap>
   );
 }
+
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } }
+};
 
 function ProjectCard({ project }: { project: Project }) {
   const primaryUrl = project.liveUrl || project.repoUrl;
@@ -283,7 +286,8 @@ function ProjectCard({ project }: { project: Project }) {
   );
 
   return (
-    <article
+    <motion.article
+      variants={item}
       className={`legacy-project ${project.featured ? 'project-featured' : ''}`}
     >
       {primaryUrl ? (
@@ -322,7 +326,7 @@ function ProjectCard({ project }: { project: Project }) {
           )}
         </div>
       </div>
-    </article>
+    </motion.article>
   );
 }
 
