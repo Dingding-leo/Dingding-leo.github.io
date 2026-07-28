@@ -18,7 +18,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const noteEntries: MetadataRoute.Sitemap = notes.map((note) => ({
     url: `${site.url}/notes/${note.slug}/`,
-    lastModified: note.date,
     priority: 0.6,
   }));
 

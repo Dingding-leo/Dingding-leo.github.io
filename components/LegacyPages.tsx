@@ -1,80 +1,56 @@
-'use client';
-
-import { motion } from 'framer-motion';
 import {
   ArrowUpRight,
-  BookOpen,
   Clock,
   ExternalLink,
   Github,
-  MapPin,
-  PenLine,
-  Star,
-  Tags,
 } from 'lucide-react';
-import { Nav } from '@/components/Site';
-import { projects, site, type Project } from '@/config/site';
-import { notes as allNotes } from '@/config/notes';
+import {
+  BlueHourHero,
+  type BlueHourScene,
+} from '@/components/BlueHourJumpShell';
+import jumpStyles from '@/components/BlueHourJumpShell.module.css';
+import { Nav } from '@/components/Nav';
 import { books, movies } from '@/config/media';
-
-const reveal = {
-  hidden: { opacity: 0, y: 20 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] as const },
-  },
-};
+import { notes as allNotes } from '@/config/notes';
+import { projects, site, type Project } from '@/config/site';
+import styles from './LegacyPages.module.css';
 
 function Wrap({
   children,
   title,
   kicker,
   copy,
+  scene,
 }: {
   children: React.ReactNode;
   title: string;
   kicker: string;
   copy: string;
+  scene: BlueHourScene;
 }) {
   return (
-    <>
+    <div className={jumpStyles.shell}>
       <Nav />
-      <main id="main-content" className="legacy-page">
-        <section className="legacy-hero">
-          <div className="container">
-            <motion.p
-              className="eyebrow"
-              initial="hidden"
-              animate="show"
-              variants={reveal}
-            >
-              {kicker}
-            </motion.p>
-            <motion.h1 initial="hidden" animate="show" variants={reveal}>
-              {title}
-            </motion.h1>
-            <motion.p
-              className="lede"
-              initial="hidden"
-              animate="show"
-              variants={reveal}
-            >
-              {copy}
-            </motion.p>
-          </div>
-        </section>
-        <div className="container legacy-content">{children}</div>
+      <main id="main-content" className={jumpStyles.page}>
+        <BlueHourHero
+          scene={scene}
+          kicker={kicker}
+          title={title}
+          copy={copy}
+        />
+        <div className={`container ${jumpStyles.content}`}>
+          <div className={jumpStyles.surface}>{children}</div>
+        </div>
       </main>
-      <footer className="legacy-footer">
+      <footer className={jumpStyles.footer}>
         <div className="container">
           <span>© 2026 Austin Liu</span>
           <a href="/">
-            Return to the living space <ArrowUpRight size={14} />
+            Return to the living space <ArrowUpRight size={14} aria-hidden="true" />
           </a>
         </div>
       </footer>
-    </>
+    </div>
   );
 }
 
@@ -84,78 +60,53 @@ export function AboutPage() {
       kicker="About / 01"
       title="A public notebook, still in progress."
       copy="A little more context about the person behind the notes, projects, and experiments."
+      scene="afterlight"
     >
-      <motion.div 
-        initial={{ opacity: 0 }} 
-        animate={{ opacity: 1 }} 
-        transition={{ staggerChildren: 0.15 }}
-      >
-        <motion.div 
-          className="legacy-split"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <div>
-            <p className="legacy-lead">
-              A builder and traveller from China, now based in Adelaide — making
-              small digital tools, collecting places, and keeping a public record
-              of the things that hold my attention.
-            </p>
-            <div className="legacy-stats mt-10">
-              <div className="stat-card">
-                <span>Location</span>
-                <strong>ADL</strong>
-                <span className="text-[10px] text-zinc-400">South Australia</span>
-              </div>
-              <div className="stat-card">
-                <span>Practice</span>
-                <strong>MAKE</strong>
-                <span className="text-[10px] text-zinc-400">Design / writing / code</span>
-              </div>
-              <div className="stat-card">
-                <span>Code</span>
-                <strong>TS</strong>
-                <span className="text-[10px] text-zinc-400">React / Next.js</span>
-              </div>
+      <div className={styles.aboutSplit}>
+        <div>
+          <p className={styles.aboutLead}>
+            A builder and traveller from China, now based in Adelaide — making
+            small digital tools, collecting places, and keeping a public record
+            of the things that hold my attention.
+          </p>
+          <div className={styles.stats}>
+            <div className={styles.statCard}>
+              <span>Location</span>
+              <strong>ADL</strong>
+              <small>South Australia</small>
+            </div>
+            <div className={styles.statCard}>
+              <span>Practice</span>
+              <strong>MAKE</strong>
+              <small>Design / writing / code</small>
+            </div>
+            <div className={styles.statCard}>
+              <span>Code</span>
+              <strong>TS</strong>
+              <small>React / Next.js</small>
             </div>
           </div>
-          <div>
-            <p className="mb-6">
-              I like work that begins with a real question: could this be calmer,
-              clearer, or more useful? That has led me from interface details and
-              prototypes to photographs, short notes, and long walks with a camera.
-            </p>
-            <p className="mb-6">
-              This site is less a résumé than a field notebook. Projects show how I
-              think through a problem; Moments are a way of paying closer attention;
-              Notes are where unfinished ideas get a little room to breathe.
-            </p>
-            <p>
-              Dentistry is one important room in that wider life: a discipline I am
-              studying seriously, and one that has taught me patience, care, and the
-              value of getting the small things right. Outside it, I&apos;m usually
-              reading, building, travelling, or looking for the next blue hour.
-            </p>
-          </div>
-        </motion.div>
-      </motion.div>
+        </div>
+        <div className={styles.prose}>
+          <p>
+            I like work that begins with a real question: could this be calmer,
+            clearer, or more useful? That has led me from interface details and
+            prototypes to photographs, short notes, and long walks with a camera.
+          </p>
+          <p>
+            This site is less a résumé than a field notebook. Projects show how I
+            think through a problem; Moments are a way of paying closer attention;
+            Notes are where unfinished ideas get a little room to breathe.
+          </p>
+          <p>
+            Dentistry is one important room in that wider life: a discipline I am
+            studying seriously, and one that has taught me patience, care, and the
+            value of getting the small things right. Outside it, I&apos;m usually
+            reading, building, travelling, or looking for the next blue hour.
+          </p>
+        </div>
+      </div>
     </Wrap>
-  );
-}
-
-function Stat({ number, label }: { number: string; label: string }) {
-  return (
-    <motion.div
-      className="stat-card"
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: true }}
-      variants={reveal}
-    >
-      <strong>{number}</strong>
-      <span>{label}</span>
-    </motion.div>
   );
 }
 
@@ -210,110 +161,114 @@ export function MomentsPage() {
       kicker="Moments / 02"
       title="A few things worth remembering."
       copy="Places I've been, things I've seen, and the small moments that stay with you."
+      scene="tide"
     >
-      <motion.div 
-        className="legacy-gallery" 
-        initial={{ opacity: 0 }} 
-        animate={{ opacity: 1 }} 
-        transition={{ staggerChildren: 0.15 }}
-      >
-        {items.map((item, i) => (
-          <motion.a
+      <div className={styles.momentsGrid}>
+        {items.map((item, index) => (
+          <a
             href={item.href}
             key={item.title}
-            className={`legacy-photo ${i < 2 ? 'photo-' + (i + 1) : 'photo-sm'}`}
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className={`${styles.momentCard} ${index < 2 ? styles.momentCardLarge : ''}`}
           >
-            <img src={item.image} alt={item.title} />
-            <div>
+            <img
+              src={item.image}
+              alt={item.title}
+              width={900}
+              height={675}
+              loading={index < 2 ? 'eager' : 'lazy'}
+              fetchPriority={index === 0 ? 'high' : undefined}
+              decoding="async"
+            />
+            <div className={styles.momentCopy}>
               <h2>{item.title}</h2>
               <p>{item.copy}</p>
             </div>
-            <ArrowUpRight size={24} aria-hidden="true" color="rgba(255,255,255,0.7)" />
-          </motion.a>
+            <ArrowUpRight size={24} aria-hidden="true" />
+          </a>
         ))}
-      </motion.div>
+      </div>
     </Wrap>
   );
 }
 
-export function ProjectsPage() {
-  const container = {
-    hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { staggerChildren: 0.15 } }
-  };
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } }
-  };
+const optimizedProjectArtwork: Record<string, string> = {
+  KnightClub: 'knightclub-editorial',
+  ScholarBank: 'scholarbank',
+  Denki: 'denki',
+};
+
+function ProjectArtwork({ project }: { project: Project }) {
+  const optimizedName = optimizedProjectArtwork[project.title];
+
+  if (!optimizedName) {
+    return (
+      <img
+        src={project.image}
+        alt={project.imageAlt}
+        width={1600}
+        height={900}
+        loading="lazy"
+        decoding="async"
+      />
+    );
+  }
 
   return (
-    <Wrap
-      kicker="Projects / 03"
-      title="Useful things, built and shipped."
-      copy="A growing collection of learning tools, local-first software, and practical experiments shaped by real interests."
-    >
-      <motion.div variants={item} className="project-summary" aria-label="Project summary">
-        <span>{projects.length} projects</span>
-        <span>{projects.filter((project) => project.liveUrl).length} live products</span>
-        <span>Built across web and desktop</span>
-      </motion.div>
-      <motion.div variants={container} initial="hidden" animate="show" className="legacy-projects">
-        {projects.map((project) => (
-          <ProjectCard project={project} key={project.title} />
-        ))}
-      </motion.div>
-    </Wrap>
+    <picture>
+      <source
+        type="image/avif"
+        srcSet={`/assets/projects/optimized/${optimizedName}-640.avif 640w, /assets/projects/optimized/${optimizedName}-960.avif 960w`}
+        sizes="(max-width: 760px) 100vw, 50vw"
+      />
+      <source
+        type="image/webp"
+        srcSet={`/assets/projects/optimized/${optimizedName}-640.webp 640w, /assets/projects/optimized/${optimizedName}-960.webp 960w`}
+        sizes="(max-width: 760px) 100vw, 50vw"
+      />
+      <img
+        src={project.image}
+        alt={project.imageAlt}
+        width={1600}
+        height={900}
+        loading="lazy"
+        decoding="async"
+      />
+    </picture>
   );
 }
-
-const item = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } }
-};
 
 function ProjectCard({ project }: { project: Project }) {
   const primaryUrl = project.liveUrl || project.repoUrl;
-  const image = (
-    <img
-      src={project.image}
-      alt={project.imageAlt}
-      loading="lazy"
-      decoding="async"
-    />
-  );
+  const artwork = <ProjectArtwork project={project} />;
 
   return (
-    <motion.article
-      variants={item}
-      className={`legacy-project ${project.featured ? 'project-featured' : ''}`}
+    <article
+      className={`${styles.projectCard} ${project.featured ? styles.projectFeatured : ''}`}
     >
       {primaryUrl ? (
         <a
-          className="project-image"
+          className={styles.projectMedia}
           href={primaryUrl}
           target="_blank"
           rel="noreferrer"
           aria-label={`Open ${project.title}`}
         >
-          {image}
+          {artwork}
         </a>
       ) : (
-        <div className="project-image">{image}</div>
+        <div className={styles.projectMedia}>{artwork}</div>
       )}
-      <div className="project-body">
-        <div className="project-status">{project.status}</div>
-        <h2 className="project-title">{project.title}</h2>
-        <p className="project-tagline">{project.tagline}</p>
+      <div className={styles.projectBody}>
+        <div className={styles.projectStatus}>{project.status}</div>
+        <h2>{project.title}</h2>
+        <p className={styles.projectTagline}>{project.tagline}</p>
         <p>{project.description}</p>
-        <div className="project-tags">
+        <div className={styles.projectTags}>
           {project.tags.map((tag) => (
             <span key={tag}>{tag}</span>
           ))}
         </div>
-        <div className="project-actions">
+        <div className={styles.projectActions}>
           {project.liveUrl && (
             <a href={project.liveUrl} target="_blank" rel="noreferrer">
               Live demo <ExternalLink size={15} aria-hidden="true" />
@@ -326,144 +281,133 @@ function ProjectCard({ project }: { project: Project }) {
           )}
         </div>
       </div>
-    </motion.article>
+    </article>
   );
 }
 
-const notes = allNotes.map((note) => ({
-  title: note.localTitle ?? note.title,
-  excerpt: note.localExcerpt ?? note.excerpt,
-  lang: note.localTitle ? note.localLang : undefined,
-  label: note.label,
-  time: note.readingTime,
-  date: note.dateLabel,
-  href: `/notes/${note.slug}`,
-}));
+export function ProjectsPage() {
+  return (
+    <Wrap
+      kicker="Projects / 03"
+      title="Useful things, built and shipped."
+      copy="A growing collection of learning tools, local-first software, and practical experiments shaped by real interests."
+      scene="mountain"
+    >
+      <div className={styles.projectSummary} aria-label="Project summary">
+        <span>{projects.length} projects</span>
+        <span>{projects.filter((project) => project.liveUrl).length} live products</span>
+        <span>Built across web and desktop</span>
+      </div>
+      <div className={styles.projectsGrid}>
+        {projects.map((project) => (
+          <ProjectCard project={project} key={project.title} />
+        ))}
+      </div>
+    </Wrap>
+  );
+}
+
+const notes = [...allNotes]
+  .sort((a, b) => b.occurredAt.localeCompare(a.occurredAt))
+  .map((note) => ({
+    title: note.localTitle ?? note.title,
+    excerpt: note.localExcerpt ?? note.excerpt,
+    lang: note.localTitle ? note.localLang : undefined,
+    label: note.label,
+    time: note.readingTime,
+    date: note.dateLabel,
+    href: `/notes/${note.slug}`,
+  }));
 
 export function NotesPage() {
-  const container = {
-    hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { staggerChildren: 0.1 } }
-  };
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } }
-  };
-
   return (
     <Wrap
       kicker="Notes / 04"
       title="Things I&apos;ve been thinking about."
       copy="Field notes from places, projects, and the ordinary days that are worth keeping."
+      scene="waterfall"
     >
-      <motion.div variants={container} initial="hidden" animate="show" className="notes-list">
+      <div className={styles.notesList}>
         {notes.map((note, index) => (
-          <motion.a
-            className="legacy-note group"
-            href={note.href}
-            key={note.title}
-            variants={item}
-          >
-            <div className="note-index group-hover:text-amber-600 transition-colors">{String(index + 1).padStart(2, '0')}</div>
-            <div className="note-main group-hover:translate-x-2 transition-transform duration-300" lang={note.lang}>
+          <a className={styles.note} href={note.href} key={note.title}>
+            <div className={styles.noteIndex}>
+              {String(index + 1).padStart(2, '0')}
+            </div>
+            <div className={styles.noteMain} lang={note.lang}>
               <h2>{note.title}</h2>
               <p>{note.excerpt}</p>
             </div>
-            <div className="note-meta opacity-60 group-hover:opacity-100 transition-opacity">
+            <div className={styles.noteMeta}>
               <span>{note.label}</span>
               <span>{note.date}</span>
               <span>
-                <Clock size={13} /> {note.time}
+                <Clock size={13} aria-hidden="true" /> {note.time}
               </span>
             </div>
-            <ArrowUpRight size={18} aria-hidden="true" className="opacity-0 -translate-x-2 translate-y-2 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-300 text-amber-600" />
-          </motion.a>
+            <ArrowUpRight
+              size={18}
+              aria-hidden="true"
+              className={styles.noteArrow}
+            />
+          </a>
         ))}
-      </motion.div>
+      </div>
     </Wrap>
   );
-}export function LibraryPage() {
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
-  };
+}
 
-  const item = {
-    hidden: { opacity: 0, y: 15 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
-  };
+function MediaShelf({
+  title,
+  items,
+}: {
+  title: string;
+  items: typeof books;
+}) {
+  return (
+    <section className={styles.shelf}>
+      <h2>{title}</h2>
+      <div className={styles.mediaGrid}>
+        {items.map((item) => (
+          <article className={styles.mediaCard} key={item.title}>
+            <a href={item.url || '#'} target="_blank" rel="noopener noreferrer">
+              <div className={styles.mediaCover}>
+                <img
+                  src={item.coverImage}
+                  alt={item.title}
+                  width={800}
+                  height={1200}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <h3>{item.title}</h3>
+              <p className={styles.mediaCreator}>{item.creator}</p>
+              {item.comment && (
+                <p className={styles.mediaComment}>&quot;{item.comment}&quot;</p>
+              )}
+            </a>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
 
+export function LibraryPage() {
   return (
     <Wrap
       kicker="Library / 05"
       title="Digital Bookshelf & Cinema."
       copy="A collection of books I've read and movies I've watched recently."
+      scene="afterlight"
     >
-      <motion.div variants={container} initial="hidden" animate="show" className="mt-12 space-y-16">
-        <section>
-          <motion.h2 variants={item} className="text-2xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-6">
-            Books
-          </motion.h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {books.map((book) => (
-              <motion.div variants={item} key={book.title} className="flex flex-col group block">
-                <a href={book.url || '#'} target="_blank" rel="noopener noreferrer" className="block relative focus:outline-none">
-                  <div className="aspect-[2/3] relative overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 mb-3 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-[0_20px_40px_rgba(232,166,109,0.12)]">
-                    <img src={book.coverImage} alt={book.title} className="object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-105" />
-                  </div>
-                  <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100 leading-tight transition-colors group-hover:text-amber-600 dark:group-hover:text-amber-500">
-                    {book.title}
-                  </h3>
-                  <p className="text-xs text-amber-600/70 dark:text-amber-500/70 mt-1">
-                    {book.creator}
-                  </p>
-                  {book.comment && (
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-2 line-clamp-2 leading-relaxed">
-                      "{book.comment}"
-                    </p>
-                  )}
-                </a>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-
-        <section>
-          <motion.h2 variants={item} className="text-2xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-6">
-            Movies
-          </motion.h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {movies.map((movie) => (
-              <motion.div variants={item} key={movie.title} className="flex flex-col group block">
-                <a href={movie.url || '#'} target="_blank" rel="noopener noreferrer" className="block relative focus:outline-none">
-                  <div className="aspect-[2/3] relative overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 mb-3 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-[0_20px_40px_rgba(232,166,109,0.12)]">
-                    <img src={movie.coverImage} alt={movie.title} className="object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-105" />
-                  </div>
-                  <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100 leading-tight transition-colors group-hover:text-amber-600 dark:group-hover:text-amber-500">
-                    {movie.title}
-                  </h3>
-                  <p className="text-xs text-amber-600/70 dark:text-amber-500/70 mt-1">
-                    {movie.creator}
-                  </p>
-                  {movie.comment && (
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-2 line-clamp-2 leading-relaxed">
-                      "{movie.comment}"
-                    </p>
-                  )}
-                </a>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-      </motion.div>
+      <div className={styles.library}>
+        <MediaShelf title="Books" items={books} />
+        <MediaShelf title="Movies" items={movies} />
+      </div>
     </Wrap>
   );
 }
-
-
 
 export function ContactPage() {
   return (
@@ -471,10 +415,11 @@ export function ContactPage() {
       kicker="Say hello / 11"
       title="Let's keep in touch."
       copy="For study chats, food recommendations, collaborations, or simply saying hello."
+      scene="lighthouse"
     >
-      <div className="legacy-contact mt-8">
-        <p className="mb-4">Feel free to drop me an email:</p>
-        <a className="email inline-flex items-center gap-2 text-xl font-medium hover:text-amber-600 transition-colors" href={`mailto:${site.email}`}>
+      <div className={styles.contact}>
+        <p>Feel free to drop me an email:</p>
+        <a href={`mailto:${site.email}`}>
           {site.email}
           <ArrowUpRight size={18} aria-hidden="true" />
         </a>

@@ -42,8 +42,9 @@ export const projects: Project[] = [
       'Product design, engineering, interaction design, and local engine integration.',
     decision:
       'Keep game data on-device and isolate bounded Stockfish work from the interface, with a native Tauri path for desktop analysis.',
-    image: '/assets/projects/knightclub.jpg',
-    imageAlt: 'KnightClub chess board and local Stockfish game controls',
+    image: '/assets/projects/knightclub-editorial.jpg',
+    imageAlt:
+      'An ivory chess knight illuminated beside a rain-streaked window at blue hour',
     tags: ['React', 'Tauri', 'Rust', 'Stockfish'],
     status: 'Live',
     liveUrl: 'https://dingding-leo.github.io/KnightClub/',

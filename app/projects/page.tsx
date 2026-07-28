@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     title: 'Projects — Austin Liu',
     description:
       'Local-first software, learning tools, and practical experiments shaped by real interests.',
-    images: ['/assets/projects/knightclub.jpg'],
+    images: ['/assets/projects/knightclub-editorial.jpg'],
   },
 };
 

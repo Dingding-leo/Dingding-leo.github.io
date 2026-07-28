@@ -1,4 +1,4 @@
-import { ArticleImage, NoteLayout } from '@/components/Site';
+import { ArticleImage, NoteLayout } from '@/components/NoteLayout';
 import { noteMetadata } from '@/config/notes';
 
 export const metadata = noteMetadata('adelaide');
@@ -6,7 +6,31 @@ export const metadata = noteMetadata('adelaide');
 export default function Page() {
   return (
     <NoteLayout slug="adelaide">
-      <p>Adelaide is where I landed and where I'm learning to call home. It's a city that doesn't shout — it asks you to slow down enough to notice the small things.</p><h2>The riverbank at golden hour</h2><p>The Riverbank Pedestrian Bridge on New Year's Eve 2023. The light hit the water just right — city skyline on one side, the Torrens on the other. One of those evenings where you don't need a reason to stay a little longer.</p><ArticleImage src="/assets/gallery/adelaide-riverbank.jpg" alt="Adelaide Riverbank"/><h2>Morialta on a study break</h2><p>When the books get heavy, Morialta Conservation Park is 20 minutes away. The waterfalls, the rock faces, the trail that winds up through the gorge — it's the kind of reset that makes the rest of the week feel manageable.</p><ArticleImage src="/assets/gallery/adelaide-morialta.jpg" alt="Morialta Conservation Park"/>
+      <p>
+        Adelaide is where I landed and where I&apos;m learning to call home. It
+        is a city that leaves enough quiet to notice the small things.
+      </p>
+      <h2>The riverbank at golden hour</h2>
+      <p>
+        The Riverbank Pedestrian Bridge on New Year&apos;s Eve 2023. The light
+        reached across the water, with the skyline on one side and the Torrens
+        on the other. I stayed a little longer.
+      </p>
+      <ArticleImage
+        src="/assets/gallery/adelaide-riverbank.jpg"
+        alt="Golden light over the River Torrens beside Adelaide's riverbank footbridge"
+        fullWidth={1919}
+        fullHeight={1080}
+      />
+      <h2>Morialta on a study break</h2>
+      <p>
+        When the books get heavy, a walk through Morialta changes the scale of
+        the day: waterfalls, rock faces, and a trail winding into the gorge.
+      </p>
+      <ArticleImage
+        src="/assets/gallery/adelaide-morialta.jpg"
+        alt="Rock faces and a waterfall along a trail in Morialta Conservation Park"
+      />
     </NoteLayout>
   );
 }

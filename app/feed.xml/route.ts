@@ -14,7 +14,7 @@ function escapeXml(value: string) {
 
 export async function GET() {
   const items = [...notes]
-    .sort((a, b) => (a.date < b.date ? 1 : -1))
+    .sort((a, b) => (a.occurredAt < b.occurredAt ? 1 : -1))
     .map((note) => {
       const url = `${site.url}/notes/${note.slug}/`;
       return `    <item>
@@ -23,7 +23,6 @@ export async function GET() {
       <guid isPermaLink="true">${url}</guid>
       <description>${escapeXml(note.excerpt)}</description>
       <category>${escapeXml(note.label)}</category>
-      <pubDate>${new Date(`${note.date}T00:00:00Z`).toUTCString()}</pubDate>
     </item>`;
     })
     .join('\n');

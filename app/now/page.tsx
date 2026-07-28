@@ -6,7 +6,9 @@ import {
   Languages,
   Stethoscope,
 } from 'lucide-react';
-import { Container, Nav } from '@/components/Site';
+import { BlueHourHero } from '@/components/BlueHourJumpShell';
+import styles from '@/components/BlueHourJumpShell.module.css';
+import { Nav } from '@/components/Nav';
 
 export const metadata: Metadata = {
   title: 'Now — Austin Liu',
@@ -44,28 +46,30 @@ const currentThreads = [
 
 export default function Page() {
   return (
-    <>
+    <div className={styles.shell}>
       <Nav />
-      <main id="main-content" className="legacy-page">
-        <section className="legacy-hero">
-          <Container>
-            <p className="eyebrow">Now / 20:19</p>
-            <h1>One window left on.</h1>
-            <p className="lede">
-              The current season, without pretending it is the whole story.
-            </p>
-          </Container>
-        </section>
+      <main id="main-content" className={styles.page}>
+        <BlueHourHero
+          scene="afterlight"
+          kicker="Now / 20:19"
+          title="One window left on."
+          copy="The current season, without pretending it is the whole story."
+        />
 
-        <Container className="legacy-content">
-          <section className="legacy-now" aria-labelledby="now-heading">
-            <p id="now-heading" className="now-updated">
+        <div className={`container ${styles.content}`}>
+          <section
+            className={`${styles.surface} ${styles.nowCard}`}
+            aria-labelledby="now-heading"
+          >
+            <p id="now-heading" className={styles.nowUpdated}>
               July 2026 · Adelaide
             </p>
-            <ul>
+            <ul className={styles.nowList}>
               {currentThreads.map(({ label, copy, icon: Icon }) => (
                 <li key={label}>
-                  <Icon size={18} aria-hidden="true" />
+                  <span className={styles.nowIcon}>
+                    <Icon size={17} aria-hidden="true" />
+                  </span>
                   <span>
                     <strong>{label}</strong> — {copy}
                   </span>
@@ -73,15 +77,15 @@ export default function Page() {
               ))}
             </ul>
           </section>
-        </Container>
+        </div>
       </main>
 
-      <footer className="legacy-footer">
-        <Container>
+      <footer className={styles.footer}>
+        <div className="container">
           <span>© 2026 Austin Liu</span>
           <a href="/projects">See what I&apos;m building</a>
-        </Container>
+        </div>
       </footer>
-    </>
+    </div>
   );
 }

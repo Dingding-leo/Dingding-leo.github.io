@@ -11,12 +11,14 @@ import {
   AnimatePresence,
   MotionConfig,
   motion,
+  type PanInfo,
   useReducedMotion,
   useScroll,
   useSpring,
 } from 'framer-motion';
 import {
   ArrowDown,
+  ArrowLeft,
   ArrowRight,
   ArrowUp,
   ArrowUpRight,
@@ -131,7 +133,6 @@ function ScenePicture({
       animate={{
         opacity: active ? 1 : 0,
         scale: active ? 1.025 : 1.065,
-        filter: active ? 'saturate(1) contrast(1)' : 'saturate(.78) contrast(1.05)',
       }}
       transition={{
         duration: reducedMotion ? 0 : 1.55,
@@ -177,22 +178,10 @@ function Weather({ type }: { type: (typeof scenes)[number]['weather'] }) {
 }
 
 function SceneBackdrop({ active }: { active: number }) {
-  const [mountedScenes, setMountedScenes] = useState(() => new Set([0, 1]));
-
-  useEffect(() => {
-    setMountedScenes((current) => {
-      const next = new Set(current);
-      next.add(active);
-      if (active > 0) next.add(active - 1);
-      if (active < scenes.length - 1) next.add(active + 1);
-      return next;
-    });
-  }, [active]);
-
   return (
     <div className={styles.backdrop} aria-hidden="true">
       {scenes.map((scene, index) =>
-        mountedScenes.has(index) ? (
+        Math.abs(index - active) <= 1 ? (
           <ScenePicture
             key={scene.id}
             scene={scene}
@@ -237,8 +226,8 @@ function ChapterTitle({
   return (
     <motion.header
       className={styles.chapterHeader}
-      initial={{ opacity: 0, y: 42, filter: 'blur(10px)' }}
-      whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      initial={{ opacity: 0, y: 42 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ amount: 0.38, once: false }}
       transition={{
         duration: reducedMotion ? 0 : 0.9,
@@ -446,133 +435,202 @@ function ProgressRail({
   );
 }
 
-function ProjectCard({
+type FeaturedProject = (typeof projects)[number];
+
+function ProjectPicture({
   project,
-  index,
+  decorative = false,
 }: {
-  project: (typeof projects)[number];
-  index: number;
+  project: FeaturedProject;
+  decorative?: boolean;
 }) {
-  const primaryUrl = project.liveUrl || project.repoUrl || '/projects';
-  const reducedMotion = useReducedMotion();
-  const visual = useRef<HTMLAnchorElement>(null);
-  const [imageVisible, setImageVisible] = useState(false);
   const optimizedImageName =
     project.title === 'KnightClub'
-      ? 'knightclub'
+      ? 'knightclub-editorial'
       : project.title === 'ScholarBank'
         ? 'scholarbank'
         : project.title === 'Denki'
           ? 'denki'
           : null;
+  const projectSlug = project.title.toLowerCase();
 
-  useEffect(() => {
-    const node = visual.current;
-    if (!node) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry?.isIntersecting) return;
-        setImageVisible(true);
-        observer.disconnect();
-      },
-      { rootMargin: '180px 0px' },
+  if (!optimizedImageName) {
+    return (
+      <img
+        src={project.image}
+        alt={decorative ? '' : project.imageAlt}
+        width={1600}
+        height={900}
+        loading="lazy"
+        decoding="async"
+        draggable={false}
+      />
     );
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
+  }
+
+  return (
+    <picture className={styles.projectPicture} data-project={projectSlug}>
+      <source
+        type="image/avif"
+        srcSet={`/assets/projects/optimized/${optimizedImageName}-640.avif 640w, /assets/projects/optimized/${optimizedImageName}-960.avif 960w`}
+        sizes="(max-width: 820px) 86vw, 460px"
+      />
+      <source
+        type="image/webp"
+        srcSet={`/assets/projects/optimized/${optimizedImageName}-640.webp 640w, /assets/projects/optimized/${optimizedImageName}-960.webp 960w`}
+        sizes="(max-width: 820px) 86vw, 460px"
+      />
+      <img
+        src={project.image}
+        alt={decorative ? '' : project.imageAlt}
+        width={1600}
+        height={900}
+        loading="lazy"
+        decoding="async"
+        draggable={false}
+      />
+    </picture>
+  );
+}
+
+function ProjectActiveCard({
+  project,
+  index,
+  count,
+  direction,
+  disabled,
+  onSwipe,
+}: {
+  project: FeaturedProject;
+  index: number;
+  count: number;
+  direction: number;
+  disabled: boolean;
+  onSwipe: (direction: number) => void;
+}) {
+  const primaryUrl = project.liveUrl || project.repoUrl || '/projects';
+  const reducedMotion = useReducedMotion();
+  const didDrag = useRef(false);
+
+  const onDragEnd = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    didDrag.current = Math.abs(info.offset.x) > 6;
+    if (info.offset.x < -72 || info.velocity.x < -550) {
+      onSwipe(1);
+    } else if (info.offset.x > 72 || info.velocity.x > 550) {
+      onSwipe(-1);
+    }
+    window.setTimeout(() => {
+      didDrag.current = false;
+    }, 180);
+  };
 
   return (
     <motion.article
-      className={styles.projectCard}
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ amount: 0.24, once: true }}
-      transition={{
-        duration: reducedMotion ? 0 : 0.78,
-        delay: reducedMotion ? 0 : index * 0.1,
-        ease: [0.16, 1, 0.3, 1],
+      className={styles.projectActiveCard}
+      role="group"
+      aria-roledescription="slide"
+      aria-label={`${index + 1} of ${count}: ${project.title}`}
+      custom={direction}
+      variants={{
+        enter: (travelDirection: number) =>
+          reducedMotion
+            ? { opacity: 0 }
+            : {
+                opacity: 0,
+                y: 18,
+                scale: 0.965,
+                rotate: travelDirection > 0 ? 2.4 : -2.4,
+              },
+        centre: {
+          opacity: 1,
+          x: 0,
+          y: 0,
+          scale: 1,
+          rotate: -0.65,
+          transition: reducedMotion
+            ? { duration: 0 }
+            : { type: 'spring', stiffness: 260, damping: 26, mass: 0.72 },
+        },
+        exit: (travelDirection: number) =>
+          reducedMotion
+            ? { opacity: 0, transition: { duration: 0 } }
+            : {
+                opacity: 0,
+                x: travelDirection > 0 ? -560 : 560,
+                y: 34,
+                rotate: travelDirection > 0 ? -14 : 14,
+                scale: 0.94,
+                transition: {
+                  duration: 0.42,
+                  ease: [0.32, 0.72, 0, 1],
+                },
+              },
+      }}
+      initial="enter"
+      animate="centre"
+      exit="exit"
+      drag={!reducedMotion && !disabled ? 'x' : false}
+      dragConstraints={{ left: 0, right: 0 }}
+      dragElastic={0.68}
+      dragMomentum={false}
+      dragSnapToOrigin
+      whileDrag={{ scale: 1.015, rotate: 3, cursor: 'grabbing' }}
+      onDragStart={() => {
+        didDrag.current = false;
+      }}
+      onDrag={(_event, info) => {
+        if (Math.abs(info.offset.x) > 6) didDrag.current = true;
+      }}
+      onDragEnd={onDragEnd}
+      onClickCapture={(event) => {
+        if (!didDrag.current) return;
+        event.preventDefault();
+        event.stopPropagation();
+        didDrag.current = false;
       }}
     >
       <a
-        ref={visual}
-        className={styles.projectVisual}
+        className={styles.projectCardVisual}
         href={primaryUrl}
         target="_blank"
         rel="noreferrer"
+        draggable={false}
         aria-label={`Open ${project.title}`}
       >
-        {imageVisible ? (
-          optimizedImageName ? (
-            <picture>
-              <source
-                type="image/avif"
-                srcSet={`/assets/projects/optimized/${optimizedImageName}-640.avif 640w, /assets/projects/optimized/${optimizedImageName}-960.avif 960w`}
-                sizes="(max-width: 760px) 100vw, 52vw"
-              />
-              <source
-                type="image/webp"
-                srcSet={`/assets/projects/optimized/${optimizedImageName}-640.webp 640w, /assets/projects/optimized/${optimizedImageName}-960.webp 960w`}
-                sizes="(max-width: 760px) 100vw, 52vw"
-              />
-              <img
-                src={project.image}
-                alt={project.imageAlt}
-                width={1600}
-                height={900}
-                loading="lazy"
-                decoding="async"
-              />
-            </picture>
-          ) : (
-            <img
-              src={project.image}
-              alt={project.imageAlt}
-              width={1600}
-              height={900}
-              loading="lazy"
-              decoding="async"
-            />
-          )
-        ) : (
-          <div
-            className={styles.projectImagePlaceholder}
-            role="img"
-            aria-label={project.imageAlt}
-          />
-        )}
+        <ProjectPicture project={project} />
         <span>{project.status}</span>
       </a>
-      <div className={styles.projectCopy}>
-        <div className={styles.projectHeading}>
-          <span>0{index + 1}</span>
+      <div className={styles.projectCompactCopy}>
+        <div className={styles.projectCompactHeading}>
+          <span>{String(index + 1).padStart(2, '0')}</span>
           <h3>{project.title}</h3>
         </div>
-        <p className={styles.projectTagline}>{project.tagline}</p>
-        <p>{project.why || project.description}</p>
-        <dl>
+        <p className={styles.projectCompactTagline}>{project.tagline}</p>
+        <p className={styles.projectCompactWhy}>{project.why || project.description}</p>
+        <div className={styles.projectCompactFooter}>
           <div>
-            <dt>Role</dt>
-            <dd>{project.role || 'Independent designer and developer'}</dd>
-          </div>
-          <div>
-            <dt>Key decision</dt>
-            <dd>{project.decision || project.description}</dd>
-          </div>
-        </dl>
-        <div className={styles.projectFooter}>
-          <div>
-            {project.tags.slice(0, 3).map((tag) => (
+            {project.tags.slice(0, 2).map((tag) => (
               <span key={tag}>{tag}</span>
             ))}
           </div>
           <span className={styles.projectLinks}>
             {project.liveUrl && (
-              <a href={project.liveUrl} target="_blank" rel="noreferrer">
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noreferrer"
+                draggable={false}
+              >
                 Live <ExternalLink size={13} />
               </a>
             )}
             {project.repoUrl && (
-              <a href={project.repoUrl} target="_blank" rel="noreferrer">
+              <a
+                href={project.repoUrl}
+                target="_blank"
+                rel="noreferrer"
+                draggable={false}
+              >
                 Source <Github size={13} />
               </a>
             )}
@@ -583,6 +641,124 @@ function ProjectCard({
   );
 }
 
+function ProjectDeck({ deckProjects }: { deckProjects: FeaturedProject[] }) {
+  const reducedMotion = useReducedMotion();
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [direction, setDirection] = useState(1);
+  const [busy, setBusy] = useState(false);
+  const count = deckProjects.length;
+  const activeProject = deckProjects[activeIndex];
+
+  if (!activeProject || count === 0) return null;
+
+  const projectAt = (offset: number) =>
+    deckProjects[(activeIndex + offset + count) % count];
+
+  const goTo = (nextIndex: number, travelDirection: number) => {
+    if (busy || nextIndex === activeIndex) return;
+    setDirection(travelDirection);
+    setBusy(true);
+    setActiveIndex((nextIndex + count) % count);
+  };
+
+  const move = (travelDirection: number) => {
+    goTo(activeIndex + travelDirection, travelDirection);
+  };
+
+  return (
+    <motion.div
+      className={styles.projectCarousel}
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Featured projects"
+      tabIndex={0}
+      initial={{ opacity: 0, y: 36 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.32 }}
+      transition={{
+        duration: reducedMotion ? 0 : 0.75,
+        ease: [0.16, 1, 0.3, 1],
+      }}
+      onKeyDown={(event) => {
+        if (event.target !== event.currentTarget) return;
+        if (event.key === 'ArrowLeft') {
+          event.preventDefault();
+          move(-1);
+        } else if (event.key === 'ArrowRight') {
+          event.preventDefault();
+          move(1);
+        } else if (event.key === 'Home') {
+          event.preventDefault();
+          goTo(0, -1);
+        } else if (event.key === 'End') {
+          event.preventDefault();
+          goTo(count - 1, 1);
+        }
+      }}
+    >
+      <div className={styles.projectStage}>
+        {[2, 1].map((offset) => {
+          const project = projectAt(offset);
+          return (
+            <div
+              className={`${styles.projectBackCard} ${
+                offset === 1 ? styles.projectBackOne : styles.projectBackTwo
+              }`}
+              aria-hidden="true"
+              key={`${project.title}-${offset}`}
+            >
+              <ProjectPicture project={project} decorative />
+              <span>{project.title}</span>
+            </div>
+          );
+        })}
+        <AnimatePresence
+          initial={false}
+          custom={direction}
+          onExitComplete={() => setBusy(false)}
+        >
+          <ProjectActiveCard
+            key={activeProject.title}
+            project={activeProject}
+            index={activeIndex}
+            count={count}
+            direction={direction}
+            disabled={busy}
+            onSwipe={move}
+          />
+        </AnimatePresence>
+      </div>
+      <div className={styles.projectControls}>
+        <button
+          type="button"
+          onClick={() => move(-1)}
+          disabled={busy}
+          aria-label={`Previous project: ${projectAt(-1).title}`}
+        >
+          <ArrowLeft size={16} />
+        </button>
+        <span className={styles.projectCounter}>
+          <strong>{String(activeIndex + 1).padStart(2, '0')}</strong>
+          <i />
+          <span>{String(count).padStart(2, '0')}</span>
+        </span>
+        <button
+          type="button"
+          onClick={() => move(1)}
+          disabled={busy}
+          aria-label={`Next project: ${projectAt(1).title}`}
+        >
+          <ArrowRight size={16} />
+        </button>
+        <small>Drag or use arrows</small>
+      </div>
+      <p className={styles.srOnly} aria-live="polite">
+        {`${activeProject.title}, project ${activeIndex + 1} of ${count}`}
+      </p>
+    </motion.div>
+  );
+}
+
 export function BlueHourSite() {
   const reducedMotion = useReducedMotion();
   const [active, setActive] = useState(0);
@@ -590,6 +766,7 @@ export function BlueHourSite() {
   const chapterNodes = useRef<Array<HTMLElement | null>>([]);
   const root = useRef<HTMLDivElement>(null);
   const pointerFrame = useRef(0);
+  const pointerLastUpdate = useRef(0);
   const audioStartRef = useRef<() => Promise<boolean>>(async () => false);
   const audioPlayingRef = useRef(false);
   const audioStartAttempting = useRef(false);
@@ -603,6 +780,17 @@ export function BlueHourSite() {
 
   const featuredProjects = useMemo(
     () => projects.filter((project) => project.featured).slice(0, 3),
+    [],
+  );
+  const homepageNotes = useMemo(
+    () =>
+      [...notes]
+        .sort(
+          (a, b) =>
+            Number(Boolean(b.featured)) - Number(Boolean(a.featured)) ||
+            b.occurredAt.localeCompare(a.occurredAt),
+        )
+        .slice(0, 4),
     [],
   );
 
@@ -724,6 +912,9 @@ export function BlueHourSite() {
     ) {
       return;
     }
+    const now = window.performance.now();
+    if (now - pointerLastUpdate.current < 32) return;
+    pointerLastUpdate.current = now;
     const x = event.clientX / window.innerWidth - 0.5;
     const y = event.clientY / window.innerHeight - 0.5;
     window.cancelAnimationFrame(pointerFrame.current);
@@ -833,25 +1024,30 @@ export function BlueHourSite() {
         >
           <div className={styles.chapterInner}>
             <ChapterKicker index={1} label="Projects / Ambition" />
-            <ChapterTitle time="19:43" title="The Opening">
-              <h2 id="projects-title">
-                Useful things,
-                <br />
-                <em>built with intent.</em>
-              </h2>
-              <p>
-                Products shaped by real needs: private chess training, focused
-                scholarship preparation, and memory that works with you.
-              </p>
-            </ChapterTitle>
-            <div className={styles.projectGrid}>
-              {featuredProjects.map((project, index) => (
-                <ProjectCard project={project} index={index} key={project.title} />
-              ))}
+            <div className={styles.projectShowcase}>
+              <div className={styles.projectIntro}>
+                <ChapterTitle time="19:43" title="The Opening">
+                  <h2 id="projects-title">
+                    Useful things,
+                    <br />
+                    <em>built with intent.</em>
+                  </h2>
+                  <p>
+                    Products shaped by real needs: private chess training,
+                    focused scholarship preparation, and memory that works with
+                    you.
+                  </p>
+                </ChapterTitle>
+                <p className={styles.projectDeckNote}>
+                  Three independent builds. Pick one up, turn it over, keep
+                  moving.
+                </p>
+                <a className={styles.chapterLink} href="/projects">
+                  Explore every build <ArrowUpRight size={16} />
+                </a>
+              </div>
+              <ProjectDeck deckProjects={featuredProjects} />
             </div>
-            <a className={styles.chapterLink} href="/projects">
-              Explore every build <ArrowUpRight size={16} />
-            </a>
           </div>
         </section>
 
@@ -943,7 +1139,7 @@ export function BlueHourSite() {
               </p>
             </ChapterTitle>
             <div className={styles.noteList}>
-              {notes.slice(0, 4).map((note, index) => (
+              {homepageNotes.map((note, index) => (
                 <motion.a
                   key={note.slug}
                   href={`/notes/${note.slug}`}
@@ -961,7 +1157,9 @@ export function BlueHourSite() {
                       {note.label} · {note.readingTime}
                     </small>
                     <h3 lang={note.localLang}>{note.localTitle || note.title}</h3>
-                    <p>{note.localExcerpt || note.excerpt}</p>
+                    <p lang={note.localExcerpt ? note.localLang : undefined}>
+                      {note.localExcerpt || note.excerpt}
+                    </p>
                   </div>
                   <ArrowUpRight size={17} />
                 </motion.a>

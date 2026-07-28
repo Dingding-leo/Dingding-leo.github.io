@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter, DM_Mono, Playfair_Display } from 'next/font/google';
 import './globals.css';
-import { Providers } from '@/components/Site';
+import { Providers } from '@/components/Providers';
 import { site } from '@/config/site';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
@@ -97,7 +97,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
-        <Providers>{children}</Providers>
+        <Providers />
+        {children}
       </body>
     </html>
   );

@@ -1388,7 +1388,6 @@ export function NoteLayout({
         headline: note.title,
         description: note.lede,
         image: `${site.url}${note.image}`,
-        datePublished: note.date,
         inLanguage: 'en-AU',
         author: { '@type': 'Person', name: site.name, url: site.url },
         mainEntityOfPage: `${site.url}/notes/${note.slug}/`,
