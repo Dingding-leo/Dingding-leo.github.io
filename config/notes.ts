@@ -10,7 +10,7 @@ export type Note = {
   localExcerpt?: string;
   /** BCP 47 language tag for localTitle/localExcerpt when they are not English. */
   localLang?: string;
-  /** The note page's own headline. */
+  /** A short deck shown beneath the canonical title on the note page. */
   pageTitle: string;
   kicker: string;
   lede: string;
@@ -19,7 +19,13 @@ export type Note = {
   /** When the photographed event happened; month-only entries use the first day as a sort key. */
   occurredAt: string;
   dateLabel: string;
+  /** First publication and latest editorial revision; never substitute the photographed date. */
+  publishedAt: string;
+  updatedAt: string;
   image: string;
+  imageAlt: string;
+  imageWidth: number;
+  imageHeight: number;
   featured?: boolean;
 };
 
@@ -27,99 +33,155 @@ export const notes: Note[] = [
   {
     slug: 'shanghai-memories',
     title: 'Shanghai Memories',
-    localTitle: '魔都漫游：城堡黄昏与夜色街巷',
-    excerpt: 'Disney at dusk, narrow streets, food stalls, and Shanghai after dark.',
-    localExcerpt: '从迪士尼的黄昏到夜里的街巷与小吃摊，这是我在上海留下的一段旅途记录。',
+    localTitle: '上海片刻：舞台灯光下的一帧',
+    excerpt:
+      'A Shanghai Disney stage washed in magenta and blue, kept as one vivid frame from July 2024.',
+    localExcerpt:
+      '一束舞台灯光、鲜明的蓝紫色彩，以及我在 2024 年 7 月上海之行留下的一帧。',
     localLang: 'zh-Hans',
-    pageTitle: 'A city after dark.',
+    pageTitle: 'One bright fragment of a much larger city.',
     kicker: 'Notes / Shanghai',
-    lede: 'Disney at dusk, then narrow streets, food stalls, and the city moving after dark.',
+    lede:
+      'A performer, oversized animal silhouettes, and a canopy of magenta light at Shanghai Disney Resort.',
     label: 'Shanghai',
-    readingTime: '1 min read',
+    readingTime: '2 min read',
     occurredAt: '2024-07-01',
     dateLabel: 'July 2024',
+    publishedAt: '2026-07-11T10:16:21+09:30',
+    updatedAt: '2026-07-29T01:51:57+09:30',
     image: '/assets/gallery/shanghai-disney.jpg',
+    imageAlt:
+      'A costumed performer in red beneath magenta and blue stage lights at Shanghai Disney Resort',
+    imageWidth: 1920,
+    imageHeight: 1080,
     featured: true,
   },
   {
     slug: 'great-ocean-road',
     title: 'The Great Ocean Road',
-    excerpt: 'Wind at the Twelve Apostles, cool rainforest in the Otways, and one road between them.',
-    pageTitle: 'Twelve Apostles at the edge of summer.',
+    excerpt:
+      'Layered limestone, a cloud-heavy horizon, and the coast changing from one stop to the next.',
+    pageTitle: 'Weather moving along the limestone coast.',
     kicker: 'Notes / Great Ocean Road',
-    lede: 'A December road trip through limestone coast and cool Otway rainforest.',
+    lede:
+      'A December road trip recorded in two coastal frames: weathered rock, open water, and a sky in motion.',
     label: 'Victoria',
-    readingTime: '1 min read',
+    readingTime: '2 min read',
     occurredAt: '2024-12-22',
     dateLabel: 'December 2024',
+    publishedAt: '2026-07-11T17:55:32+09:30',
+    updatedAt: '2026-07-29T01:51:57+09:30',
     image: '/assets/gallery/great-ocean-road.jpg',
+    imageAlt:
+      'Layered limestone cliffs and offshore stacks beneath broken cloud along the Great Ocean Road',
+    imageWidth: 1920,
+    imageHeight: 1440,
     featured: true,
   },
   {
     slug: 'sydney',
     title: 'A First Sydney Chapter',
-    excerpt: 'Sandstone quadrangles, harbour light, and an early memory of life in Australia.',
-    pageTitle: 'An early Australian chapter.',
+    excerpt:
+      'Modern campus lines, the Opera House beneath cloud, and open water at Kamay Botany Bay.',
+    pageTitle: 'An early Australian chapter, recorded in three frames.',
     kicker: 'Notes / Sydney',
-    lede: 'October 2022 — sandstone quadrangles, harbour light, and one of my first big trips in Australia.',
+    lede:
+      'October 2022 — a first Sydney trip moving from campus architecture to the harbour and coast.',
     label: 'Sydney',
-    readingTime: '1 min read',
+    readingTime: '2 min read',
     occurredAt: '2022-10-01',
     dateLabel: 'October 2022',
+    publishedAt: '2026-07-11T17:55:32+09:30',
+    updatedAt: '2026-07-29T01:51:57+09:30',
     image: '/assets/gallery/sydney-usyd.jpg',
+    imageAlt:
+      'A modern glass and metal building at the University of Sydney',
+    imageWidth: 1920,
+    imageHeight: 1440,
     featured: true,
   },
   {
     slug: 'adelaide',
     title: 'Adelaide, Slowly',
-    excerpt: 'Riverbank evenings, campus routines, and a study-break walk through Morialta.',
-    pageTitle: 'The steady rhythm of home.',
+    excerpt:
+      'New Year’s Eve fireworks and a study-break walk among the rock and water of Morialta.',
+    pageTitle: 'Two ways Adelaide changes the scale of a day.',
     kicker: 'Notes / Adelaide',
-    lede: 'Campus routines, Morialta rock faces, and the River Torrens at dusk.',
+    lede:
+      'A night sky above the city, then three figures among the rock pools of Morialta.',
     label: 'Adelaide',
-    readingTime: '1 min read',
+    readingTime: '2 min read',
     occurredAt: '2023-12-31',
     dateLabel: 'December 2023',
+    publishedAt: '2026-07-11T17:55:32+09:30',
+    updatedAt: '2026-07-29T01:51:57+09:30',
     image: '/assets/gallery/adelaide-riverbank.jpg',
+    imageAlt:
+      'Orange fireworks and smoke above Adelaide on New Year’s Eve 2023',
+    imageWidth: 1919,
+    imageHeight: 1080,
   },
   {
     slug: 'melbourne',
     title: 'Melbourne in Two Moods',
-    excerpt: 'St Kilda sunsets, Dandenong mornings, and a city that keeps changing pace.',
-    pageTitle: 'Weekend escapes to the south.',
+    excerpt:
+      'Late light above the Dandenong foothills and a red-hooded figure beside the water at St Kilda.',
+    pageTitle: 'A city held between overlook and shoreline.',
     kicker: 'Notes / Melbourne',
-    lede: 'A second city in two moods — mountain ash in the Dandenong Ranges and New Year’s Eve at St Kilda.',
+    lede:
+      'A sunlit Dandenong overlook and marina lights at St Kilda on New Year’s Eve.',
     label: 'Melbourne',
-    readingTime: '1 min read',
+    readingTime: '2 min read',
     occurredAt: '2025-01-01',
-    dateLabel: 'January 2025',
+    dateLabel: 'December 2024 — January 2025',
+    publishedAt: '2026-07-11T17:55:32+09:30',
+    updatedAt: '2026-07-29T01:51:57+09:30',
     image: '/assets/gallery/melbourne-stkilda.jpg',
+    imageAlt:
+      'A person in a red-and-black hood beside the water at St Kilda, with marina lights beyond',
+    imageWidth: 1440,
+    imageHeight: 1920,
   },
   {
     slug: 'beijing',
     title: 'Forty-Eight Hours in Beijing',
     excerpt: 'Two packed days between Universal Beijing Resort and Tiananmen Square at dusk.',
-    pageTitle: 'Two days in the capital.',
+    pageTitle: 'Two July evenings, built at completely different scales.',
     kicker: 'Notes / Beijing',
-    lede: 'Universal Beijing Resort on July 9, then Tiananmen Square at dusk the following day.',
+    lede:
+      'Universal Beijing Resort on July 9, then a crowd beneath the lamps at Tiananmen Square the following evening.',
     label: 'Beijing',
-    readingTime: '1 min read',
+    readingTime: '2 min read',
     occurredAt: '2024-07-10',
     dateLabel: 'July 2024',
+    publishedAt: '2026-07-11T17:55:32+09:30',
+    updatedAt: '2026-07-29T01:51:57+09:30',
     image: '/assets/gallery/beijing-tiananmen.jpg',
+    imageAlt:
+      'A crowd waiting behind barriers beneath lamps at Tiananmen Square after dusk',
+    imageWidth: 1920,
+    imageHeight: 1440,
   },
   {
     slug: 'cairns',
     title: 'Warm Days in Cairns',
-    excerpt: 'Barron Gorge, reef water, and three tropical days in the middle of winter.',
-    pageTitle: 'Chasing the winter sun north.',
+    excerpt:
+      'A narrow fall at Barron Gorge, reef water, and three tropical days in the middle of winter.',
+    pageTitle: 'From exposed rock to an underwater horizon.',
     kicker: 'Notes / Cairns',
-    lede: 'Tropical Queensland in July — Barron Gorge, reef water, and three warm days away from Adelaide winter.',
+    lede:
+      'Tropical Queensland in July — a rainforest lookout, coral forms, and fish suspended in blue water.',
     label: 'Cairns',
-    readingTime: '1 min read',
+    readingTime: '2 min read',
     occurredAt: '2025-07-01',
     dateLabel: 'July 2025',
+    publishedAt: '2026-07-11T17:55:32+09:30',
+    updatedAt: '2026-07-29T01:51:57+09:30',
     image: '/assets/gallery/cairns-barron.jpg',
+    imageAlt:
+      'A narrow waterfall crossing exposed rock in the rainforest at Barron Gorge',
+    imageWidth: 1920,
+    imageHeight: 1440,
   },
 ];
 
@@ -132,20 +194,33 @@ export function noteBySlug(slug: string): Note {
 export function noteMetadata(slug: string): Metadata {
   const note = noteBySlug(slug);
   const title = `${note.title} — Austin Liu`;
+  const image = {
+    url: note.image,
+    width: note.imageWidth,
+    height: note.imageHeight,
+    alt: note.imageAlt,
+  };
+
   return {
     title,
     description: note.lede,
+    authors: [{ name: 'Austin Liu', url: '/' }],
+    alternates: { canonical: `/notes/${note.slug}/` },
     openGraph: {
       title,
       description: note.lede,
       type: 'article',
-      images: [note.image],
+      publishedTime: note.publishedAt,
+      modifiedTime: note.updatedAt,
+      authors: ['/'],
+      section: 'Field notes',
+      images: [image],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description: note.lede,
-      images: [note.image],
+      images: [image],
     },
   };
 }

@@ -17,7 +17,7 @@ export default function NotFound() {
       <main id="main-content" className={styles.notFound}>
         <BlueHourPicture scene="lighthouse" />
         <div className={styles.notFoundInner}>
-          <p className={styles.kicker}>404 / lost in the notes</p>
+          <p className={styles.kicker}>19:31 · Lost at the beacon / 404</p>
           <h1>This page took a quiet walk.</h1>
           <p className={styles.notFoundCopy}>
             The address doesn&apos;t match anything here — but the good parts of

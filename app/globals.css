@@ -119,9 +119,8 @@ picture {
   border: 1px solid var(--line);
   border-radius: 999px;
   color: var(--text);
-  background: rgba(5, 13, 22, 0.82);
+  background: rgba(5, 13, 22, 0.95);
   box-shadow: 0 18px 45px rgba(0, 0, 0, 0.22);
-  backdrop-filter: blur(18px);
   transform: translateX(-50%);
 }
 
@@ -256,7 +255,6 @@ picture {
   place-items: start center;
   padding-top: 18vh;
   background: rgba(1, 5, 9, 0.72);
-  backdrop-filter: blur(8px);
 }
 
 .palette {
@@ -373,6 +371,32 @@ html.blue-hour-page body {
   background: #06101b;
 }
 
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root) {
+  animation: pageLeave 0.28s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+::view-transition-new(root) {
+  animation: pageEnter 0.48s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes pageLeave {
+  to {
+    opacity: 0;
+    transform: scale(1.008);
+  }
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.996);
+  }
+}
+
 @media (max-width: 800px) {
   .container {
     width: min(100% - 32px, 760px);
@@ -427,5 +451,10 @@ html.blue-hour-page body {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
   }
 }

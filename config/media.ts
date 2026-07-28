@@ -13,10 +13,8 @@ export const books: MediaItem[] = [
     title: '我的26岁女房客',
     creator: '超级大坦克科比',
     year: 2014,
-    // 这边用了一张符合小说开场意境（雨夜下）的精美配图暂时作为封面，有书封可以自己换链接
     coverImage: 'https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?auto=format&fit=crop&q=80&w=800',
     rating: 5,
-    comment: '（保留位置）等待你的读后感...',
     url: 'https://book.douban.com/subject/26343118/',
   },
   {
@@ -25,8 +23,8 @@ export const books: MediaItem[] = [
     year: 2013,
     coverImage: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1400827252i/840.jpg',
     rating: 5,
-    comment: 'Completely changed how I look at doors and interfaces.'
-  }
+    comment: 'Completely changed how I look at doors and interfaces.',
+  },
 ];
 
 export const movies: MediaItem[] = [
@@ -36,6 +34,6 @@ export const movies: MediaItem[] = [
     year: 2024,
     coverImage: 'https://m.media-amazon.com/images/M/MV5BODdjNjEyNDYtMTU0My00MTRjLTllNDQtNmFhNDVhODU5NjY2XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg',
     rating: 5,
-    comment: 'The sand worm sequence was incredible.'
-  }
+    comment: 'The sand worm sequence was incredible.',
+  },
 ];

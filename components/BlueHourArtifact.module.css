@@ -1,0 +1,47 @@
+.artifact {
+  position: absolute;
+  z-index: 3;
+  width: clamp(132px, 16vw, 220px);
+  margin: 0;
+  pointer-events: none;
+  transform: rotate(var(--artifact-rotate, -2deg));
+  transform-origin: 50% 82%;
+  filter: drop-shadow(0 22px 30px rgba(0, 0, 0, 0.28));
+  contain: layout paint;
+}
+
+.artifact img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@supports (animation-timeline: view()) {
+  .artifact {
+    animation: artifactReveal linear both;
+    animation-timeline: view();
+    animation-range: entry 4% cover 28%;
+  }
+}
+
+@keyframes artifactReveal {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0)
+      rotate(calc(var(--artifact-rotate, -2deg) - 3deg)) scale(0.93);
+  }
+
+  to {
+    opacity: var(--artifact-opacity, 0.9);
+    transform: translate3d(0, 0, 0) rotate(var(--artifact-rotate, -2deg))
+      scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .artifact {
+    animation: none;
+    opacity: var(--artifact-opacity, 0.9);
+    transform: rotate(var(--artifact-rotate, -2deg));
+  }
+}

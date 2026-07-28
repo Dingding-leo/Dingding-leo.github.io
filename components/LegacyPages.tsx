@@ -1,32 +1,121 @@
 import {
   ArrowUpRight,
   Clock,
-  ExternalLink,
-  Github,
 } from 'lucide-react';
+import Link from 'next/link';
 import {
   BlueHourHero,
   type BlueHourScene,
 } from '@/components/BlueHourJumpShell';
 import jumpStyles from '@/components/BlueHourJumpShell.module.css';
 import { Nav } from '@/components/Nav';
-import { books, movies } from '@/config/media';
+import { books, movies, type MediaItem } from '@/config/media';
 import { notes as allNotes } from '@/config/notes';
-import { projects, site, type Project } from '@/config/site';
+import { site } from '@/config/site';
 import styles from './LegacyPages.module.css';
 
-function Wrap({
+type GalleryArtwork = {
+  name: string;
+  width: number;
+  height: number;
+  alt: string;
+};
+
+const galleryArtwork = {
+  adelaide: {
+    name: 'adelaide-riverbank',
+    width: 800,
+    height: 450,
+    alt: "Orange fireworks and smoke above Adelaide on New Year's Eve 2023",
+  },
+  melbourne: {
+    name: 'melbourne-stkilda',
+    width: 600,
+    height: 800,
+    alt: 'A person in a red-and-black hood beside the water at St Kilda',
+  },
+  shanghai: {
+    name: 'shanghai-disney',
+    width: 800,
+    height: 450,
+    alt: 'A performer beneath purple stage lights at Shanghai Disney Resort',
+  },
+  beijing: {
+    name: 'beijing-universal',
+    width: 800,
+    height: 600,
+    alt: 'Illuminated waterfront buildings at Universal Beijing Resort at night',
+  },
+  cairns: {
+    name: 'cairns-barron',
+    width: 800,
+    height: 600,
+    alt: 'A narrow waterfall crossing exposed rock in the rainforest at Barron Gorge',
+  },
+  greatOceanRoad: {
+    name: 'great-ocean-road',
+    width: 800,
+    height: 600,
+    alt: "Layered limestone formations along Victoria's Great Ocean Road",
+  },
+  sydney: {
+    name: 'sydney-usyd',
+    width: 800,
+    height: 600,
+    alt: 'A modern glass and metal building at the University of Sydney',
+  },
+} as const satisfies Record<string, GalleryArtwork>;
+
+function GalleryPicture({
+  artwork,
+  sizes,
+  className,
+  priority = false,
+}: {
+  artwork: GalleryArtwork;
+  sizes: string;
+  className?: string;
+  priority?: boolean;
+}) {
+  return (
+    <picture className={className}>
+      <source
+        type="image/avif"
+        srcSet={`/assets/gallery/optimized/${artwork.name}-320.avif 320w, /assets/gallery/optimized/${artwork.name}-600.avif 600w`}
+        sizes={sizes}
+      />
+      <source
+        type="image/webp"
+        srcSet={`/assets/gallery/optimized/${artwork.name}-320.webp 320w, /assets/gallery/optimized/${artwork.name}-600.webp 600w`}
+        sizes={sizes}
+      />
+      <img
+        src={`/assets/gallery/${artwork.name}_thumb.jpg`}
+        alt={artwork.alt}
+        width={artwork.width}
+        height={artwork.height}
+        loading={priority ? 'eager' : 'lazy'}
+        fetchPriority={priority ? 'high' : 'auto'}
+        decoding="async"
+      />
+    </picture>
+  );
+}
+
+export function LegacyPageShell({
   children,
   title,
   kicker,
   copy,
   scene,
+  returnHref,
 }: {
   children: React.ReactNode;
   title: string;
   kicker: string;
   copy: string;
   scene: BlueHourScene;
+  returnHref: string;
 }) {
   return (
     <div className={jumpStyles.shell}>
@@ -45,9 +134,9 @@ function Wrap({
       <footer className={jumpStyles.footer}>
         <div className="container">
           <span>© 2026 Austin Liu</span>
-          <a href="/">
+          <Link href={returnHref}>
             Return to the living space <ArrowUpRight size={14} aria-hidden="true" />
-          </a>
+          </Link>
         </div>
       </footer>
     </div>
@@ -56,11 +145,12 @@ function Wrap({
 
 export function AboutPage() {
   return (
-    <Wrap
-      kicker="About / 01"
+    <LegacyPageShell
+      kicker="20:19 · One Window Left / About"
       title="A public notebook, still in progress."
       copy="A little more context about the person behind the notes, projects, and experiments."
       scene="afterlight"
+      returnHref="/#afterlight"
     >
       <div className={styles.aboutSplit}>
         <div>
@@ -106,7 +196,7 @@ export function AboutPage() {
           </p>
         </div>
       </div>
-    </Wrap>
+    </LegacyPageShell>
   );
 }
 
@@ -114,198 +204,90 @@ export function MomentsPage() {
   const items = [
     {
       title: 'Adelaide',
-      copy: 'Riverbank walks, campus routines, and the quiet pulse of a city that gives you room to grow.',
-      image: '/assets/gallery/adelaide-riverbank_thumb.jpg',
+      copy: 'New Year’s Eve fireworks, Morialta stone, and the quieter rhythm of a city becoming home.',
+      artwork: galleryArtwork.adelaide,
       href: '/notes/adelaide',
     },
     {
       title: 'Melbourne',
-      copy: 'St Kilda sunsets and Dandenong mornings. A second city that always has something new.',
-      image: '/assets/gallery/melbourne-stkilda_thumb.jpg',
+      copy: 'A figure at St Kilda and a framed view from the Dandenong Ranges — two ways of holding the city’s edges.',
+      artwork: galleryArtwork.melbourne,
       href: '/notes/melbourne',
     },
     {
       title: 'Shanghai',
-      copy: 'Disney castle at dusk, then lost in the streets. 魔都 hits different at night.',
-      image: '/assets/gallery/shanghai-disney_thumb.jpg',
+      copy: 'One costumed performer held beneath magenta and blue stage lights at Shanghai Disney Resort.',
+      artwork: galleryArtwork.shanghai,
       href: '/notes/shanghai-memories',
     },
     {
       title: 'Beijing',
-      copy: 'Universal Studios at full volume, Tiananmen at dusk. 48 hours that felt like a week.',
-      image: '/assets/gallery/beijing-universal_thumb.jpg',
+      copy: 'Universal Beijing Resort, then Tiananmen Square at dusk across two packed July days.',
+      artwork: galleryArtwork.beijing,
       href: '/notes/beijing',
     },
     {
       title: 'Cairns',
-      copy: 'Barron Gorge roaring, marina mornings, and the kind of warmth you forget exists in July.',
-      image: '/assets/gallery/cairns-barron_thumb.jpg',
+      copy: 'Barron Gorge, Great Barrier Reef water, and three warm July days in tropical Queensland.',
+      artwork: galleryArtwork.cairns,
       href: '/notes/cairns',
     },
     {
       title: 'Great Ocean Road',
-      copy: 'Twelve Apostles at the edge of summer. One road, two Australias, no rush.',
-      image: '/assets/gallery/great-ocean-road_thumb.jpg',
+      copy: 'Layered limestone, broken cloud, and an open horizon farther along the same coast.',
+      artwork: galleryArtwork.greatOceanRoad,
       href: '/notes/great-ocean-road',
     },
     {
       title: 'Sydney',
-      copy: 'October 2022. Sandstone quadrangles, harbour light, and my first real Australian chapter.',
-      image: '/assets/gallery/sydney-usyd_thumb.jpg',
+      copy: 'University buildings, harbour light, and an early chapter of life in Australia.',
+      artwork: galleryArtwork.sydney,
       href: '/notes/sydney',
     },
   ];
 
   return (
-    <Wrap
-      kicker="Moments / 02"
+    <LegacyPageShell
+      kicker="19:55 · What the Tide Kept / Moments"
       title="A few things worth remembering."
       copy="Places I've been, things I've seen, and the small moments that stay with you."
       scene="tide"
+      returnHref="/#tide"
     >
       <div className={styles.momentsGrid}>
         {items.map((item, index) => (
-          <a
+          <Link
             href={item.href}
             key={item.title}
             className={`${styles.momentCard} ${index < 2 ? styles.momentCardLarge : ''}`}
           >
-            <img
-              src={item.image}
-              alt={item.title}
-              width={900}
-              height={675}
-              loading={index < 2 ? 'eager' : 'lazy'}
-              fetchPriority={index === 0 ? 'high' : undefined}
-              decoding="async"
+            <GalleryPicture
+              artwork={item.artwork}
+              className={styles.momentPicture}
+              sizes="(max-width: 760px) calc(100vw - 64px), (max-width: 1200px) 50vw, 560px"
+              priority={index === 0}
             />
             <div className={styles.momentCopy}>
               <h2>{item.title}</h2>
               <p>{item.copy}</p>
             </div>
             <ArrowUpRight size={24} aria-hidden="true" />
-          </a>
+          </Link>
         ))}
       </div>
-    </Wrap>
+    </LegacyPageShell>
   );
 }
 
-const optimizedProjectArtwork: Record<string, string> = {
-  KnightClub: 'knightclub-editorial',
-  ScholarBank: 'scholarbank',
-  Denki: 'denki',
+const noteArtworkBySlug: Record<string, GalleryArtwork> = {
+  adelaide: galleryArtwork.adelaide,
+  melbourne: galleryArtwork.melbourne,
+  'shanghai-memories': galleryArtwork.shanghai,
+  beijing: galleryArtwork.beijing,
+  cairns: galleryArtwork.cairns,
+  'great-ocean-road': galleryArtwork.greatOceanRoad,
+  sydney: galleryArtwork.sydney,
 };
-
-function ProjectArtwork({ project }: { project: Project }) {
-  const optimizedName = optimizedProjectArtwork[project.title];
-
-  if (!optimizedName) {
-    return (
-      <img
-        src={project.image}
-        alt={project.imageAlt}
-        width={1600}
-        height={900}
-        loading="lazy"
-        decoding="async"
-      />
-    );
-  }
-
-  return (
-    <picture>
-      <source
-        type="image/avif"
-        srcSet={`/assets/projects/optimized/${optimizedName}-640.avif 640w, /assets/projects/optimized/${optimizedName}-960.avif 960w`}
-        sizes="(max-width: 760px) 100vw, 50vw"
-      />
-      <source
-        type="image/webp"
-        srcSet={`/assets/projects/optimized/${optimizedName}-640.webp 640w, /assets/projects/optimized/${optimizedName}-960.webp 960w`}
-        sizes="(max-width: 760px) 100vw, 50vw"
-      />
-      <img
-        src={project.image}
-        alt={project.imageAlt}
-        width={1600}
-        height={900}
-        loading="lazy"
-        decoding="async"
-      />
-    </picture>
-  );
-}
-
-function ProjectCard({ project }: { project: Project }) {
-  const primaryUrl = project.liveUrl || project.repoUrl;
-  const artwork = <ProjectArtwork project={project} />;
-
-  return (
-    <article
-      className={`${styles.projectCard} ${project.featured ? styles.projectFeatured : ''}`}
-    >
-      {primaryUrl ? (
-        <a
-          className={styles.projectMedia}
-          href={primaryUrl}
-          target="_blank"
-          rel="noreferrer"
-          aria-label={`Open ${project.title}`}
-        >
-          {artwork}
-        </a>
-      ) : (
-        <div className={styles.projectMedia}>{artwork}</div>
-      )}
-      <div className={styles.projectBody}>
-        <div className={styles.projectStatus}>{project.status}</div>
-        <h2>{project.title}</h2>
-        <p className={styles.projectTagline}>{project.tagline}</p>
-        <p>{project.description}</p>
-        <div className={styles.projectTags}>
-          {project.tags.map((tag) => (
-            <span key={tag}>{tag}</span>
-          ))}
-        </div>
-        <div className={styles.projectActions}>
-          {project.liveUrl && (
-            <a href={project.liveUrl} target="_blank" rel="noreferrer">
-              Live demo <ExternalLink size={15} aria-hidden="true" />
-            </a>
-          )}
-          {project.repoUrl && (
-            <a href={project.repoUrl} target="_blank" rel="noreferrer">
-              GitHub <Github size={15} aria-hidden="true" />
-            </a>
-          )}
-        </div>
-      </div>
-    </article>
-  );
-}
-
-export function ProjectsPage() {
-  return (
-    <Wrap
-      kicker="Projects / 03"
-      title="Useful things, built and shipped."
-      copy="A growing collection of learning tools, local-first software, and practical experiments shaped by real interests."
-      scene="mountain"
-    >
-      <div className={styles.projectSummary} aria-label="Project summary">
-        <span>{projects.length} projects</span>
-        <span>{projects.filter((project) => project.liveUrl).length} live products</span>
-        <span>Built across web and desktop</span>
-      </div>
-      <div className={styles.projectsGrid}>
-        {projects.map((project) => (
-          <ProjectCard project={project} key={project.title} />
-        ))}
-      </div>
-    </Wrap>
-  );
-}
 
 const notes = [...allNotes]
   .sort((a, b) => b.occurredAt.localeCompare(a.occurredAt))
@@ -317,22 +299,29 @@ const notes = [...allNotes]
     time: note.readingTime,
     date: note.dateLabel,
     href: `/notes/${note.slug}`,
+    artwork: noteArtworkBySlug[note.slug],
   }));
 
 export function NotesPage() {
   return (
-    <Wrap
-      kicker="Notes / 04"
+    <LegacyPageShell
+      kicker="20:07 · Water in the Dark / Notes"
       title="Things I&apos;ve been thinking about."
       copy="Field notes from places, projects, and the ordinary days that are worth keeping."
       scene="waterfall"
+      returnHref="/#water"
     >
       <div className={styles.notesList}>
         {notes.map((note, index) => (
-          <a className={styles.note} href={note.href} key={note.title}>
+          <Link className={styles.note} href={note.href} key={note.title}>
             <div className={styles.noteIndex}>
               {String(index + 1).padStart(2, '0')}
             </div>
+            <GalleryPicture
+              artwork={note.artwork}
+              className={styles.notePicture}
+              sizes="(max-width: 760px) 68px, 96px"
+            />
             <div className={styles.noteMain} lang={note.lang}>
               <h2>{note.title}</h2>
               <p>{note.excerpt}</p>
@@ -349,10 +338,10 @@ export function NotesPage() {
               aria-hidden="true"
               className={styles.noteArrow}
             />
-          </a>
+          </Link>
         ))}
       </div>
-    </Wrap>
+    </LegacyPageShell>
   );
 }
 
@@ -361,19 +350,19 @@ function MediaShelf({
   items,
 }: {
   title: string;
-  items: typeof books;
+  items: MediaItem[];
 }) {
   return (
     <section className={styles.shelf}>
       <h2>{title}</h2>
       <div className={styles.mediaGrid}>
-        {items.map((item) => (
-          <article className={styles.mediaCard} key={item.title}>
-            <a href={item.url || '#'} target="_blank" rel="noopener noreferrer">
+        {items.map((item) => {
+          const content = (
+            <>
               <div className={styles.mediaCover}>
                 <img
                   src={item.coverImage}
-                  alt={item.title}
+                  alt={`${item.title} cover`}
                   width={800}
                   height={1200}
                   loading="lazy"
@@ -382,12 +371,35 @@ function MediaShelf({
               </div>
               <h3>{item.title}</h3>
               <p className={styles.mediaCreator}>{item.creator}</p>
+              <p className={styles.mediaMeta}>
+                <span>{item.year}</span>
+                {item.rating != null && (
+                  <span aria-label={`${item.rating} out of 5 stars`}>
+                    <span aria-hidden="true">★</span> {item.rating}/5
+                  </span>
+                )}
+              </p>
               {item.comment && (
                 <p className={styles.mediaComment}>&quot;{item.comment}&quot;</p>
               )}
-            </a>
-          </article>
-        ))}
+            </>
+          );
+
+          return (
+            <article
+              className={`${styles.mediaCard} ${item.url ? styles.mediaCardLinked : ''}`}
+              key={item.title}
+            >
+              {item.url ? (
+                <a href={item.url} target="_blank" rel="noopener noreferrer">
+                  {content}
+                </a>
+              ) : (
+                <div className={styles.mediaEntry}>{content}</div>
+              )}
+            </article>
+          );
+        })}
       </div>
     </section>
   );
@@ -395,27 +407,29 @@ function MediaShelf({
 
 export function LibraryPage() {
   return (
-    <Wrap
-      kicker="Library / 05"
+    <LegacyPageShell
+      kicker="20:19 · Afterlight / Library"
       title="Digital Bookshelf & Cinema."
       copy="A collection of books I've read and movies I've watched recently."
       scene="afterlight"
+      returnHref="/#afterlight"
     >
       <div className={styles.library}>
         <MediaShelf title="Books" items={books} />
         <MediaShelf title="Movies" items={movies} />
       </div>
-    </Wrap>
+    </LegacyPageShell>
   );
 }
 
 export function ContactPage() {
   return (
-    <Wrap
-      kicker="Say hello / 11"
+    <LegacyPageShell
+      kicker="19:31 · Bearing / Contact"
       title="Let's keep in touch."
       copy="For study chats, food recommendations, collaborations, or simply saying hello."
       scene="lighthouse"
+      returnHref="/#bearing"
     >
       <div className={styles.contact}>
         <p>Feel free to drop me an email:</p>
@@ -424,6 +438,6 @@ export function ContactPage() {
           <ArrowUpRight size={18} aria-hidden="true" />
         </a>
       </div>
-    </Wrap>
+    </LegacyPageShell>
   );
 }

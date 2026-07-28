@@ -21,10 +21,10 @@ export type Project = {
 
 export const navItems: NavItem[] = [
   { label: 'Home', href: '/' },
-  { label: 'About', href: '/about' },
-  { label: 'Moments', href: '/moments' },
   { label: 'Projects', href: '/projects' },
+  { label: 'Moments', href: '/moments' },
   { label: 'Notes', href: '/notes' },
+  { label: 'About', href: '/about' },
   { label: 'Library', href: '/library' },
   { label: 'Now', href: '/now' },
   { label: 'Contact', href: '/contact' },
@@ -63,7 +63,8 @@ export const projects: Project[] = [
     decision:
       'Organise original questions around transferable skills and bind saved practice to individual learners while keeping provider independence explicit.',
     image: '/assets/projects/scholarbank.jpg',
-    imageAlt: 'ScholarBank scholarship preparation practice interface',
+    imageAlt:
+      'ScholarBank practice illustration with a number-sequence question and progress card',
     tags: ['Next.js', 'Cloudflare D1', 'Drizzle', 'Education'],
     status: 'Public beta',
     liveUrl: 'https://mul.tjren.site/',

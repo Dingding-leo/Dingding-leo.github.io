@@ -50,10 +50,7 @@ export const metadata: Metadata = {
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: [
-    { media: '(prefers-color-scheme: dark)', color: '#06101b' },
-    { media: '(prefers-color-scheme: light)', color: '#f3eee5' },
-  ],
+  themeColor: '#06101b',
 };
 
 const structuredData = {
@@ -97,8 +94,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
-        <Providers />
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

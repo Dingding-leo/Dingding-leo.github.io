@@ -1,3 +1,4 @@
+import { BlueHourArtifact } from './BlueHourArtifact';
 import styles from './BlueHourJumpShell.module.css';
 
 export type BlueHourScene =
@@ -7,6 +8,17 @@ export type BlueHourScene =
   | 'waterfall'
   | 'lighthouse';
 
+const sceneFocalPoints: Record<
+  BlueHourScene,
+  { desktop: string; mobile: string }
+> = {
+  lighthouse: { desktop: '54% 50%', mobile: '59% 50%' },
+  mountain: { desktop: '55% 50%', mobile: '69% 50%' },
+  tide: { desktop: '54% 50%', mobile: '70% 50%' },
+  waterfall: { desktop: '52% 50%', mobile: '62% 50%' },
+  afterlight: { desktop: '54% 50%', mobile: '71% 50%' },
+};
+
 export function BlueHourPicture({
   scene,
   priority = true,
@@ -14,8 +26,20 @@ export function BlueHourPicture({
   scene: BlueHourScene;
   priority?: boolean;
 }) {
+  const focalPoint = sceneFocalPoints[scene];
+
   return (
-    <picture className={styles.scenePicture} aria-hidden="true">
+    <picture
+      className={styles.scenePicture}
+      data-scene={scene}
+      aria-hidden="true"
+      style={
+        {
+          '--jump-scene-position': focalPoint.desktop,
+          '--jump-scene-mobile-position': focalPoint.mobile,
+        } as React.CSSProperties
+      }
+    >
       <source
         type="image/avif"
         srcSet={`/assets/blue-hour/${scene}-720.avif 720w, /assets/blue-hour/${scene}-1200.avif 1200w, /assets/blue-hour/${scene}-1672.avif 1672w`}
@@ -53,14 +77,20 @@ export function BlueHourHero({
   meta?: React.ReactNode;
 }) {
   return (
-    <section className={styles.hero}>
+    <section className={styles.hero} data-scene={scene}>
       <BlueHourPicture scene={scene} />
+      <span className={styles.sceneMotion} aria-hidden="true" />
       <div className={`container ${styles.heroInner}`}>
         <p className={styles.kicker}>{kicker}</p>
         <h1>{title}</h1>
         <p className={styles.lede}>{copy}</p>
         {meta && <p className={styles.meta}>{meta}</p>}
       </div>
+      <BlueHourArtifact
+        scene={scene}
+        className={styles.heroArtifact}
+        priority
+      />
     </section>
   );
 }

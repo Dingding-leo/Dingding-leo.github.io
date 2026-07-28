@@ -6,24 +6,20 @@ import {
   useRef,
   useState,
   type MouseEvent as ReactMouseEvent,
+  type RefObject,
 } from 'react';
+import Link from 'next/link';
 import {
   AnimatePresence,
   MotionConfig,
   motion,
-  type PanInfo,
   useReducedMotion,
-  useScroll,
-  useSpring,
 } from 'framer-motion';
 import {
   ArrowDown,
-  ArrowLeft,
   ArrowRight,
   ArrowUp,
   ArrowUpRight,
-  ExternalLink,
-  Github,
   Mail,
   MapPin,
   Menu,
@@ -31,8 +27,12 @@ import {
 } from 'lucide-react';
 import { projects, site } from '@/config/site';
 import { notes } from '@/config/notes';
-import { AudioControl, useBlueHourAudio } from './AudioExperience';
+import { BlueHourArtifact } from '@/components/BlueHourArtifact';
+import { ProjectDeck } from '@/components/ProjectDeck';
+import { useBlueHourAudioContext } from './AudioExperience';
 import styles from './BlueHourSite.module.css';
+
+const MotionLink = motion.create(Link);
 
 const scenes = [
   {
@@ -113,10 +113,12 @@ function ScenePicture({
   scene,
   active,
   eager,
+  transitioning,
 }: {
   scene: (typeof scenes)[number];
   active: boolean;
   eager: boolean;
+  transitioning: boolean;
 }) {
   const reducedMotion = useReducedMotion();
   const style = {
@@ -127,9 +129,11 @@ function ScenePicture({
 
   return (
     <motion.div
-      className={`${styles.sceneLayer} ${active ? styles.sceneLayerActive : ''}`}
+      className={`${styles.sceneLayer} ${active ? styles.sceneLayerActive : ''} ${
+        transitioning ? styles.sceneLayerTransitioning : ''
+      }`}
       aria-hidden="true"
-      initial={false}
+      initial={{ opacity: 0, scale: 1.065 }}
       animate={{
         opacity: active ? 1 : 0,
         scale: active ? 1.025 : 1.065,
@@ -177,19 +181,54 @@ function Weather({ type }: { type: (typeof scenes)[number]['weather'] }) {
   );
 }
 
-function SceneBackdrop({ active }: { active: number }) {
+function SceneBackdrop({
+  active,
+  backdropRef,
+}: {
+  active: number;
+  backdropRef: RefObject<HTMLDivElement | null>;
+}) {
+  const reducedMotion = useReducedMotion();
+  const previousActive = useRef(active);
+  const [renderedScenes, setRenderedScenes] = useState([active]);
+  const [transitioning, setTransitioning] = useState(false);
+
+  useEffect(() => {
+    const outgoing = previousActive.current;
+    previousActive.current = active;
+
+    if (outgoing === active) {
+      setRenderedScenes([active]);
+      return;
+    }
+
+    if (reducedMotion) {
+      setRenderedScenes([active]);
+      setTransitioning(false);
+      return;
+    }
+
+    setRenderedScenes([outgoing, active]);
+    setTransitioning(true);
+    const settleTimer = window.setTimeout(() => {
+      setRenderedScenes([active]);
+      setTransitioning(false);
+    }, 1650);
+
+    return () => window.clearTimeout(settleTimer);
+  }, [active, reducedMotion]);
+
   return (
-    <div className={styles.backdrop} aria-hidden="true">
-      {scenes.map((scene, index) =>
-        Math.abs(index - active) <= 1 ? (
-          <ScenePicture
-            key={scene.id}
-            scene={scene}
-            active={index === active}
-            eager={index === 0}
-          />
-        ) : null,
-      )}
+    <div ref={backdropRef} className={styles.backdrop} aria-hidden="true">
+      {renderedScenes.map((index) => (
+        <ScenePicture
+          key={scenes[index].id}
+          scene={scenes[index]}
+          active={index === active}
+          eager={index === 0}
+          transitioning={transitioning}
+        />
+      ))}
       <Weather type={scenes[active].weather} />
       <div className={styles.backdropTone} />
       <div className={styles.backdropGrain} />
@@ -228,7 +267,7 @@ function ChapterTitle({
       className={styles.chapterHeader}
       initial={{ opacity: 0, y: 42 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ amount: 0.38, once: false }}
+      viewport={{ amount: 0.38, once: true }}
       transition={{
         duration: reducedMotion ? 0 : 0.9,
         ease: [0.16, 1, 0.3, 1],
@@ -398,9 +437,9 @@ function Header({
               </a>
             ))}
             <div className={styles.mobileRouteLinks}>
-              <a href="/projects">All projects</a>
-              <a href="/moments">All moments</a>
-              <a href="/notes">All notes</a>
+              <Link href="/projects">All projects</Link>
+              <Link href="/moments">All moments</Link>
+              <Link href="/notes">All notes</Link>
             </div>
           </motion.nav>
         )}
@@ -435,348 +474,16 @@ function ProgressRail({
   );
 }
 
-type FeaturedProject = (typeof projects)[number];
-
-function ProjectPicture({
-  project,
-  decorative = false,
-}: {
-  project: FeaturedProject;
-  decorative?: boolean;
-}) {
-  const optimizedImageName =
-    project.title === 'KnightClub'
-      ? 'knightclub-editorial'
-      : project.title === 'ScholarBank'
-        ? 'scholarbank'
-        : project.title === 'Denki'
-          ? 'denki'
-          : null;
-  const projectSlug = project.title.toLowerCase();
-
-  if (!optimizedImageName) {
-    return (
-      <img
-        src={project.image}
-        alt={decorative ? '' : project.imageAlt}
-        width={1600}
-        height={900}
-        loading="lazy"
-        decoding="async"
-        draggable={false}
-      />
-    );
-  }
-
-  return (
-    <picture className={styles.projectPicture} data-project={projectSlug}>
-      <source
-        type="image/avif"
-        srcSet={`/assets/projects/optimized/${optimizedImageName}-640.avif 640w, /assets/projects/optimized/${optimizedImageName}-960.avif 960w`}
-        sizes="(max-width: 820px) 86vw, 460px"
-      />
-      <source
-        type="image/webp"
-        srcSet={`/assets/projects/optimized/${optimizedImageName}-640.webp 640w, /assets/projects/optimized/${optimizedImageName}-960.webp 960w`}
-        sizes="(max-width: 820px) 86vw, 460px"
-      />
-      <img
-        src={project.image}
-        alt={decorative ? '' : project.imageAlt}
-        width={1600}
-        height={900}
-        loading="lazy"
-        decoding="async"
-        draggable={false}
-      />
-    </picture>
-  );
-}
-
-function ProjectActiveCard({
-  project,
-  index,
-  count,
-  direction,
-  disabled,
-  onSwipe,
-}: {
-  project: FeaturedProject;
-  index: number;
-  count: number;
-  direction: number;
-  disabled: boolean;
-  onSwipe: (direction: number) => void;
-}) {
-  const primaryUrl = project.liveUrl || project.repoUrl || '/projects';
-  const reducedMotion = useReducedMotion();
-  const didDrag = useRef(false);
-
-  const onDragEnd = (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    didDrag.current = Math.abs(info.offset.x) > 6;
-    if (info.offset.x < -72 || info.velocity.x < -550) {
-      onSwipe(1);
-    } else if (info.offset.x > 72 || info.velocity.x > 550) {
-      onSwipe(-1);
-    }
-    window.setTimeout(() => {
-      didDrag.current = false;
-    }, 180);
-  };
-
-  return (
-    <motion.article
-      className={styles.projectActiveCard}
-      role="group"
-      aria-roledescription="slide"
-      aria-label={`${index + 1} of ${count}: ${project.title}`}
-      custom={direction}
-      variants={{
-        enter: (travelDirection: number) =>
-          reducedMotion
-            ? { opacity: 0 }
-            : {
-                opacity: 0,
-                y: 18,
-                scale: 0.965,
-                rotate: travelDirection > 0 ? 2.4 : -2.4,
-              },
-        centre: {
-          opacity: 1,
-          x: 0,
-          y: 0,
-          scale: 1,
-          rotate: -0.65,
-          transition: reducedMotion
-            ? { duration: 0 }
-            : { type: 'spring', stiffness: 260, damping: 26, mass: 0.72 },
-        },
-        exit: (travelDirection: number) =>
-          reducedMotion
-            ? { opacity: 0, transition: { duration: 0 } }
-            : {
-                opacity: 0,
-                x: travelDirection > 0 ? -560 : 560,
-                y: 34,
-                rotate: travelDirection > 0 ? -14 : 14,
-                scale: 0.94,
-                transition: {
-                  duration: 0.42,
-                  ease: [0.32, 0.72, 0, 1],
-                },
-              },
-      }}
-      initial="enter"
-      animate="centre"
-      exit="exit"
-      drag={!reducedMotion && !disabled ? 'x' : false}
-      dragConstraints={{ left: 0, right: 0 }}
-      dragElastic={0.68}
-      dragMomentum={false}
-      dragSnapToOrigin
-      whileDrag={{ scale: 1.015, rotate: 3, cursor: 'grabbing' }}
-      onDragStart={() => {
-        didDrag.current = false;
-      }}
-      onDrag={(_event, info) => {
-        if (Math.abs(info.offset.x) > 6) didDrag.current = true;
-      }}
-      onDragEnd={onDragEnd}
-      onClickCapture={(event) => {
-        if (!didDrag.current) return;
-        event.preventDefault();
-        event.stopPropagation();
-        didDrag.current = false;
-      }}
-    >
-      <a
-        className={styles.projectCardVisual}
-        href={primaryUrl}
-        target="_blank"
-        rel="noreferrer"
-        draggable={false}
-        aria-label={`Open ${project.title}`}
-      >
-        <ProjectPicture project={project} />
-        <span>{project.status}</span>
-      </a>
-      <div className={styles.projectCompactCopy}>
-        <div className={styles.projectCompactHeading}>
-          <span>{String(index + 1).padStart(2, '0')}</span>
-          <h3>{project.title}</h3>
-        </div>
-        <p className={styles.projectCompactTagline}>{project.tagline}</p>
-        <p className={styles.projectCompactWhy}>{project.why || project.description}</p>
-        <div className={styles.projectCompactFooter}>
-          <div>
-            {project.tags.slice(0, 2).map((tag) => (
-              <span key={tag}>{tag}</span>
-            ))}
-          </div>
-          <span className={styles.projectLinks}>
-            {project.liveUrl && (
-              <a
-                href={project.liveUrl}
-                target="_blank"
-                rel="noreferrer"
-                draggable={false}
-              >
-                Live <ExternalLink size={13} />
-              </a>
-            )}
-            {project.repoUrl && (
-              <a
-                href={project.repoUrl}
-                target="_blank"
-                rel="noreferrer"
-                draggable={false}
-              >
-                Source <Github size={13} />
-              </a>
-            )}
-          </span>
-        </div>
-      </div>
-    </motion.article>
-  );
-}
-
-function ProjectDeck({ deckProjects }: { deckProjects: FeaturedProject[] }) {
-  const reducedMotion = useReducedMotion();
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [direction, setDirection] = useState(1);
-  const [busy, setBusy] = useState(false);
-  const count = deckProjects.length;
-  const activeProject = deckProjects[activeIndex];
-
-  if (!activeProject || count === 0) return null;
-
-  const projectAt = (offset: number) =>
-    deckProjects[(activeIndex + offset + count) % count];
-
-  const goTo = (nextIndex: number, travelDirection: number) => {
-    if (busy || nextIndex === activeIndex) return;
-    setDirection(travelDirection);
-    setBusy(true);
-    setActiveIndex((nextIndex + count) % count);
-  };
-
-  const move = (travelDirection: number) => {
-    goTo(activeIndex + travelDirection, travelDirection);
-  };
-
-  return (
-    <motion.div
-      className={styles.projectCarousel}
-      role="region"
-      aria-roledescription="carousel"
-      aria-label="Featured projects"
-      tabIndex={0}
-      initial={{ opacity: 0, y: 36 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.32 }}
-      transition={{
-        duration: reducedMotion ? 0 : 0.75,
-        ease: [0.16, 1, 0.3, 1],
-      }}
-      onKeyDown={(event) => {
-        if (event.target !== event.currentTarget) return;
-        if (event.key === 'ArrowLeft') {
-          event.preventDefault();
-          move(-1);
-        } else if (event.key === 'ArrowRight') {
-          event.preventDefault();
-          move(1);
-        } else if (event.key === 'Home') {
-          event.preventDefault();
-          goTo(0, -1);
-        } else if (event.key === 'End') {
-          event.preventDefault();
-          goTo(count - 1, 1);
-        }
-      }}
-    >
-      <div className={styles.projectStage}>
-        {[2, 1].map((offset) => {
-          const project = projectAt(offset);
-          return (
-            <div
-              className={`${styles.projectBackCard} ${
-                offset === 1 ? styles.projectBackOne : styles.projectBackTwo
-              }`}
-              aria-hidden="true"
-              key={`${project.title}-${offset}`}
-            >
-              <ProjectPicture project={project} decorative />
-              <span>{project.title}</span>
-            </div>
-          );
-        })}
-        <AnimatePresence
-          initial={false}
-          custom={direction}
-          onExitComplete={() => setBusy(false)}
-        >
-          <ProjectActiveCard
-            key={activeProject.title}
-            project={activeProject}
-            index={activeIndex}
-            count={count}
-            direction={direction}
-            disabled={busy}
-            onSwipe={move}
-          />
-        </AnimatePresence>
-      </div>
-      <div className={styles.projectControls}>
-        <button
-          type="button"
-          onClick={() => move(-1)}
-          disabled={busy}
-          aria-label={`Previous project: ${projectAt(-1).title}`}
-        >
-          <ArrowLeft size={16} />
-        </button>
-        <span className={styles.projectCounter}>
-          <strong>{String(activeIndex + 1).padStart(2, '0')}</strong>
-          <i />
-          <span>{String(count).padStart(2, '0')}</span>
-        </span>
-        <button
-          type="button"
-          onClick={() => move(1)}
-          disabled={busy}
-          aria-label={`Next project: ${projectAt(1).title}`}
-        >
-          <ArrowRight size={16} />
-        </button>
-        <small>Drag or use arrows</small>
-      </div>
-      <p className={styles.srOnly} aria-live="polite">
-        {`${activeProject.title}, project ${activeIndex + 1} of ${count}`}
-      </p>
-    </motion.div>
-  );
-}
-
 export function BlueHourSite() {
   const reducedMotion = useReducedMotion();
   const [active, setActive] = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
   const chapterNodes = useRef<Array<HTMLElement | null>>([]);
-  const root = useRef<HTMLDivElement>(null);
+  const backdropRef = useRef<HTMLDivElement>(null);
   const pointerFrame = useRef(0);
   const pointerLastUpdate = useRef(0);
-  const audioStartRef = useRef<() => Promise<boolean>>(async () => false);
-  const audioPlayingRef = useRef(false);
-  const audioStartAttempting = useRef(false);
-  const { scrollYProgress } = useScroll();
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 80,
-    damping: 24,
-    mass: 0.3,
-  });
-  const audio = useBlueHourAudio(active);
+  const pointerEnabled = useRef(false);
+  const { setActiveChapter } = useBlueHourAudioContext();
 
   const featuredProjects = useMemo(
     () => projects.filter((project) => project.featured).slice(0, 3),
@@ -795,76 +502,29 @@ export function BlueHourSite() {
   );
 
   useEffect(() => {
-    audioStartRef.current = audio.start;
-    audioPlayingRef.current = audio.isPlaying;
-  }, [audio.isPlaying, audio.start]);
+    setActiveChapter(active);
+  }, [active, setActiveChapter]);
 
   useEffect(() => {
-    try {
-      if (window.localStorage.getItem('blue-hour-sound') === 'off') return;
-    } catch {
-      // Storage can be unavailable in strict privacy modes; sound can still run.
-    }
-
-    const cleanup = () => {
-      window.removeEventListener('pointerdown', onGesture, true);
-      window.removeEventListener('keydown', onGesture, true);
+    const coarsePointer = window.matchMedia('(pointer: coarse)');
+    const reducedMotionQuery = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    );
+    const updatePointerCapability = () => {
+      pointerEnabled.current =
+        !coarsePointer.matches && !reducedMotionQuery.matches;
     };
 
-    const onGesture = (event: PointerEvent | KeyboardEvent) => {
-      if (audioPlayingRef.current) {
-        cleanup();
-        return;
-      }
-
-      const target = event.target;
-      if (
-        target instanceof Element &&
-        target.closest('[data-blue-hour-audio-toggle]')
-      ) {
-        return;
-      }
-
-      if (event instanceof KeyboardEvent) {
-        if (
-          event.repeat ||
-          event.ctrlKey ||
-          event.metaKey ||
-          event.altKey ||
-          !['Enter', ' '].includes(event.key)
-        ) {
-          return;
-        }
-        if (
-          target instanceof HTMLElement &&
-          (target.isContentEditable ||
-            ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))
-        ) {
-          return;
-        }
-      }
-
-      if (audioStartAttempting.current) return;
-      audioStartAttempting.current = true;
-      void audioStartRef
-        .current()
-        .then((started) => {
-          if (started) cleanup();
-        })
-        .catch(() => {
-          // Keep the listener armed for the next eligible interaction.
-        })
-        .finally(() => {
-          audioStartAttempting.current = false;
-        });
+    updatePointerCapability();
+    coarsePointer.addEventListener('change', updatePointerCapability);
+    reducedMotionQuery.addEventListener('change', updatePointerCapability);
+    return () => {
+      coarsePointer.removeEventListener('change', updatePointerCapability);
+      reducedMotionQuery.removeEventListener(
+        'change',
+        updatePointerCapability,
+      );
     };
-
-    window.addEventListener('pointerdown', onGesture, {
-      capture: true,
-      passive: true,
-    });
-    window.addEventListener('keydown', onGesture, true);
-    return cleanup;
   }, []);
 
   useEffect(() => {
@@ -905,13 +565,7 @@ export function BlueHourSite() {
   };
 
   const onPointerMove = (event: ReactMouseEvent<HTMLDivElement>) => {
-    if (
-      !root.current ||
-      window.matchMedia('(pointer: coarse)').matches ||
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
-      return;
-    }
+    if (!backdropRef.current || !pointerEnabled.current) return;
     const now = window.performance.now();
     if (now - pointerLastUpdate.current < 32) return;
     pointerLastUpdate.current = now;
@@ -919,25 +573,20 @@ export function BlueHourSite() {
     const y = event.clientY / window.innerHeight - 0.5;
     window.cancelAnimationFrame(pointerFrame.current);
     pointerFrame.current = window.requestAnimationFrame(() => {
-      root.current?.style.setProperty('--pointer-x', `${x}`);
-      root.current?.style.setProperty('--pointer-y', `${y}`);
+      backdropRef.current?.style.setProperty('--pointer-x', `${x}`);
+      backdropRef.current?.style.setProperty('--pointer-y', `${y}`);
     });
   };
 
   return (
     <MotionConfig reducedMotion="user">
       <div
-        ref={root}
         className={styles.experience}
         onMouseMove={onPointerMove}
         style={{ '--active-chapter': active } as React.CSSProperties}
       >
-      <SceneBackdrop active={active} />
-      <motion.div
-        className={styles.globalProgress}
-        style={{ scaleX: reducedMotion ? scrollYProgress : smoothProgress }}
-        aria-hidden="true"
-      />
+      <SceneBackdrop active={active} backdropRef={backdropRef} />
+      <div className={styles.globalProgress} aria-hidden="true" />
       <Header
         active={active}
         mobileOpen={mobileOpen}
@@ -958,6 +607,11 @@ export function BlueHourSite() {
         >
           <div className={styles.chapterInner}>
             <ChapterKicker index={0} label="Home / Direction" />
+            <BlueHourArtifact
+              scene="lighthouse"
+              className={styles.chapterArtifact}
+              priority
+            />
             <motion.div
               className={styles.heroCopy}
               initial={{ opacity: 0, y: 36 }}
@@ -987,9 +641,9 @@ export function BlueHourSite() {
                 <a href="#opening">
                   Begin the journey <ArrowDown size={16} />
                 </a>
-                <a href="/projects">
+                <Link href="/projects">
                   View the index <ArrowUpRight size={15} />
-                </a>
+                </Link>
               </div>
             </motion.div>
             <motion.aside
@@ -1024,6 +678,10 @@ export function BlueHourSite() {
         >
           <div className={styles.chapterInner}>
             <ChapterKicker index={1} label="Projects / Ambition" />
+            <BlueHourArtifact
+              scene="mountain"
+              className={styles.chapterArtifact}
+            />
             <div className={styles.projectShowcase}>
               <div className={styles.projectIntro}>
                 <ChapterTitle time="19:43" title="The Opening">
@@ -1033,7 +691,7 @@ export function BlueHourSite() {
                     <em>built with intent.</em>
                   </h2>
                   <p>
-                    Products shaped by real needs: private chess training,
+                    Projects shaped by real needs: private chess training,
                     focused scholarship preparation, and memory that works with
                     you.
                   </p>
@@ -1042,11 +700,14 @@ export function BlueHourSite() {
                   Three independent builds. Pick one up, turn it over, keep
                   moving.
                 </p>
-                <a className={styles.chapterLink} href="/projects">
+                <Link className={styles.chapterLink} href="/projects">
                   Explore every build <ArrowUpRight size={16} />
-                </a>
+                </Link>
               </div>
-              <ProjectDeck deckProjects={featuredProjects} />
+              <ProjectDeck
+                className={styles.homepageProjectDeck}
+                deckProjects={featuredProjects}
+              />
             </div>
           </div>
         </section>
@@ -1063,6 +724,10 @@ export function BlueHourSite() {
         >
           <div className={styles.chapterInner}>
             <ChapterKicker index={2} label="Moments / Memory" />
+            <BlueHourArtifact
+              scene="tide"
+              className={styles.chapterArtifact}
+            />
             <ChapterTitle time="19:55" title="What the Tide Kept">
               <h2 id="moments-title">
                 Places return
@@ -1090,7 +755,7 @@ export function BlueHourSite() {
               }}
             >
               {places.map(([name, copy, href], index) => (
-                <motion.a
+                <MotionLink
                   href={href}
                   key={name}
                   variants={{
@@ -1103,14 +768,14 @@ export function BlueHourSite() {
                   <strong>{name}</strong>
                   <small>{copy}</small>
                   <ArrowUpRight size={16} />
-                </motion.a>
+                </MotionLink>
               ))}
             </motion.div>
             <div className={styles.momentFooter}>
               <span>07 places · 24 frames · still becoming</span>
-              <a href="/moments">
+              <Link href="/moments">
                 Open the full visual journal <ArrowRight size={15} />
-              </a>
+              </Link>
             </div>
           </div>
         </section>
@@ -1127,6 +792,10 @@ export function BlueHourSite() {
         >
           <div className={styles.chapterInner}>
             <ChapterKicker index={3} label="Notes / Reflection" />
+            <BlueHourArtifact
+              scene="waterfall"
+              className={styles.chapterArtifact}
+            />
             <ChapterTitle time="20:07" title="Water in the Dark">
               <h2 id="notes-title">
                 Thinking,
@@ -1140,7 +809,7 @@ export function BlueHourSite() {
             </ChapterTitle>
             <div className={styles.noteList}>
               {homepageNotes.map((note, index) => (
-                <motion.a
+                <MotionLink
                   key={note.slug}
                   href={`/notes/${note.slug}`}
                   initial={{ opacity: 0, y: 22 }}
@@ -1162,12 +831,12 @@ export function BlueHourSite() {
                     </p>
                   </div>
                   <ArrowUpRight size={17} />
-                </motion.a>
+                </MotionLink>
               ))}
             </div>
-            <a className={styles.chapterLink} href="/notes">
+            <Link className={styles.chapterLink} href="/notes">
               Read all notes <ArrowUpRight size={16} />
-            </a>
+            </Link>
           </div>
         </section>
 
@@ -1183,6 +852,10 @@ export function BlueHourSite() {
         >
           <div className={styles.chapterInner}>
             <ChapterKicker index={4} label="About / Return" />
+            <BlueHourArtifact
+              scene="afterlight"
+              className={styles.chapterArtifact}
+            />
             <ChapterTitle time="20:19" title="One Window Left">
               <h2 id="about-title">
                 A life with
@@ -1214,9 +887,9 @@ export function BlueHourSite() {
                   <MapPin size={15} />
                   Adelaide, South Australia
                 </div>
-                <a href="/about">
+                <Link href="/about">
                   The longer version <ArrowUpRight size={14} />
-                </a>
+                </Link>
               </motion.div>
               <motion.div
                 className={styles.nowPanel}
@@ -1237,9 +910,9 @@ export function BlueHourSite() {
                     </li>
                   ))}
                 </ul>
-                <a href="/now">
+                <Link href="/now">
                   See what is current <ArrowUpRight size={14} />
-                </a>
+                </Link>
               </motion.div>
             </div>
             <motion.div
@@ -1275,8 +948,6 @@ export function BlueHourSite() {
           </div>
         </section>
       </main>
-
-        <AudioControl audio={audio} activeChapter={active} />
       </div>
     </MotionConfig>
   );

@@ -84,6 +84,8 @@
   border: 1px solid var(--jump-line);
   border-radius: 20px;
   background: var(--jump-panel-soft);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 390px;
   isolation: isolate;
 }
 
@@ -95,15 +97,19 @@
   background: linear-gradient(180deg, transparent 30%, rgba(3, 9, 15, 0.9) 100%);
 }
 
-.momentCard img {
+.momentPicture {
   position: absolute;
   inset: 0;
   z-index: -2;
   display: block;
+}
+
+.momentPicture img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), filter 0.7s ease;
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .momentCardLarge {
@@ -146,8 +152,8 @@
   margin: 0 0 30px;
 }
 
-.projectSummary span,
-.projectTags span {
+.projectSummary span {
+  padding: 10px 13px;
   border: 1px solid var(--jump-line);
   border-radius: 999px;
   color: var(--jump-muted);
@@ -155,132 +161,8 @@
   letter-spacing: 0.03em;
 }
 
-.projectSummary span {
-  padding: 10px 13px;
-}
-
-.projectsGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.projectCard {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  overflow: hidden;
-  border: 1px solid var(--jump-line);
-  border-radius: 21px;
-  background: rgba(255, 255, 255, 0.025);
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease, background 0.4s ease;
-}
-
-.projectFeatured {
-  grid-column: span 2;
-  display: grid;
-  grid-template-columns: minmax(0, 1.12fr) minmax(330px, 0.88fr);
-}
-
-.projectMedia {
-  display: block;
-  min-height: 265px;
-  overflow: hidden;
-  background: #07101a;
-}
-
-.projectFeatured .projectMedia {
-  min-height: 420px;
-}
-
-.projectMedia picture,
-.projectMedia img {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.projectMedia img {
-  object-fit: cover;
-  transition: transform 0.75s cubic-bezier(0.16, 1, 0.3, 1), filter 0.75s ease;
-}
-
-.projectBody {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 27px;
-}
-
-.projectStatus {
-  margin-bottom: 13px;
-  color: var(--jump-amber);
-  font: 600 9px/1 var(--font-mono), ui-monospace, monospace;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-.projectBody h2 {
-  margin: 0 0 7px;
-  color: var(--jump-ink);
-  font-family: var(--font-serif), 'Iowan Old Style', Georgia, serif;
-  font-size: clamp(28px, 3vw, 37px);
-  font-weight: 400;
-  letter-spacing: -0.055em;
-  line-height: 1;
-}
-
-.projectBody > p {
-  max-width: 510px;
-  margin: 0;
-  color: var(--jump-muted);
-  font-size: 13px;
-  line-height: 1.65;
-}
-
-.projectBody .projectTagline {
-  margin: 0 0 12px;
-  color: var(--jump-ink);
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.projectTags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  margin: 24px 0;
-}
-
-.projectTags span {
-  padding: 8px 10px;
-}
-
-.projectActions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: auto;
-}
-
-.projectActions a {
-  display: inline-flex;
-  min-height: 42px;
-  align-items: center;
-  gap: 7px;
-  padding: 0 14px;
-  border: 1px solid var(--jump-line);
-  border-radius: 999px;
-  color: var(--jump-amber);
-  font-size: 12px;
-  transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
-}
-
-.projectActions a:first-child {
-  border-color: var(--jump-amber);
-  color: #15110b;
-  background: var(--jump-amber);
+.projectsDeck {
+  margin-top: 8px;
 }
 
 .notesList {
@@ -289,11 +171,13 @@
 
 .note {
   display: grid;
-  grid-template-columns: 48px minmax(0, 1fr) 170px 18px;
-  gap: 24px;
+  grid-template-columns: 40px 96px minmax(0, 1fr) 150px 18px;
+  gap: 20px;
   align-items: center;
   padding: 28px 12px 28px 0;
   border-bottom: 1px solid var(--jump-line);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 145px;
   transition: padding 0.3s ease, background 0.3s ease;
 }
 
@@ -304,7 +188,26 @@
 }
 
 .noteMain {
+  min-width: 0;
   transition: transform 0.3s ease;
+}
+
+.notePicture {
+  display: block;
+  width: 96px;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 1px solid var(--jump-line);
+  border-radius: 11px;
+  background: var(--jump-panel-soft);
+}
+
+.notePicture img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .noteMain h2 {
@@ -363,9 +266,12 @@
 
 .mediaCard {
   min-width: 0;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 430px;
 }
 
-.mediaCard a {
+.mediaCard a,
+.mediaEntry {
   display: block;
 }
 
@@ -402,6 +308,21 @@
   margin: 5px 0 0;
   color: var(--jump-amber);
   font-size: 11px;
+}
+
+.mediaMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 12px;
+  margin: 8px 0 0;
+  color: var(--jump-dim);
+  font: 600 9px/1.4 var(--font-mono), ui-monospace, monospace;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.mediaMeta span:last-child {
+  color: var(--jump-muted);
 }
 
 .mediaComment {
@@ -461,31 +382,65 @@
   transition: color 0.25s ease;
 }
 
+.momentCard:focus-visible {
+  border-color: var(--jump-line-strong);
+}
+
+.momentCard:focus-visible img {
+  transform: scale(1.045);
+}
+
+.momentCard:focus-visible > svg {
+  color: white;
+  transform: translate(3px, -3px);
+}
+
+.note:focus-visible {
+  padding-right: 7px;
+  padding-left: 7px;
+  background: linear-gradient(90deg, rgba(93, 133, 162, 0.11), transparent);
+}
+
+.note:focus-visible .noteMain {
+  transform: translateX(5px);
+}
+
+.note:focus-visible .notePicture img {
+  transform: scale(1.045);
+}
+
+.note:focus-visible .noteArrow {
+  opacity: 1;
+  transform: translate(0, 0);
+}
+
+.mediaCardLinked:focus-within .mediaCover {
+  border-color: var(--jump-line-strong);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.32);
+  transform: translateY(-6px);
+}
+
+.mediaCardLinked:focus-within .mediaCover img {
+  transform: scale(1.035);
+}
+
+.mediaCardLinked:focus-within h3,
+.contact a:focus-visible {
+  color: var(--jump-amber);
+}
+
 @media (hover: hover) and (pointer: fine) {
+  .momentCard:hover {
+    border-color: var(--jump-line-strong);
+  }
+
   .momentCard:hover img {
     transform: scale(1.045);
-    filter: saturate(1.06);
   }
 
   .momentCard:hover > svg {
     color: white;
     transform: translate(3px, -3px);
-  }
-
-  .projectCard:hover {
-    border-color: var(--jump-line-strong);
-    background: rgba(255, 255, 255, 0.045);
-    transform: translateY(-5px);
-  }
-
-  .projectCard:hover .projectMedia img {
-    transform: scale(1.035);
-    filter: saturate(1.05);
-  }
-
-  .projectActions a:hover {
-    border-color: var(--jump-amber);
-    transform: translateY(-2px);
   }
 
   .note:hover {
@@ -498,24 +453,40 @@
     transform: translateX(5px);
   }
 
+  .note:hover .notePicture img {
+    transform: scale(1.045);
+  }
+
   .note:hover .noteArrow {
     opacity: 1;
     transform: translate(0, 0);
   }
 
-  .mediaCard:hover .mediaCover {
+  .mediaCardLinked:hover .mediaCover {
     border-color: var(--jump-line-strong);
     box-shadow: 0 20px 48px rgba(0, 0, 0, 0.32);
     transform: translateY(-6px);
   }
 
-  .mediaCard:hover .mediaCover img {
+  .mediaCardLinked:hover .mediaCover img {
     transform: scale(1.035);
   }
 
-  .mediaCard:hover h3,
+  .mediaCardLinked:hover h3,
   .contact a:hover {
     color: var(--jump-amber);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  .statCard,
+  .momentCard,
+  .note,
+  .mediaCard,
+  .contact {
+    animation: collectionObjectArrive linear both;
+    animation-timeline: view(block);
+    animation-range: entry 2% cover 23%;
   }
 }
 
@@ -525,26 +496,19 @@
     gap: 50px;
   }
 
-  .projectsGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .projectFeatured {
-    grid-column: auto;
-    grid-template-columns: 1fr;
-  }
-
-  .projectFeatured .projectMedia {
-    min-height: 320px;
-  }
-
   .note {
-    grid-template-columns: 38px minmax(0, 1fr) 18px;
+    grid-template-columns: 32px 80px minmax(0, 1fr) 18px;
     gap: 16px;
   }
 
-  .noteMeta {
+  .notePicture {
     grid-column: 2;
+    grid-row: 1 / span 2;
+    width: 80px;
+  }
+
+  .noteMeta {
+    grid-column: 3;
     grid-row: 2;
     display: flex;
     flex-wrap: wrap;
@@ -552,7 +516,7 @@
   }
 
   .noteArrow {
-    grid-column: 3;
+    grid-column: 4;
     grid-row: 1;
     opacity: 0.65;
     transform: none;
@@ -586,19 +550,14 @@
     text-align: center;
   }
 
-  .projectMedia,
-  .projectFeatured .projectMedia {
-    min-height: 240px;
-  }
-
-  .projectBody {
-    padding: 23px 20px;
-  }
-
   .note {
-    grid-template-columns: 30px minmax(0, 1fr) 16px;
+    grid-template-columns: 24px 68px minmax(0, 1fr) 16px;
     gap: 11px;
     padding: 23px 2px 23px 0;
+  }
+
+  .notePicture {
+    width: 68px;
   }
 
   .noteMain p {
@@ -612,7 +571,6 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 24px 14px;
   }
-
 }
 
 @media (max-width: 420px) {
@@ -642,14 +600,32 @@
 @media (prefers-reduced-motion: reduce) {
   .momentCard img,
   .momentCard > svg,
-  .projectCard,
-  .projectMedia img,
-  .projectActions a,
   .note,
   .noteMain,
+  .notePicture img,
   .noteArrow,
   .mediaCover,
   .mediaCover img {
     transition: none;
+  }
+
+  .statCard,
+  .momentCard,
+  .note,
+  .mediaCard,
+  .contact {
+    animation: none;
+  }
+}
+
+@keyframes collectionObjectArrive {
+  from {
+    opacity: 0.12;
+    translate: 0 24px;
+  }
+
+  to {
+    opacity: 1;
+    translate: 0 0;
   }
 }

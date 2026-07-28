@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
-import { ProjectsPage } from '@/components/LegacyPages';
+import { ProjectsPage } from '@/components/ProjectsPage';
 
 export const metadata: Metadata = {
   title: 'Projects — Austin Liu',
   description:
-    'KnightClub, ScholarBank, Denki, and other useful products built by Austin Liu.',
+    'KnightClub, ScholarBank, Denki, and other useful projects shaped by Austin Liu.',
   openGraph: {
     title: 'Projects — Austin Liu',
     description:

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import {
   BookOpen,
   Braces,
@@ -51,7 +52,7 @@ export default function Page() {
       <main id="main-content" className={styles.page}>
         <BlueHourHero
           scene="afterlight"
-          kicker="Now / 20:19"
+          kicker="20:19 · One Window Left / Now"
           title="One window left on."
           copy="The current season, without pretending it is the whole story."
         />
@@ -83,7 +84,7 @@ export default function Page() {
       <footer className={styles.footer}>
         <div className="container">
           <span>© 2026 Austin Liu</span>
-          <a href="/projects">See what I&apos;m building</a>
+          <Link href="/#afterlight">Return to the last blue hour</Link>
         </div>
       </footer>
     </div>

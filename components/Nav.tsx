@@ -8,7 +8,8 @@ import {
   useRef,
   useState,
 } from 'react';
-import { usePathname } from 'next/navigation';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   ArrowUpRight,
   ChevronRight,
@@ -60,12 +61,14 @@ function normalisePath(path: string) {
 
 export function Nav() {
   const pathname = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [palette, setPalette] = useState(false);
   const [query, setQuery] = useState('');
   const [hash, setHash] = useState('');
   const searchButtonRef = useRef<HTMLButtonElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const mobileNavRef = useRef<HTMLElement>(null);
 
   const closePalette = useCallback((restoreFocus = true) => {
     setPalette(false);
@@ -75,12 +78,25 @@ export function Nav() {
     }
   }, []);
 
+  const closeMobile = useCallback((restoreFocus = true) => {
+    setOpen(false);
+    if (restoreFocus) {
+      window.requestAnimationFrame(() => menuButtonRef.current?.focus());
+    }
+  }, []);
+
+  const openPalette = useCallback(() => {
+    setOpen(false);
+    setPalette(true);
+  }, []);
+
   useEffect(() => {
     const updateHash = () => setHash(window.location.hash);
     const onKeyDown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();
-        setPalette(true);
+        openPalette();
+        return;
       }
       if (
         event.key === '/' &&
@@ -92,13 +108,14 @@ export function Nav() {
             event.target.isContentEditable))
       ) {
         event.preventDefault();
-        setPalette(true);
+        openPalette();
+        return;
       }
       if (event.key === 'Escape') {
-        if (palette) closePalette();
-        if (open) {
-          setOpen(false);
-          window.requestAnimationFrame(() => menuButtonRef.current?.focus());
+        if (palette) {
+          closePalette();
+        } else if (open) {
+          closeMobile();
         }
       }
     };
@@ -113,7 +130,17 @@ export function Nav() {
       window.removeEventListener('popstate', updateHash);
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, [closePalette, open, palette]);
+  }, [closeMobile, closePalette, open, openPalette, palette]);
+
+  useEffect(() => {
+    if (!open) return;
+    const frame = window.requestAnimationFrame(() => {
+      mobileNavRef.current
+        ?.querySelector<HTMLElement>('a[href], button:not([disabled])')
+        ?.focus();
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [open]);
 
   useEffect(() => {
     if (!open && !palette) return;
@@ -138,18 +165,24 @@ export function Nav() {
 
   const isActive = (item: Pick<NavItem, 'href'>) => {
     const currentPath = normalisePath(pathname || '/');
-    if (item.href === '/#contact') {
-      return currentPath === '/' && hash === '#contact';
+    const [rawPath, rawHash] = item.href.split('#');
+    const targetPath = normalisePath(rawPath || '/');
+
+    if (rawHash) {
+      return currentPath === targetPath && hash === `#${rawHash}`;
     }
-    if (item.href === '/') {
+    if (targetPath === '/') {
       return currentPath === '/' && hash !== '#contact';
     }
-    return currentPath === normalisePath(item.href);
+    return (
+      currentPath === targetPath ||
+      currentPath.startsWith(`${targetPath}/`)
+    );
   };
 
-  const navigate = (item: NavItem) => {
+  const navigate = (item: Pick<SearchItem, 'href'>) => {
     closePalette(false);
-    window.location.href = item.href;
+    router.push(item.href);
   };
 
   const trapDialogFocus = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -178,25 +211,46 @@ export function Nav() {
     }
   };
 
+  const trapMobileFocus = (event: React.KeyboardEvent<HTMLElement>) => {
+    if (event.key !== 'Tab') return;
+
+    const focusable = [
+      ...event.currentTarget.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled])',
+      ),
+    ];
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
+
   return (
     <>
       <a className="skip-link" href="#main-content">
         Skip to main content
       </a>
       <header className="nav">
-        <a href="/" className="brand" aria-label="Austin Liu — home">
+        <Link href="/" className="brand" aria-label="Austin Liu — home">
           AL<span>•</span>
-        </a>
+        </Link>
         <nav aria-label="Primary navigation">
           {site.nav.map((item) => (
-            <a
+            <Link
               className={isActive(item) ? 'active' : ''}
               key={item.label}
               href={item.href}
               aria-current={isActive(item) ? 'page' : undefined}
             >
               {item.label}
-            </a>
+            </Link>
           ))}
         </nav>
         <div className="nav-actions">
@@ -204,7 +258,7 @@ export function Nav() {
             ref={searchButtonRef}
             className="command"
             type="button"
-            onClick={() => setPalette(true)}
+            onClick={openPalette}
             aria-haspopup="dialog"
             aria-expanded={palette}
           >
@@ -216,12 +270,16 @@ export function Nav() {
             ref={menuButtonRef}
             className="icon-button mobile-only"
             type="button"
-            onClick={() => setOpen((value) => !value)}
+            onClick={() => (open ? closeMobile() : setOpen(true))}
             aria-label={open ? 'Close navigation menu' : 'Open navigation menu'}
             aria-expanded={open}
             aria-controls="mobile-navigation"
           >
-            {open ? <X size={19} /> : <Menu size={19} />}
+            {open ? (
+              <X size={19} aria-hidden="true" />
+            ) : (
+              <Menu size={19} aria-hidden="true" />
+            )}
           </button>
         </div>
       </header>
@@ -230,32 +288,33 @@ export function Nav() {
         <>
           <div
             className="mobile-backdrop"
-            onClick={() => setOpen(false)}
+            onClick={() => closeMobile()}
             aria-hidden="true"
             style={{
               position: 'fixed',
               inset: 0,
               zIndex: 28,
               background: 'rgba(0,0,0,.35)',
-              backdropFilter: 'blur(3px)',
             }}
           />
           <nav
+            ref={mobileNavRef}
             id="mobile-navigation"
             className="mobile-nav"
             aria-label="Mobile navigation"
+            onKeyDown={trapMobileFocus}
           >
             {site.nav.map((item) => (
-              <a
+              <Link
                 className={isActive(item) ? 'active' : ''}
-                onClick={() => setOpen(false)}
+                onClick={() => closeMobile(false)}
                 key={item.label}
                 href={item.href}
                 aria-current={isActive(item) ? 'page' : undefined}
               >
                 {item.label}
                 <ChevronRight size={17} aria-hidden="true" />
-              </a>
+              </Link>
             ))}
           </nav>
         </>
@@ -302,7 +361,7 @@ export function Nav() {
                       <p className="palette-group">{group}</p>
                     )}
                     {items.map((item) => (
-                      <a
+                      <Link
                         className={isActive(item) ? 'active' : ''}
                         key={`${group}-${item.href}-${item.label}`}
                         href={item.href}
@@ -314,7 +373,7 @@ export function Nav() {
                         ) : (
                           <ArrowUpRight size={16} aria-hidden="true" />
                         )}
-                      </a>
+                      </Link>
                     ))}
                   </Fragment>
                 );

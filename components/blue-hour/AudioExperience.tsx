@@ -1,12 +1,16 @@
 'use client';
 
 import {
+  createContext,
   useCallback,
+  useContext,
   useEffect,
   useRef,
   useState,
   type MutableRefObject,
+  type ReactNode,
 } from 'react';
+import { usePathname } from 'next/navigation';
 import {
   Pause,
   Play,
@@ -728,6 +732,136 @@ export function useBlueHourAudio(activeChapter: number): AudioExperience {
   };
 }
 
+type BlueHourAudioContextValue = AudioExperience & {
+  activeChapter: number;
+  setActiveChapter: (chapter: number) => void;
+};
+
+const BlueHourAudioContext = createContext<BlueHourAudioContextValue | null>(
+  null,
+);
+
+function chapterForPath(pathname: string) {
+  if (pathname.startsWith('/projects')) return 1;
+  if (pathname.startsWith('/moments')) return 2;
+  if (pathname.startsWith('/notes')) return 3;
+  if (
+    pathname.startsWith('/about') ||
+    pathname.startsWith('/library') ||
+    pathname.startsWith('/now')
+  ) {
+    return 4;
+  }
+  return 0;
+}
+
+export function BlueHourAudioProvider({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+  const [activeChapter, setActiveChapterState] = useState(() =>
+    chapterForPath(pathname),
+  );
+  const audio = useBlueHourAudio(activeChapter);
+  const startRef = useRef(audio.start);
+  const playingRef = useRef(audio.isPlaying);
+  const startPending = useRef(false);
+
+  const setActiveChapter = useCallback((chapter: number) => {
+    setActiveChapterState(Math.max(0, Math.min(chapter, chapterNames.length - 1)));
+  }, []);
+
+  useEffect(() => {
+    setActiveChapterState(chapterForPath(pathname));
+  }, [pathname]);
+
+  useEffect(() => {
+    startRef.current = audio.start;
+    playingRef.current = audio.isPlaying;
+  }, [audio.isPlaying, audio.start]);
+
+  useEffect(() => {
+    if (readAudioPreference('blue-hour-sound') === 'off') return;
+
+    const cleanup = () => {
+      window.removeEventListener('pointerdown', onGesture, true);
+      window.removeEventListener('keydown', onGesture, true);
+    };
+
+    const onGesture = (event: PointerEvent | KeyboardEvent) => {
+      if (playingRef.current) {
+        cleanup();
+        return;
+      }
+
+      const target = event.target;
+      if (
+        target instanceof Element &&
+        target.closest('[data-blue-hour-audio-toggle]')
+      ) {
+        return;
+      }
+
+      if (event instanceof KeyboardEvent) {
+        if (
+          event.repeat ||
+          event.ctrlKey ||
+          event.metaKey ||
+          event.altKey ||
+          !['Enter', ' '].includes(event.key)
+        ) {
+          return;
+        }
+        if (
+          target instanceof HTMLElement &&
+          (target.isContentEditable ||
+            ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))
+        ) {
+          return;
+        }
+      }
+
+      if (startPending.current) return;
+      startPending.current = true;
+      void startRef
+        .current()
+        .then((started) => {
+          if (started) cleanup();
+        })
+        .catch(() => {
+          // Keep the listener armed for the next eligible interaction.
+        })
+        .finally(() => {
+          startPending.current = false;
+        });
+    };
+
+    window.addEventListener('pointerdown', onGesture, {
+      capture: true,
+      passive: true,
+    });
+    window.addEventListener('keydown', onGesture, true);
+    return cleanup;
+  }, []);
+
+  return (
+    <BlueHourAudioContext.Provider
+      value={{ ...audio, activeChapter, setActiveChapter }}
+    >
+      {children}
+      <AudioControl audio={audio} activeChapter={activeChapter} />
+    </BlueHourAudioContext.Provider>
+  );
+}
+
+export function useBlueHourAudioContext() {
+  const context = useContext(BlueHourAudioContext);
+  if (!context) {
+    throw new Error(
+      'useBlueHourAudioContext must be used within BlueHourAudioProvider',
+    );
+  }
+  return context;
+}
+
 function AudioOrb({
   analyser,
   active,
@@ -743,6 +877,8 @@ function AudioOrb({
     const context = element.getContext('2d');
     if (!context) return;
     let raf = 0;
+    let lastFrame = 0;
+    const frameInterval = 1000 / 24;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     const values = new Uint8Array(analyser.current?.frequencyBinCount ?? 64);
 
@@ -787,14 +923,18 @@ function AudioOrb({
       window.cancelAnimationFrame(raf);
       raf = 0;
     };
-    const loop = () => {
-      draw(true);
+    const loop = (timestamp: number) => {
+      if (timestamp - lastFrame >= frameInterval) {
+        draw(true);
+        lastFrame = timestamp;
+      }
       raf = window.requestAnimationFrame(loop);
     };
     const sync = () => {
       stop();
       if (active && !document.hidden && !reduced.matches) {
-        loop();
+        lastFrame = 0;
+        raf = window.requestAnimationFrame(loop);
       } else {
         draw(false);
       }

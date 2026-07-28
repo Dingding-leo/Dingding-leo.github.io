@@ -1,4 +1,8 @@
-import { ArticleImage, NoteLayout } from '@/components/NoteLayout';
+import {
+  ArticleFigure,
+  FieldNote,
+  NoteLayout,
+} from '@/components/NoteLayout';
 import { noteMetadata } from '@/config/notes';
 
 export const metadata = noteMetadata('sydney');
@@ -8,30 +12,54 @@ export default function Page() {
     <NoteLayout slug="sydney">
       <p>
         October 2022. I had recently arrived in Australia, and Sydney was one of
-        my first big trips: new light, sandstone architecture, and the scale of
-        the harbour.
+        my first big trips. The photographs move through three kinds of built
+        and natural space: a modern university facade, the shells of the Opera
+        House, and the low horizon of Kamay Botany Bay.
       </p>
       <h2>University of Sydney</h2>
       <p>
-        The quadrangle at USyd held sandstone, ivy, and cloisters in the same
-        frame. It felt older and quieter than the city around it.
+        My campus frame is not the sandstone quadrangle usually associated with
+        the university. It looks up at a modern facade of glass, dark panels,
+        and horizontal metal fins. Trees soften the edges, while the words
+        “The University of Sydney” anchor the building at ground level.
       </p>
-      <ArticleImage
+      <ArticleFigure
         src="/assets/gallery/sydney-usyd.jpg"
-        alt="Sandstone arches and ivy around the University of Sydney quadrangle"
+        alt="A modern glass and metal building at the University of Sydney"
+        caption="University of Sydney, October 2022 — a modern facade recorded in lines and layers."
+      />
+      <FieldNote>
+        The campus photograph is a useful correction: the place in front of the
+        camera matters more than the landmark image expected in advance.
+      </FieldNote>
+      <h2>Opera House beneath cloud</h2>
+      <p>
+        At the harbour, the Opera House is seen from close to its broad steps.
+        White tiled shells rise into a heavy grey sky, their dark undersides
+        turning the familiar silhouette into a sequence of sharp openings.
+        People scattered across the steps provide the scale.
+      </p>
+      <ArticleFigure
+        src="/assets/gallery/sydney-opera.jpg"
+        alt="The white shells of the Sydney Opera House beneath a heavy grey sky"
+        caption="Sydney Opera House — familiar geometry made heavier by the weather above it."
       />
       <h2>Kamay Botany Bay</h2>
       <p>
-        Toward the coast, the city gave way to sandstone cliffs and a wider
-        horizon. I stopped there to watch the water.
+        At Kamay Botany Bay, the composition becomes lower and quieter. Wet
+        green leaves fill the foreground, grey water takes most of the frame,
+        and a low built structure sits on the left beneath a grassed roof. A
+        dark headland closes the far side of the bay.
       </p>
-      <ArticleImage
+      <ArticleFigure
         src="/assets/gallery/sydney-botany.jpg"
-        alt="Sandstone coast and open water at Kamay Botany Bay"
+        alt="Grey water, a low coastal structure, and a distant headland at Kamay Botany Bay"
+        caption="Kamay Botany Bay — water and headland replacing the vertical lines of the city."
       />
       <p>
-        The trip remains an early chapter in a country I am still learning to
-        call home.
+        The three frames move from vertical facade, to sculptural landmark, to
+        open water. Together they remain an early chapter in a country I am
+        still learning to call home.
       </p>
     </NoteLayout>
   );
