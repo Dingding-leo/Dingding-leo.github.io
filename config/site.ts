@@ -37,7 +37,7 @@ export const projects: Project[] = [
     description:
       'Play, review, and train entirely on-device with Stockfish analysis, personal mistake drills, a private game library, and local performance insights.',
     why:
-      'Chess improvement should be private, understandable, and available without an account or subscription.',
+      'I wanted chess study to stay private and understandable, with no account standing between a player and the board.',
     role:
       'Product design, engineering, interaction design, and local engine integration.',
     decision:
@@ -57,7 +57,7 @@ export const projects: Project[] = [
     description:
       'A Melbourne-focused learning platform combining original skill-mapped questions, timed practice, worked explanations, and personalised progress insights.',
     why:
-      'Families need a clearer way to prepare for Melbourne scholarship pathways than another pile of generic worksheets.',
+      'I built ScholarBank to turn scholarship preparation into a clearer practice loop instead of another pile of generic worksheets.',
     role:
       'Product strategy, learning experience design, content systems, and full-stack engineering.',
     decision:
@@ -76,7 +76,7 @@ export const projects: Project[] = [
     description:
       'Create, import, and review flashcards with FSRS scheduling, offline storage, focused study sessions, a built-in scratchpad, and clear progress insights.',
     why:
-      'Spaced repetition works best when review feels calm, portable, and under the learner’s control.',
+      'I wanted spaced repetition to feel calm, portable, and under the learner’s control rather than like another demanding inbox.',
     role:
       'Product design, frontend engineering, offline architecture, and study workflow design.',
     decision:
@@ -114,9 +114,9 @@ export const site = {
   email: 'austinliu234@gmail.com',
   location: 'Adelaide, Australia',
   description:
-    'Austin Liu’s personal space for building useful products, travelling with a camera, writing field notes, and documenting a life that also includes dentistry.',
+    'Austin Liu’s personal space for building useful products, travelling with a camera, writing field notes, and paying attention to a wider life.',
   identity:
-    'Builder, traveller, writer, and photographer based in Adelaide. Dentistry is one discipline within a wider life of making, learning, and paying attention.',
+    'Builder, traveller, writer, and photographer based in Adelaide, making useful tools and keeping a record of places, ideas, and ordinary days.',
   nav: navItems,
   interests: [
     ['Dentistry', 'Precision, patience, and care in progress.'],

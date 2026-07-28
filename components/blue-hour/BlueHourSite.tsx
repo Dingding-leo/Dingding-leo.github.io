@@ -5,7 +5,6 @@ import {
   useMemo,
   useRef,
   useState,
-  type MouseEvent as ReactMouseEvent,
   type RefObject,
 } from 'react';
 import Link from 'next/link';
@@ -29,7 +28,7 @@ import { projects, site } from '@/config/site';
 import { notes } from '@/config/notes';
 import { BlueHourArtifact } from '@/components/BlueHourArtifact';
 import { ProjectDeck } from '@/components/ProjectDeck';
-import { useBlueHourAudioContext } from './AudioExperience';
+import { useBlueHourChapterDispatch } from './AudioExperience';
 import styles from './BlueHourSite.module.css';
 
 const MotionLink = motion.create(Link);
@@ -94,16 +93,16 @@ const scenes = [
 
 const places = [
   ['Adelaide', 'Riverbank light and Morialta stone', '/notes/adelaide'],
-  ['Melbourne', 'St Kilda dusk and Dandenong mist', '/notes/melbourne'],
-  ['Shanghai', 'A city remembered after dark', '/notes/shanghai-memories'],
+  ['Melbourne', 'St Kilda dusk and Dandenong light', '/notes/melbourne'],
+  ['Shanghai', 'A performer held in stage light', '/notes/shanghai-memories'],
   ['Beijing', 'Forty-eight hours at full volume', '/notes/beijing'],
-  ['Cairns', 'Rainforest water and marina mornings', '/notes/cairns'],
+  ['Cairns', 'Rainforest rock and reef-blue water', '/notes/cairns'],
   ['Great Ocean Road', 'Weather moving along the edge', '/notes/great-ocean-road'],
   ['Sydney', 'The first Australian chapter', '/notes/sydney'],
 ] as const;
 
 const nowItems = [
-  ['Building', 'Denki, ScholarBank, and quieter tools that respect attention.'],
+  ['Building', 'KnightClub, ScholarBank, Denki, and quieter tools that respect attention.'],
   ['Learning', 'Clinical craft, systems thinking, and how good products earn trust.'],
   ['Exploring', 'Photography, systematic strategies, and cities on foot.'],
   ['Keeping', 'A little more room for books, music, friends, and unplanned days.'],
@@ -164,7 +163,7 @@ function ScenePicture({
           height={941}
           loading={eager ? 'eager' : 'lazy'}
           fetchPriority={eager ? 'high' : 'auto'}
-          decoding={eager ? 'sync' : 'async'}
+          decoding="async"
         />
       </picture>
     </motion.div>
@@ -302,11 +301,20 @@ function Header({
     const desktopViewport = window.matchMedia('(min-width: 821px)');
     let closedForDesktop = false;
     const main = document.getElementById('main-content');
+    const audioRoot = document.querySelector<HTMLElement>(
+      '[data-blue-hour-audio-root]',
+    );
     const previousAriaHidden = main?.getAttribute('aria-hidden');
+    const previousAudioAriaHidden = audioRoot?.getAttribute('aria-hidden');
+    const previousAudioInert = audioRoot?.inert;
     document.body.style.overflow = 'hidden';
     if (main) {
       main.inert = true;
       main.setAttribute('aria-hidden', 'true');
+    }
+    if (audioRoot) {
+      audioRoot.inert = true;
+      audioRoot.setAttribute('aria-hidden', 'true');
     }
 
     const firstLink = mobileNavigation.current?.querySelector<HTMLElement>('a');
@@ -356,6 +364,14 @@ function Header({
         if (previousAriaHidden == null) main.removeAttribute('aria-hidden');
         else main.setAttribute('aria-hidden', previousAriaHidden);
       }
+      if (audioRoot) {
+        audioRoot.inert = previousAudioInert ?? false;
+        if (previousAudioAriaHidden == null) {
+          audioRoot.removeAttribute('aria-hidden');
+        } else {
+          audioRoot.setAttribute('aria-hidden', previousAudioAriaHidden);
+        }
+      }
       if (closedForDesktop) {
         window.requestAnimationFrame(() => {
           document
@@ -394,6 +410,17 @@ function Header({
               {scene.nav}
             </a>
           ))}
+          <details className={styles.siteIndex}>
+            <summary>Index</summary>
+            <div>
+              <Link href="/projects">Projects</Link>
+              <Link href="/moments">Moments</Link>
+              <Link href="/notes">Notes</Link>
+              <Link href="/library">Library</Link>
+              <Link href="/now">Now</Link>
+              <Link href="/contact">Contact</Link>
+            </div>
+          </details>
         </nav>
         <button
           ref={menuButton}
@@ -440,6 +467,9 @@ function Header({
               <Link href="/projects">All projects</Link>
               <Link href="/moments">All moments</Link>
               <Link href="/notes">All notes</Link>
+              <Link href="/library">Library</Link>
+              <Link href="/now">Now</Link>
+              <Link href="/contact">Contact</Link>
             </div>
           </motion.nav>
         )}
@@ -479,11 +509,11 @@ export function BlueHourSite() {
   const [active, setActive] = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
   const chapterNodes = useRef<Array<HTMLElement | null>>([]);
+  const experienceRef = useRef<HTMLDivElement>(null);
   const backdropRef = useRef<HTMLDivElement>(null);
   const pointerFrame = useRef(0);
   const pointerLastUpdate = useRef(0);
-  const pointerEnabled = useRef(false);
-  const { setActiveChapter } = useBlueHourAudioContext();
+  const setActiveChapter = useBlueHourChapterDispatch();
 
   const featuredProjects = useMemo(
     () => projects.filter((project) => project.featured).slice(0, 3),
@@ -506,24 +536,67 @@ export function BlueHourSite() {
   }, [active, setActiveChapter]);
 
   useEffect(() => {
-    const coarsePointer = window.matchMedia('(pointer: coarse)');
+    const surface = experienceRef.current;
+    if (!surface) return;
+    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
     const reducedMotionQuery = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
     );
-    const updatePointerCapability = () => {
-      pointerEnabled.current =
-        !coarsePointer.matches && !reducedMotionQuery.matches;
+    const slowUpdate = window.matchMedia('(update: slow)');
+    const wideScreen = window.matchMedia('(min-width: 1024px)');
+    const saveData = (
+      navigator as Navigator & { connection?: { saveData?: boolean } }
+    ).connection?.saveData;
+    let listening = false;
+
+    const onPointerMove = (event: PointerEvent) => {
+      if (!backdropRef.current) return;
+      const now = window.performance.now();
+      if (now - pointerLastUpdate.current < 64) return;
+      pointerLastUpdate.current = now;
+      const x = event.clientX / window.innerWidth - 0.5;
+      const y = event.clientY / window.innerHeight - 0.5;
+      window.cancelAnimationFrame(pointerFrame.current);
+      pointerFrame.current = window.requestAnimationFrame(() => {
+        backdropRef.current?.style.setProperty('--pointer-x', `${x}`);
+        backdropRef.current?.style.setProperty('--pointer-y', `${y}`);
+      });
     };
 
-    updatePointerCapability();
-    coarsePointer.addEventListener('change', updatePointerCapability);
-    reducedMotionQuery.addEventListener('change', updatePointerCapability);
+    const updateListener = () => {
+      const shouldListen =
+        finePointer.matches &&
+        wideScreen.matches &&
+        !reducedMotionQuery.matches &&
+        !slowUpdate.matches &&
+        !saveData;
+      if (shouldListen === listening) return;
+      listening = shouldListen;
+      if (listening) {
+        surface.addEventListener('pointermove', onPointerMove, {
+          passive: true,
+        });
+      } else {
+        surface.removeEventListener('pointermove', onPointerMove);
+        backdropRef.current?.style.removeProperty('--pointer-x');
+        backdropRef.current?.style.removeProperty('--pointer-y');
+      }
+    };
+
+    const queries = [
+      finePointer,
+      reducedMotionQuery,
+      slowUpdate,
+      wideScreen,
+    ];
+    updateListener();
+    queries.forEach((query) => query.addEventListener('change', updateListener));
     return () => {
-      coarsePointer.removeEventListener('change', updatePointerCapability);
-      reducedMotionQuery.removeEventListener(
-        'change',
-        updatePointerCapability,
+      surface.removeEventListener('pointermove', onPointerMove);
+      queries.forEach((query) =>
+        query.removeEventListener('change', updateListener),
       );
+      window.cancelAnimationFrame(pointerFrame.current);
     };
   }, []);
 
@@ -564,25 +637,11 @@ export function BlueHourSite() {
     });
   };
 
-  const onPointerMove = (event: ReactMouseEvent<HTMLDivElement>) => {
-    if (!backdropRef.current || !pointerEnabled.current) return;
-    const now = window.performance.now();
-    if (now - pointerLastUpdate.current < 32) return;
-    pointerLastUpdate.current = now;
-    const x = event.clientX / window.innerWidth - 0.5;
-    const y = event.clientY / window.innerHeight - 0.5;
-    window.cancelAnimationFrame(pointerFrame.current);
-    pointerFrame.current = window.requestAnimationFrame(() => {
-      backdropRef.current?.style.setProperty('--pointer-x', `${x}`);
-      backdropRef.current?.style.setProperty('--pointer-y', `${y}`);
-    });
-  };
-
   return (
     <MotionConfig reducedMotion="user">
       <div
+        ref={experienceRef}
         className={styles.experience}
-        onMouseMove={onPointerMove}
         style={{ '--active-chapter': active } as React.CSSProperties}
       >
       <SceneBackdrop active={active} backdropRef={backdropRef} />
@@ -610,7 +669,6 @@ export function BlueHourSite() {
             <BlueHourArtifact
               scene="lighthouse"
               className={styles.chapterArtifact}
-              priority
             />
             <motion.div
               className={styles.heroCopy}
@@ -633,9 +691,9 @@ export function BlueHourSite() {
               </h1>
               <p className={styles.heroChinese}>最后的蓝调时刻</p>
               <p className={styles.heroLead}>
-                I&apos;m Austin Liu — a builder, traveller, writer, photographer,
-                and dental student in Adelaide. This is a field guide to the
-                things I am making and the moments I want to keep.
+                I&apos;m Austin Liu — a builder, traveller, writer, and
+                photographer in Adelaide. This is a field guide to the things I
+                am making and the moments I want to keep.
               </p>
               <div className={styles.heroActions}>
                 <a href="#opening">
@@ -772,7 +830,7 @@ export function BlueHourSite() {
               ))}
             </motion.div>
             <div className={styles.momentFooter}>
-              <span>07 places · 24 frames · still becoming</span>
+              <span>07 places · 14 published frames</span>
               <Link href="/moments">
                 Open the full visual journal <ArrowRight size={15} />
               </Link>
@@ -803,8 +861,8 @@ export function BlueHourSite() {
                 <em>before it settles.</em>
               </h2>
               <p>
-                Field notes from travel, projects, systems, and ordinary days.
-                Written to understand, not to perform certainty.
+                Three build journals and seven photographic field notes.
+                Written to notice what a system—or a frame—chooses to keep.
               </p>
             </ChapterTitle>
             <div className={styles.noteList}>
@@ -825,10 +883,16 @@ export function BlueHourSite() {
                     <small>
                       {note.label} · {note.readingTime}
                     </small>
-                    <h3 lang={note.localLang}>{note.localTitle || note.title}</h3>
-                    <p lang={note.localExcerpt ? note.localLang : undefined}>
-                      {note.localExcerpt || note.excerpt}
-                    </p>
+                  <h3>{note.title}</h3>
+                  {note.localTitle && (
+                    <span
+                      className={styles.noteLocalTitle}
+                      lang={note.localLang}
+                    >
+                      {note.localTitle}
+                    </span>
+                  )}
+                  <p>{note.excerpt}</p>
                   </div>
                   <ArrowUpRight size={17} />
                 </MotionLink>
@@ -864,8 +928,9 @@ export function BlueHourSite() {
               </h2>
               <p>
                 Born in China, based in Adelaide, always moving between
-                disciplines. Medicine is one room. Technology, design,
-                photography, people, and the road outside are others.
+                disciplines. No single pursuit gets the whole house.
+                Technology, design, photography, people, and the road outside
+                each leave a light on.
               </p>
             </ChapterTitle>
             <div className={styles.finalGrid}>
@@ -879,7 +944,7 @@ export function BlueHourSite() {
                 <span className={styles.panelLabel}>About Austin</span>
                 <p>
                   I like making useful things feel considered. Some weeks that
-                  means clinical training; others mean debugging a product,
+                  means studying carefully; others mean debugging a product,
                   walking through a new city, or noticing how evening light
                   changes a familiar street.
                 </p>
@@ -937,6 +1002,9 @@ export function BlueHourSite() {
               <span>© 2026 Austin Liu</span>
               <span>The Last Blue Hour · 最后的蓝调时刻</span>
               <div>
+                <Link href="/library">Library</Link>
+                <Link href="/now">Now</Link>
+                <Link href="/contact">Contact</Link>
                 <a href={site.github} target="_blank" rel="noreferrer">
                   GitHub <ArrowUpRight size={13} />
                 </a>

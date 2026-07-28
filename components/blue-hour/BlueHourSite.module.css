@@ -100,7 +100,7 @@
   width: 100%;
   height: 100%;
   transform: none;
-  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 520ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .sceneLayerActive picture {
@@ -552,6 +552,64 @@
   transition: color 200ms ease;
 }
 
+.siteIndex {
+  position: relative;
+}
+
+.siteIndex summary {
+  padding: 12px 0;
+  color: var(--amber);
+  cursor: pointer;
+  list-style: none;
+}
+
+.siteIndex summary::-webkit-details-marker {
+  display: none;
+}
+
+.siteIndex summary::after {
+  margin-left: 6px;
+  content: '＋';
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+}
+
+.siteIndex[open] summary::after {
+  content: '−';
+}
+
+.siteIndex > div {
+  position: absolute;
+  top: calc(100% + 11px);
+  right: 0;
+  display: grid;
+  width: 220px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  background: rgba(5, 13, 22, 0.98);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.4);
+}
+
+.desktopNav .siteIndex > div a {
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+}
+
+.desktopNav .siteIndex > div a:last-child {
+  border-bottom: 0;
+}
+
+.desktopNav .siteIndex > div a::after {
+  display: none;
+}
+
+.desktopNav .siteIndex > div a:hover,
+.desktopNav .siteIndex > div a:focus-visible {
+  color: var(--amber);
+  background: rgba(255, 255, 255, 0.035);
+}
+
 .desktopNav a::after {
   position: absolute;
   right: 0;
@@ -743,7 +801,7 @@
   --artifact-rotate: -3deg;
   top: auto;
   right: clamp(24px, 4vw, 68px);
-  bottom: 10svh;
+  bottom: 22svh;
 }
 
 .chapterArtifact[data-scene='tide'],
@@ -934,7 +992,7 @@
 .heroFieldNote {
   position: absolute;
   right: clamp(230px, 18vw, 310px);
-  bottom: 15svh;
+  bottom: calc(15svh + 72px);
 }
 
 .scrollMark {
@@ -1160,6 +1218,14 @@
   line-height: 1.05;
 }
 
+.noteLocalTitle {
+  display: block;
+  margin: -3px 0 7px;
+  color: rgba(241, 183, 115, 0.82);
+  font-size: 9px;
+  line-height: 1.4;
+}
+
 .noteList p {
   max-width: 600px;
   margin: 0;
@@ -1354,170 +1420,6 @@
   color: var(--amber);
 }
 
-.audioDock {
-  --amber: #f1b773;
-  --paper: #f2f0e9;
-  --muted: #9aa8b3;
-  --line: rgba(231, 238, 242, 0.18);
-  --deep: #06101b;
-  position: fixed;
-  z-index: 92;
-  right: clamp(18px, 2.8vw, 42px);
-  bottom: 24px;
-  display: grid;
-  justify-items: end;
-  gap: 9px;
-}
-
-.audioQuick {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-
-.audioButton {
-  display: flex;
-  min-height: 48px;
-  align-items: center;
-  gap: 9px;
-  padding: 4px 13px 4px 5px;
-  border: 1px solid rgba(232, 239, 243, 0.2);
-  border-radius: 99px;
-  background: rgba(5, 12, 20, 0.94);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-  cursor: pointer;
-}
-
-.audioSettingsButton {
-  display: grid;
-  width: 48px;
-  height: 48px;
-  place-items: center;
-  border: 1px solid rgba(232, 239, 243, 0.2);
-  border-radius: 50%;
-  background: rgba(5, 12, 20, 0.94);
-  color: var(--amber) !important;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-  cursor: pointer;
-}
-
-.audioOrb {
-  display: block;
-  width: 38px;
-  height: 38px;
-}
-
-.audioState {
-  color: rgba(232, 238, 241, 0.68);
-  font: 8.5px var(--font-mono), monospace;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.audioButton > svg {
-  color: var(--amber);
-}
-
-.audioPanel {
-  width: 252px;
-  padding: 17px;
-  border: 1px solid rgba(231, 238, 242, 0.2);
-  border-radius: 18px;
-  background: rgba(5, 12, 20, 0.94);
-  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.4);
-}
-
-.audioPanelHead {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.audioPanelHead > div {
-  display: grid;
-  gap: 5px;
-}
-
-.audioPanelHead span {
-  color: var(--muted);
-  font: 8px var(--font-mono), monospace;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.audioPanelHead strong {
-  font-family: var(--font-serif), Georgia, serif;
-  font-size: 18px;
-  font-weight: 400;
-}
-
-.audioPanelHead button {
-  display: grid;
-  width: 32px;
-  height: 32px;
-  flex: 0 0 auto;
-  place-items: center;
-  border: 1px solid var(--line);
-  border-radius: 50%;
-  background: transparent;
-  cursor: pointer;
-}
-
-.volumeRow {
-  display: grid;
-  grid-template-columns: 32px 1fr;
-  align-items: center;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.muteButton {
-  display: grid;
-  width: 32px;
-  height: 32px;
-  place-items: center;
-  border: 1px solid var(--line);
-  border-radius: 50%;
-  background: transparent;
-  color: var(--amber) !important;
-  cursor: pointer;
-}
-
-.volumeRow input {
-  width: 100%;
-  height: 32px;
-  appearance: none;
-  border-radius: 0;
-  background:
-    linear-gradient(
-      to bottom,
-      transparent 15px,
-      rgba(232, 238, 241, 0.18) 15px,
-      rgba(232, 238, 241, 0.18) 17px,
-      transparent 17px
-    );
-  accent-color: var(--amber);
-  cursor: pointer;
-}
-
-.volumeRow input::-webkit-slider-thumb {
-  width: 13px;
-  height: 13px;
-  appearance: none;
-  border: 2px solid #15202a;
-  border-radius: 50%;
-  background: var(--amber);
-  box-shadow: 0 0 0 1px rgba(241, 183, 115, 0.4);
-}
-
-.audioPanel > p {
-  margin: 14px 0 0;
-  color: rgba(226, 233, 237, 0.43);
-  font: 7.5px var(--font-mono), monospace;
-  letter-spacing: 0.04em;
-}
-
 @media (max-width: 1180px) {
   .projectShowcase {
     grid-template-columns: minmax(0, 1fr) minmax(350px, 430px);
@@ -1708,14 +1610,6 @@
     justify-content: flex-start;
   }
 
-  .audioDock {
-    right: 14px;
-    bottom: max(14px, env(safe-area-inset-bottom));
-  }
-
-  .audioState {
-    display: none;
-  }
 }
 
 @media (max-width: 540px) {
@@ -1803,9 +1697,6 @@
     padding-bottom: 44px;
   }
 
-  .audioPanel {
-    width: min(252px, calc(100vw - 28px));
-  }
 }
 
 @media (update: slow) {

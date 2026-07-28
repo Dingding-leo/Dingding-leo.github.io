@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   AnimatePresence,
   motion,
@@ -21,6 +21,13 @@ const optimizedProjectArtwork: Record<string, string> = {
   ScholarBank: 'scholarbank',
   Denki: 'denki',
 };
+
+function projectSlug(title: string) {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
 
 function ProjectPicture({
   project,
@@ -51,12 +58,12 @@ function ProjectPicture({
       <source
         type="image/avif"
         srcSet={`/assets/projects/optimized/${optimizedName}-640.avif 640w, /assets/projects/optimized/${optimizedName}-960.avif 960w`}
-        sizes="(max-width: 820px) 86vw, 460px"
+        sizes="(max-width: 820px) 86vw, 420px"
       />
       <source
         type="image/webp"
         srcSet={`/assets/projects/optimized/${optimizedName}-640.webp 640w, /assets/projects/optimized/${optimizedName}-960.webp 960w`}
-        sizes="(max-width: 820px) 86vw, 460px"
+        sizes="(max-width: 820px) 86vw, 420px"
       />
       <img
         src={project.image}
@@ -86,7 +93,6 @@ function ProjectActiveCard({
   disabled: boolean;
   onSwipe: (direction: number) => void;
 }) {
-  const primaryUrl = project.liveUrl || project.repoUrl;
   const reducedMotion = useReducedMotion();
   const didDrag = useRef(false);
 
@@ -172,24 +178,10 @@ function ProjectActiveCard({
         didDrag.current = false;
       }}
     >
-      {primaryUrl ? (
-        <a
-          className={styles.projectCardVisual}
-          href={primaryUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          draggable={false}
-          aria-label={`Open ${project.title}`}
-        >
-          {artwork}
-          <span>{project.status}</span>
-        </a>
-      ) : (
-        <div className={styles.projectCardVisual}>
-          {artwork}
-          <span>{project.status}</span>
-        </div>
-      )}
+      <div className={styles.projectCardVisual}>
+        {artwork}
+        <span>{project.status}</span>
+      </div>
       <div className={styles.projectCompactCopy}>
         <div className={styles.projectCompactHeading}>
           <span>{String(index + 1).padStart(2, '0')}</span>
@@ -212,6 +204,7 @@ function ProjectActiveCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 draggable={false}
+                aria-label={`${project.title} live site (opens in a new tab)`}
               >
                 Live <ExternalLink size={13} aria-hidden="true" />
               </a>
@@ -222,6 +215,7 @@ function ProjectActiveCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 draggable={false}
+                aria-label={`${project.title} source code (opens in a new tab)`}
               >
                 Source <Github size={13} aria-hidden="true" />
               </a>
@@ -249,6 +243,35 @@ export function ProjectDeck({
   const count = deckProjects.length;
   const activeProject = deckProjects[activeIndex];
 
+  useEffect(() => {
+    const selectRequestedProject = (requested: string | null) => {
+      if (!requested) return;
+      const requestedIndex = deckProjects.findIndex(
+        (project) => projectSlug(project.title) === requested.toLowerCase(),
+      );
+      if (requestedIndex < 0) return;
+      setActiveIndex((currentIndex) => {
+        setDirection(requestedIndex >= currentIndex ? 1 : -1);
+        return requestedIndex;
+      });
+      setBusy(false);
+    };
+    const selectFromLocation = () =>
+      selectRequestedProject(
+        new URLSearchParams(window.location.search).get('project'),
+      );
+    const selectFromEvent = (event: Event) =>
+      selectRequestedProject((event as CustomEvent<string>).detail);
+
+    selectFromLocation();
+    window.addEventListener('popstate', selectFromLocation);
+    window.addEventListener('project-deck-select', selectFromEvent);
+    return () => {
+      window.removeEventListener('popstate', selectFromLocation);
+      window.removeEventListener('project-deck-select', selectFromEvent);
+    };
+  }, [deckProjects]);
+
   if (!activeProject || count === 0) return null;
 
   const projectAt = (offset: number) =>
@@ -275,7 +298,7 @@ export function ProjectDeck({
       tabIndex={0}
       initial={{ opacity: 0, y: 36 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.32 }}
+      viewport={{ once: true, amount: 0.06 }}
       transition={{
         duration: reducedMotion ? 0 : 0.75,
         ease: [0.16, 1, 0.3, 1],

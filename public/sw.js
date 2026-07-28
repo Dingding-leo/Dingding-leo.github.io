@@ -1,5 +1,11 @@
-/* Offline support: network-first for pages, stale-while-revalidate for assets. */
-const CACHE = 'al-blue-hour-v3';
+/* Offline support: immutable build files, bounded media, fresh pages. */
+const STATIC_CACHE = 'al-blue-hour-static-v4';
+const MEDIA_CACHE = 'al-blue-hour-media-v4';
+const PAGE_CACHE = 'al-blue-hour-pages-v4';
+const CURRENT_CACHES = new Set([STATIC_CACHE, MEDIA_CACHE, PAGE_CACHE]);
+const CACHE_PREFIX = 'al-blue-hour-';
+const INDEPENDENT_APP_PATHS = ['/KnightClub/', '/Denki/'];
+const MEDIA_LIMIT = 180;
 
 self.addEventListener('install', () => {
   self.skipWaiting();
@@ -9,10 +15,25 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches
       .keys()
-      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key))))
+      .then((keys) =>
+        Promise.all(
+          keys
+            .filter(
+              (key) =>
+                key.startsWith(CACHE_PREFIX) && !CURRENT_CACHES.has(key),
+            )
+            .map((key) => caches.delete(key)),
+        ),
+      )
       .then(() => self.clients.claim()),
   );
 });
+
+async function trimCache(cache, limit) {
+  const keys = await cache.keys();
+  if (keys.length <= limit) return;
+  await Promise.all(keys.slice(0, keys.length - limit).map((key) => cache.delete(key)));
+}
 
 self.addEventListener('fetch', (event) => {
   const { request } = event;
@@ -20,21 +41,47 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(request.url);
   if (url.origin !== location.origin) return;
+  if (
+    INDEPENDENT_APP_PATHS.some(
+      (path) => url.pathname === path.slice(0, -1) || url.pathname.startsWith(path),
+    )
+  ) {
+    return;
+  }
 
-  // Hashed build output and media: serve from cache, refresh in the background.
-  if (url.pathname.startsWith('/_next/static/') || url.pathname.startsWith('/assets/')) {
+  // Next build filenames are content-hashed, so a cache hit is final.
+  if (url.pathname.startsWith('/_next/static/')) {
     event.respondWith(
-      caches.open(CACHE).then((cache) =>
-        cache.match(request).then((hit) => {
-          const refresh = fetch(request)
-            .then((response) => {
-              if (response.ok) cache.put(request, response.clone());
-              return response;
-            })
-            .catch(() => hit);
-          return hit || refresh;
-        }),
-      ),
+      caches.open(STATIC_CACHE).then(async (cache) => {
+        const hit = await cache.match(request);
+        if (hit) return hit;
+        const response = await fetch(request);
+        if (response.ok) await cache.put(request, response.clone());
+        return response;
+      }),
+    );
+    return;
+  }
+
+  // Media can keep stable URLs across edits: show the cache, refresh quietly.
+  if (url.pathname.startsWith('/assets/')) {
+    const cachePromise = caches.open(MEDIA_CACHE);
+    const hitPromise = cachePromise.then((cache) => cache.match(request));
+    const refreshPromise = cachePromise.then(async (cache) => {
+      const response = await fetch(request);
+      if (response.ok) {
+        await cache.put(request, response.clone());
+        await trimCache(cache, MEDIA_LIMIT);
+      }
+      return response;
+    });
+
+    event.waitUntil(refreshPromise.then(() => undefined).catch(() => undefined));
+    event.respondWith(
+      hitPromise.then(async (hit) => {
+        if (hit) return hit;
+        return refreshPromise.catch(() => Response.error());
+      }),
     );
     return;
   }
@@ -42,13 +89,13 @@ self.addEventListener('fetch', (event) => {
   // Pages and everything else: prefer the network so deploys show up immediately.
   event.respondWith(
     fetch(request)
-      .then((response) => {
+      .then(async (response) => {
         if (response.ok) {
-          const copy = response.clone();
-          caches.open(CACHE).then((cache) => cache.put(request, copy));
+          const cache = await caches.open(PAGE_CACHE);
+          await cache.put(request, response.clone());
         }
         return response;
       })
-      .catch(() => caches.match(request)),
+      .catch(() => caches.open(PAGE_CACHE).then((cache) => cache.match(request))),
   );
 });

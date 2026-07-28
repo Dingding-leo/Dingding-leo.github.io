@@ -1,0 +1,225 @@
+.audioDock {
+  --amber: #f1b773;
+  --paper: #f2f0e9;
+  --muted: #9aa8b3;
+  --line: rgba(231, 238, 242, 0.18);
+  --deep: #06101b;
+  position: fixed;
+  z-index: 92;
+  right: clamp(18px, 2.8vw, 42px);
+  bottom: 24px;
+  display: grid;
+  justify-items: end;
+  gap: 9px;
+  color: var(--paper);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.audioDock[aria-hidden='true'] {
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+.audioQuick {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.audioButton {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  gap: 9px;
+  padding: 4px 13px 4px 5px;
+  border: 1px solid rgba(232, 239, 243, 0.2);
+  border-radius: 99px;
+  background: rgba(5, 12, 20, 0.94);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  color: inherit;
+  cursor: pointer;
+}
+
+.audioSettingsButton {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border: 1px solid rgba(232, 239, 243, 0.2);
+  border-radius: 50%;
+  background: rgba(5, 12, 20, 0.94);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  color: var(--amber);
+  cursor: pointer;
+}
+
+.audioButton:focus-visible,
+.audioSettingsButton:focus-visible,
+.audioPanel button:focus-visible,
+.volumeRow input:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 3px;
+}
+
+.audioOrb {
+  display: block;
+  width: 38px;
+  height: 38px;
+}
+
+.audioState {
+  color: rgba(232, 238, 241, 0.68);
+  font: 8.5px var(--font-mono), monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.audioButton > svg {
+  color: var(--amber);
+}
+
+.audioPanel {
+  width: 252px;
+  padding: 17px;
+  border: 1px solid rgba(231, 238, 242, 0.2);
+  border-radius: 18px;
+  background: rgba(5, 12, 20, 0.94);
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.4);
+}
+
+.audioPanelHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.audioPanelHead > div {
+  display: grid;
+  gap: 5px;
+}
+
+.audioPanelHead span {
+  color: var(--muted);
+  font: 8px var(--font-mono), monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.audioPanelHead strong {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.audioPanelHead button {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.volumeRow {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.muteButton {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--amber);
+  cursor: pointer;
+}
+
+.volumeRow input {
+  width: 100%;
+  height: 32px;
+  appearance: none;
+  border-radius: 0;
+  background:
+    linear-gradient(
+      to bottom,
+      transparent 15px,
+      rgba(232, 238, 241, 0.18) 15px,
+      rgba(232, 238, 241, 0.18) 17px,
+      transparent 17px
+    );
+  accent-color: var(--amber);
+  cursor: pointer;
+}
+
+.volumeRow input::-webkit-slider-thumb {
+  width: 13px;
+  height: 13px;
+  appearance: none;
+  border: 2px solid #15202a;
+  border-radius: 50%;
+  background: var(--amber);
+  box-shadow: 0 0 0 1px rgba(241, 183, 115, 0.4);
+}
+
+.audioPanel > p {
+  margin: 14px 0 0;
+  color: rgba(226, 233, 237, 0.43);
+  font: 7.5px var(--font-mono), monospace;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 1600px), (max-height: 760px) {
+  .audioDock {
+    right: 14px;
+    bottom: max(14px, env(safe-area-inset-bottom));
+  }
+
+  .audioState {
+    display: none;
+  }
+}
+
+@media (max-width: 540px) {
+  .audioDock {
+    top: max(82px, calc(env(safe-area-inset-top) + 74px));
+    right: 14px;
+    bottom: auto;
+    gap: 0;
+  }
+
+  .audioButton {
+    width: 48px;
+    min-height: 48px;
+    justify-content: center;
+    gap: 0;
+    padding: 5px;
+  }
+
+  .audioButton > svg,
+  .audioSettingsButton,
+  .audioPanel {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce), (update: slow) {
+  .audioDock *,
+  .audioDock *::before,
+  .audioDock *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

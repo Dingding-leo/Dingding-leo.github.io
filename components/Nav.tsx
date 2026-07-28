@@ -47,7 +47,10 @@ const searchIndex: SearchItem[] = [
   })),
   ...projects.map((project) => ({
     label: project.title,
-    href: '/projects',
+    href: `/projects?project=${project.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '')}`,
     group: 'Projects' as const,
     hint: project.status,
     keywords: [project.tagline, project.tags.join(' ')].join(' '),
@@ -69,12 +72,27 @@ export function Nav() {
   const searchButtonRef = useRef<HTMLButtonElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const mobileNavRef = useRef<HTMLElement>(null);
+  const paletteTriggerRef = useRef<HTMLElement | null>(null);
+  const paletteScrollRef = useRef(0);
 
   const closePalette = useCallback((restoreFocus = true) => {
     setPalette(false);
     setQuery('');
     if (restoreFocus) {
-      window.requestAnimationFrame(() => searchButtonRef.current?.focus());
+      window.requestAnimationFrame(() => {
+        window.scrollTo({
+          top: paletteScrollRef.current,
+          left: 0,
+          behavior: 'auto',
+        });
+        const trigger = paletteTriggerRef.current;
+        const fallback = [searchButtonRef.current, menuButtonRef.current].find(
+          (node) => Boolean(node?.getClientRects().length),
+        );
+        (trigger?.isConnected ? trigger : fallback)?.focus({
+          preventScroll: true,
+        });
+      });
     }
   }, []);
 
@@ -86,9 +104,21 @@ export function Nav() {
   }, []);
 
   const openPalette = useCallback(() => {
+    const activeElement =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    paletteTriggerRef.current = open
+      ? menuButtonRef.current
+      : activeElement && activeElement !== document.body
+        ? activeElement
+        : [searchButtonRef.current, menuButtonRef.current].find((node) =>
+            Boolean(node?.getClientRects().length),
+          ) ?? null;
+    paletteScrollRef.current = window.scrollY;
     setOpen(false);
     setPalette(true);
-  }, []);
+  }, [open]);
 
   useEffect(() => {
     const updateHash = () => setHash(window.location.hash);
@@ -143,11 +173,59 @@ export function Nav() {
   }, [open]);
 
   useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab') return;
+      const focusable = [
+        menuButtonRef.current,
+        ...(mobileNavRef.current?.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled])',
+        ) ?? []),
+      ].filter((item): item is HTMLElement => Boolean(item));
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [open]);
+
+  useEffect(() => {
     if (!open && !palette) return;
     const previousOverflow = document.body.style.overflow;
+    const backgroundNodes = [
+      ...document.querySelectorAll<HTMLElement>(
+        'main, footer, [data-blue-hour-audio-root]',
+      ),
+    ].map((node) => ({
+      node,
+      inert: node.inert,
+      ariaHidden: node.getAttribute('aria-hidden'),
+    }));
     document.body.style.overflow = 'hidden';
+    backgroundNodes.forEach(({ node }) => {
+      node.inert = true;
+      node.setAttribute('aria-hidden', 'true');
+    });
     return () => {
       document.body.style.overflow = previousOverflow;
+      backgroundNodes.forEach(({ node, inert, ariaHidden }) => {
+        node.inert = inert;
+        if (ariaHidden === null) {
+          node.removeAttribute('aria-hidden');
+        } else {
+          node.setAttribute('aria-hidden', ariaHidden);
+        }
+      });
     };
   }, [open, palette]);
 
@@ -182,7 +260,31 @@ export function Nav() {
 
   const navigate = (item: Pick<SearchItem, 'href'>) => {
     closePalette(false);
+    const requestedProject = new URL(item.href, window.location.href).searchParams.get(
+      'project',
+    );
+    if (requestedProject) {
+      window.dispatchEvent(
+        new CustomEvent('project-deck-select', {
+          detail: requestedProject,
+        }),
+      );
+    }
     router.push(item.href);
+  };
+
+  const chooseSearchResult = (item: SearchItem) => {
+    const requestedProject = new URL(item.href, window.location.href).searchParams.get(
+      'project',
+    );
+    if (requestedProject) {
+      window.dispatchEvent(
+        new CustomEvent('project-deck-select', {
+          detail: requestedProject,
+        }),
+      );
+    }
+    closePalette(false);
   };
 
   const trapDialogFocus = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -196,27 +298,6 @@ export function Nav() {
     const focusable = [
       ...event.currentTarget.querySelectorAll<HTMLElement>(
         'input, a[href], button:not([disabled])',
-      ),
-    ];
-    if (!focusable.length) return;
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
-
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault();
-      first.focus();
-    }
-  };
-
-  const trapMobileFocus = (event: React.KeyboardEvent<HTMLElement>) => {
-    if (event.key !== 'Tab') return;
-
-    const focusable = [
-      ...event.currentTarget.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled])',
       ),
     ];
     if (!focusable.length) return;
@@ -302,8 +383,16 @@ export function Nav() {
             id="mobile-navigation"
             className="mobile-nav"
             aria-label="Mobile navigation"
-            onKeyDown={trapMobileFocus}
           >
+            <button
+              className="mobile-search"
+              type="button"
+              onClick={openPalette}
+            >
+              <Search size={16} aria-hidden="true" />
+              <span>Search this journal</span>
+              <kbd>⌘K</kbd>
+            </button>
             {site.nav.map((item) => (
               <Link
                 className={isActive(item) ? 'active' : ''}
@@ -365,7 +454,7 @@ export function Nav() {
                         className={isActive(item) ? 'active' : ''}
                         key={`${group}-${item.href}-${item.label}`}
                         href={item.href}
-                        onClick={() => closePalette(false)}
+                        onClick={() => chooseSearchResult(item)}
                       >
                         <span>{item.label}</span>
                         {item.hint ? (

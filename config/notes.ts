@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 export type Note = {
   slug: string;
   title: string;
+  kind?: 'field' | 'project';
   /** Display title on the notes index when it differs from the canonical title. */
   localTitle?: string;
   excerpt: string;
@@ -30,6 +31,78 @@ export type Note = {
 };
 
 export const notes: Note[] = [
+  {
+    slug: 'memory-needs-a-calmer-interface',
+    title: 'Memory Needs a Calmer Interface',
+    kind: 'project',
+    excerpt:
+      'What building Denki taught me about local-first study, honest scheduling, and making review feel less like another inbox.',
+    pageTitle:
+      'A local-first spaced-repetition studio built around trust, intervals, and quieter study.',
+    kicker: 'Notes / Denki',
+    lede:
+      'The design decisions behind a calmer flashcard studio: FSRS scheduling, data that stays close, and fewer reasons to leave the learning loop.',
+    label: 'Denki',
+    readingTime: '7 min read',
+    occurredAt: '2026-07-27',
+    dateLabel: 'June–July 2026',
+    publishedAt: '2026-07-29T11:00:00+09:30',
+    updatedAt: '2026-07-29T11:00:00+09:30',
+    image: '/assets/projects/denki.jpg',
+    imageAlt:
+      'A quiet blue desk with a row of cream and violet study cards, a notebook, and a circular progress light',
+    imageWidth: 1600,
+    imageHeight: 900,
+    featured: true,
+  },
+  {
+    slug: 'why-i-removed-14400-questions',
+    title: 'Why I Removed 14,400 Questions',
+    kind: 'project',
+    excerpt:
+      'ScholarBank became more credible when I stopped treating question count as a substitute for content integrity.',
+    pageTitle:
+      'What ScholarBank taught me about useful practice, calibrated claims, and the courage to make a catalogue smaller.',
+    kicker: 'Notes / ScholarBank',
+    lede:
+      'A design note on current-year pathways, server-side practice, transparent limits, and why curated does not mean calibrated.',
+    label: 'ScholarBank',
+    readingTime: '7 min read',
+    occurredAt: '2026-07-26',
+    dateLabel: 'July 2026',
+    publishedAt: '2026-07-29T11:00:00+09:30',
+    updatedAt: '2026-07-29T11:00:00+09:30',
+    image: '/assets/projects/scholarbank.jpg',
+    imageAlt:
+      'ScholarBank editorial artwork with a practice question card, progress indicator, and the words Practise with purpose',
+    imageWidth: 1600,
+    imageHeight: 840,
+    featured: true,
+  },
+  {
+    slug: 'no-account-between-me-and-the-board',
+    title: 'No Account Between Me and the Board',
+    kind: 'project',
+    excerpt:
+      'Inside KnightClub: private game data, bounded Stockfish analysis, and an on-device loop from play to practice.',
+    pageTitle:
+      'Building a local-first chess studio around ownership, understandable analysis, and honest limits.',
+    kicker: 'Notes / KnightClub',
+    lede:
+      'How KnightClub keeps play, review, and mistakes from my games close to the board—without pretending local software has no tradeoffs.',
+    label: 'KnightClub',
+    readingTime: '7 min read',
+    occurredAt: '2026-07-25',
+    dateLabel: 'July 2026',
+    publishedAt: '2026-07-29T11:00:00+09:30',
+    updatedAt: '2026-07-29T11:00:00+09:30',
+    image: '/assets/projects/knightclub-editorial.jpg',
+    imageAlt:
+      'A white knight lit warmly on a dark wooden chessboard beside a rain-covered blue-hour window',
+    imageWidth: 1600,
+    imageHeight: 900,
+    featured: true,
+  },
   {
     slug: 'shanghai-memories',
     title: 'Shanghai Memories',
@@ -213,7 +286,7 @@ export function noteMetadata(slug: string): Metadata {
       publishedTime: note.publishedAt,
       modifiedTime: note.updatedAt,
       authors: ['/'],
-      section: 'Field notes',
+      section: note.kind === 'project' ? 'Project notes' : 'Field notes',
       images: [image],
     },
     twitter: {

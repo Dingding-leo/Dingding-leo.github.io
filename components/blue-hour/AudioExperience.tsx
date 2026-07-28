@@ -20,7 +20,7 @@ import {
   VolumeX,
   X,
 } from 'lucide-react';
-import styles from './BlueHourSite.module.css';
+import styles from './AudioExperience.module.css';
 
 type AudioContextConstructor = typeof AudioContext;
 
@@ -79,10 +79,15 @@ class BlueHourEngine {
   oscillators: OscillatorNode[] = [];
   continuousSources: AudioScheduledSourceNode[] = [];
   transientSources = new Set<AudioScheduledSourceNode>();
-  rainDropBuffer: AudioBuffer;
+  rainBedBuffer: AudioBuffer | null = null;
+  rainDropBuffer: AudioBuffer | null = null;
   rainTimer?: number;
   pianoTimer?: number;
   suspendTimer?: number;
+  preparationHandle?: number;
+  preparationKind?: 'idle' | 'timeout';
+  atmospherePrepared = false;
+  rainBedStarted = false;
   chapter = 0;
   volume = DEFAULT_VOLUME;
   disposed = false;
@@ -118,8 +123,6 @@ class BlueHourEngine {
     this.pianoWet.gain.value = 0.14;
     this.reverb = this.context.createConvolver();
     this.reverb.normalize = true;
-    this.reverb.buffer = this.createReverbImpulse();
-    this.rainDropBuffer = this.createRainDropBuffer();
 
     this.padFilter.connect(this.compressor);
     this.rainBus.connect(this.compressor);
@@ -130,13 +133,47 @@ class BlueHourEngine {
     this.master.connect(this.analyser);
     this.analyser.connect(this.context.destination);
 
-    this.createPad();
-    this.createRain();
+  }
+
+  scheduleAtmospherePreparation(timeout = 2200) {
+    if (
+      this.disposed ||
+      this.atmospherePrepared ||
+      this.preparationHandle !== undefined
+    ) {
+      return;
+    }
+
+    const prepare = () => {
+      this.preparationHandle = undefined;
+      this.preparationKind = undefined;
+      this.prepareAtmosphere();
+    };
+
+    if (typeof window.requestIdleCallback === 'function') {
+      this.preparationKind = 'idle';
+      this.preparationHandle = window.requestIdleCallback(prepare, { timeout });
+    } else {
+      this.preparationKind = 'timeout';
+      this.preparationHandle = window.setTimeout(prepare, Math.min(timeout, 900));
+    }
+  }
+
+  private prepareAtmosphere() {
+    if (this.disposed || this.atmospherePrepared) return;
+    this.reverb.buffer = this.createReverbImpulse();
+    this.rainBedBuffer = this.createRainBedBuffer();
+    this.rainDropBuffer = this.createRainDropBuffer();
+    this.atmospherePrepared = true;
+    if (this.desiredPlaying && this.context.state === 'running') {
+      this.createRain();
+      this.scheduleRain();
+    }
   }
 
   private createPad() {
     const now = this.context.currentTime;
-    chapterChords[0].forEach((frequency, index) => {
+    chapterChords[this.chapter].forEach((frequency, index) => {
       const oscillator = this.context.createOscillator();
       const gain = this.context.createGain();
       const stereo = this.context.createStereoPanner?.();
@@ -160,7 +197,7 @@ class BlueHourEngine {
     });
   }
 
-  private createRain() {
+  private createRainBedBuffer() {
     const length = Math.ceil(this.context.sampleRate * 3.5);
     const buffer = this.context.createBuffer(2, length, this.context.sampleRate);
 
@@ -173,7 +210,13 @@ class BlueHourEngine {
         data[index] = white * 0.62 + slow * 0.7;
       }
     }
+    return buffer;
+  }
 
+  private createRain() {
+    const buffer = this.rainBedBuffer;
+    if (this.rainBedStarted || !buffer) return;
+    this.rainBedStarted = true;
     const source = this.context.createBufferSource();
     source.buffer = buffer;
     source.loop = true;
@@ -273,11 +316,13 @@ class BlueHourEngine {
   }
 
   private playRainDrop(offset = 0) {
+    const rainDropBuffer = this.rainDropBuffer;
+    if (!rainDropBuffer) return;
     const now = this.context.currentTime + offset;
     const source = this.context.createBufferSource();
     const filter = this.context.createBiquadFilter();
     const gain = this.context.createGain();
-    source.buffer = this.rainDropBuffer;
+    source.buffer = rainDropBuffer;
     filter.type = 'bandpass';
     filter.frequency.setValueAtTime(1800 + Math.random() * 3600, now);
     filter.Q.value = 0.7 + Math.random() * 1.1;
@@ -408,6 +453,7 @@ class BlueHourEngine {
   async start(volume = this.volume) {
     const operation = ++this.operation;
     this.desiredPlaying = true;
+    this.scheduleAtmospherePreparation(900);
     if (this.suspendTimer) {
       window.clearTimeout(this.suspendTimer);
       this.suspendTimer = undefined;
@@ -438,12 +484,14 @@ class BlueHourEngine {
       return false;
     }
     const now = this.context.currentTime;
+    if (!this.oscillators.length) this.createPad();
+    if (this.atmospherePrepared) this.createRain();
     this.holdMasterAt(now);
     this.master.gain.exponentialRampToValueAtTime(
       Math.max(this.volume, 0.0001),
       now + 2.4,
     );
-    this.scheduleRain();
+    if (this.atmospherePrepared) this.scheduleRain();
     this.schedulePiano(!this.pianoIntroduced);
     return true;
   }
@@ -524,6 +572,16 @@ class BlueHourEngine {
 
   destroy() {
     this.disposed = true;
+    if (this.preparationHandle !== undefined) {
+      if (
+        this.preparationKind === 'idle' &&
+        typeof window.cancelIdleCallback === 'function'
+      ) {
+        window.cancelIdleCallback(this.preparationHandle);
+      } else {
+        window.clearTimeout(this.preparationHandle);
+      }
+    }
     if (this.rainTimer) window.clearTimeout(this.rainTimer);
     if (this.pianoTimer) window.clearTimeout(this.pianoTimer);
     if (this.suspendTimer) window.clearTimeout(this.suspendTimer);
@@ -577,6 +635,7 @@ export function useBlueHourAudio(activeChapter: number): AudioExperience {
     const Context = window.AudioContext || browserWindow.webkitAudioContext;
     if (!Context) return null;
     engine.current = new BlueHourEngine(Context);
+    engine.current.scheduleAtmospherePreparation();
     analyser.current = engine.current.analyser;
     engine.current.context.onstatechange = () => {
       const running =
@@ -586,6 +645,38 @@ export function useBlueHourAudio(activeChapter: number): AudioExperience {
     };
     return engine.current;
   }, []);
+
+  useEffect(() => {
+    if (readAudioPreference('blue-hour-sound') === 'off') return;
+    const connection = (
+      navigator as Navigator & { connection?: { saveData?: boolean } }
+    ).connection;
+    if (connection?.saveData) return;
+
+    let cancelled = false;
+    let idleHandle: number | undefined;
+    let timeoutHandle: number | undefined;
+    const warmEngine = () => {
+      if (!cancelled && !document.hidden) ensureEngine();
+    };
+
+    if (typeof window.requestIdleCallback === 'function') {
+      idleHandle = window.requestIdleCallback(warmEngine, { timeout: 2800 });
+    } else {
+      timeoutHandle = window.setTimeout(warmEngine, 1800);
+    }
+
+    return () => {
+      cancelled = true;
+      if (
+        idleHandle !== undefined &&
+        typeof window.cancelIdleCallback === 'function'
+      ) {
+        window.cancelIdleCallback(idleHandle);
+      }
+      if (timeoutHandle !== undefined) window.clearTimeout(timeoutHandle);
+    };
+  }, [ensureEngine]);
 
   const start = useCallback(async () => {
     const operation = ++audioOperation.current;
@@ -732,14 +823,9 @@ export function useBlueHourAudio(activeChapter: number): AudioExperience {
   };
 }
 
-type BlueHourAudioContextValue = AudioExperience & {
-  activeChapter: number;
-  setActiveChapter: (chapter: number) => void;
-};
-
-const BlueHourAudioContext = createContext<BlueHourAudioContextValue | null>(
-  null,
-);
+const BlueHourChapterDispatchContext = createContext<
+  ((chapter: number) => void) | null
+>(null);
 
 function chapterForPath(pathname: string) {
   if (pathname.startsWith('/projects')) return 1;
@@ -768,7 +854,6 @@ export function BlueHourAudioProvider({ children }: { children: ReactNode }) {
   const setActiveChapter = useCallback((chapter: number) => {
     setActiveChapterState(Math.max(0, Math.min(chapter, chapterNames.length - 1)));
   }, []);
-
   useEffect(() => {
     setActiveChapterState(chapterForPath(pathname));
   }, [pathname]);
@@ -782,11 +867,11 @@ export function BlueHourAudioProvider({ children }: { children: ReactNode }) {
     if (readAudioPreference('blue-hour-sound') === 'off') return;
 
     const cleanup = () => {
-      window.removeEventListener('pointerdown', onGesture, true);
+      window.removeEventListener('click', onGesture, true);
       window.removeEventListener('keydown', onGesture, true);
     };
 
-    const onGesture = (event: PointerEvent | KeyboardEvent) => {
+    const onGesture = (event: MouseEvent | KeyboardEvent) => {
       if (playingRef.current) {
         cleanup();
         return;
@@ -834,32 +919,29 @@ export function BlueHourAudioProvider({ children }: { children: ReactNode }) {
         });
     };
 
-    window.addEventListener('pointerdown', onGesture, {
+    window.addEventListener('click', onGesture, {
       capture: true,
-      passive: true,
     });
     window.addEventListener('keydown', onGesture, true);
     return cleanup;
   }, []);
 
   return (
-    <BlueHourAudioContext.Provider
-      value={{ ...audio, activeChapter, setActiveChapter }}
-    >
+    <BlueHourChapterDispatchContext.Provider value={setActiveChapter}>
       {children}
       <AudioControl audio={audio} activeChapter={activeChapter} />
-    </BlueHourAudioContext.Provider>
+    </BlueHourChapterDispatchContext.Provider>
   );
 }
 
-export function useBlueHourAudioContext() {
-  const context = useContext(BlueHourAudioContext);
-  if (!context) {
+export function useBlueHourChapterDispatch() {
+  const setActiveChapter = useContext(BlueHourChapterDispatchContext);
+  if (!setActiveChapter) {
     throw new Error(
-      'useBlueHourAudioContext must be used within BlueHourAudioProvider',
+      'useBlueHourChapterDispatch must be used within BlueHourAudioProvider',
     );
   }
-  return context;
+  return setActiveChapter;
 }
 
 function AudioOrb({
@@ -996,7 +1078,7 @@ export function AudioControl({
   }, [audio.panelOpen, closePanel]);
 
   return (
-    <div className={styles.audioDock}>
+    <div className={styles.audioDock} data-blue-hour-audio-root>
       {audio.panelOpen && (
         <div
           id="blue-hour-audio-panel"

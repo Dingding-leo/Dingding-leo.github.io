@@ -1,11 +1,13 @@
-import type { Metadata } from 'next';
 import { AboutPage } from '@/components/LegacyPages';
+import { pageMetadata } from '@/config/pageMetadata';
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: 'About — Austin Liu',
   description:
-    'Builder, traveller, photographer, writer, and dental student behind this public notebook.',
-};
+    'Builder, traveller, photographer, and writer behind The Last Blue Hour.',
+  image: '/assets/blue-hour/afterlight-1200.jpg',
+  imageAlt: 'A small stone cabin with one warm window on a blue moor',
+});
 
 export default function Page() {
   return <AboutPage />;

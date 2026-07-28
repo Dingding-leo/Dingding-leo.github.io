@@ -89,7 +89,6 @@ export function BlueHourHero({
       <BlueHourArtifact
         scene={scene}
         className={styles.heroArtifact}
-        priority
       />
     </section>
   );

@@ -237,6 +237,27 @@ picture {
   font-size: 14px;
 }
 
+.mobile-search {
+  display: flex;
+  min-height: 50px;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--line);
+  color: var(--accent);
+  font-size: 13px;
+  text-align: left;
+}
+
+.mobile-search span {
+  flex: 1;
+}
+
+.mobile-search kbd {
+  font: 9px var(--font-mono), ui-monospace, monospace;
+  opacity: 0.65;
+}
+
 .mobile-nav a:last-child {
   border-bottom: 0;
 }
@@ -397,6 +418,21 @@ html.blue-hour-page body {
   }
 }
 
+.route-transition-frame {
+  min-height: 100%;
+  animation: routeFrameArrive 0.62s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes routeFrameArrive {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 @media (max-width: 800px) {
   .container {
     width: min(100% - 32px, 760px);
@@ -436,6 +472,12 @@ html.blue-hour-page body {
     border-bottom: 0;
     border-left: 0;
     border-radius: 20px 20px 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-transition-frame {
+    animation: none;
   }
 }
 

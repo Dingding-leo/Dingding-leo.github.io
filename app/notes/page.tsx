@@ -1,11 +1,13 @@
-import type { Metadata } from 'next';
 import { NotesPage } from '@/components/LegacyPages';
+import { pageMetadata } from '@/config/pageMetadata';
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: 'Notes — Austin Liu',
   description:
-    'Field notes from places, projects, and the ordinary days worth keeping.',
-};
+    'Ten notes on products and places: three build journals and seven photographic field notes.',
+  image: '/assets/blue-hour/waterfall-1200.jpg',
+  imageAlt: 'A waterfall catching the last light inside a dark forest gorge',
+});
 
 export default function Page() {
   return <NotesPage />;
