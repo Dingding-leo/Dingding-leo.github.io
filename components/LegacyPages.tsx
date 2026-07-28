@@ -219,22 +219,33 @@ export function MomentsPage() {
 }
 
 export function ProjectsPage() {
+  const container = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { staggerChildren: 0.15 } }
+  };
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } }
+  };
+
   return (
     <Wrap
       kicker="Projects / 03"
       title="Useful things, built and shipped."
       copy="A growing collection of learning tools, local-first software, and practical experiments shaped by real interests."
     >
-      <div className="project-summary" aria-label="Project summary">
+      <motion.div variants={item} className="project-summary" aria-label="Project summary">
         <span>{projects.length} projects</span>
         <span>{projects.filter((project) => project.liveUrl).length} live products</span>
         <span>Built across web and desktop</span>
-      </div>
-      <div className="legacy-projects">
+      </motion.div>
+      <motion.div variants={container} initial="hidden" animate="show" className="legacy-projects">
         {projects.map((project) => (
-          <ProjectCard project={project} key={project.title} />
+          <motion.div variants={item} key={project.title}>
+            <ProjectCard project={project} />
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     </Wrap>
   );
 }
@@ -342,68 +353,85 @@ export function NotesPage() {
   );
 }
 
+
 export function LibraryPage() {
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 15 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
+  };
+
   return (
     <Wrap
       kicker="Library / 05"
       title="Digital Bookshelf & Cinema."
       copy="A collection of books I've read and movies I've watched recently."
     >
-      <div className="mt-12 space-y-16">
+      <motion.div variants={container} initial="hidden" animate="show" className="mt-12 space-y-16">
         <section>
-          <h2 className="text-2xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-6">
+          <motion.h2 variants={item} className="text-2xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-6">
             Books
-          </h2>
+          </motion.h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {books.map((book) => (
-              <div key={book.title} className="flex flex-col group">
-                <div className="aspect-[2/3] relative overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 mb-3 shadow-[0_4px_12px_rgba(0,0,0,0.05)] dark:shadow-none transition-transform duration-300 group-hover:-translate-y-1">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={book.coverImage} alt={book.title} className="object-cover w-full h-full" />
-                </div>
-                <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100 leading-tight">
-                  {book.title}
-                </h3>
-                <p className="text-xs text-amber-600 dark:text-amber-500 mt-1">
-                  {book.creator}
-                </p>
-                {book.comment && (
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-2 line-clamp-2">
-                    "{book.comment}"
+              <motion.div variants={item} key={book.title} className="flex flex-col group block">
+                <a href={book.url || '#'} target="_blank" rel="noopener noreferrer" className="block relative focus:outline-none">
+                  <div className="aspect-[2/3] relative overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 mb-3 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-[0_20px_40px_rgba(232,166,109,0.12)]">
+                    <img src={book.coverImage} alt={book.title} className="object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-105" />
+                  </div>
+                  <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100 leading-tight transition-colors group-hover:text-amber-600 dark:group-hover:text-amber-500">
+                    {book.title}
+                  </h3>
+                  <p className="text-xs text-amber-600/70 dark:text-amber-500/70 mt-1">
+                    {book.creator}
                   </p>
-                )}
-              </div>
+                  {book.comment && (
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-2 line-clamp-2 leading-relaxed">
+                      "{book.comment}"
+                    </p>
+                  )}
+                </a>
+              </motion.div>
             ))}
           </div>
         </section>
 
         <section>
-          <h2 className="text-2xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-6">
+          <motion.h2 variants={item} className="text-2xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 mb-6">
             Movies
-          </h2>
+          </motion.h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {movies.map((movie) => (
-              <div key={movie.title} className="flex flex-col group">
-                <div className="aspect-[2/3] relative overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 mb-3 shadow-[0_4px_12px_rgba(0,0,0,0.05)] dark:shadow-none transition-transform duration-300 group-hover:-translate-y-1">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={movie.coverImage} alt={movie.title} className="object-cover w-full h-full" />
-                </div>
-                <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100 leading-tight">
-                  {movie.title}
-                </h3>
-                <p className="text-xs text-amber-600 dark:text-amber-500 mt-1">
-                  {movie.creator}
-                </p>
-                {movie.comment && (
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-2 line-clamp-2">
-                    "{movie.comment}"
+              <motion.div variants={item} key={movie.title} className="flex flex-col group block">
+                <a href={movie.url || '#'} target="_blank" rel="noopener noreferrer" className="block relative focus:outline-none">
+                  <div className="aspect-[2/3] relative overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 mb-3 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-[0_20px_40px_rgba(232,166,109,0.12)]">
+                    <img src={movie.coverImage} alt={movie.title} className="object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-105" />
+                  </div>
+                  <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100 leading-tight transition-colors group-hover:text-amber-600 dark:group-hover:text-amber-500">
+                    {movie.title}
+                  </h3>
+                  <p className="text-xs text-amber-600/70 dark:text-amber-500/70 mt-1">
+                    {movie.creator}
                   </p>
-                )}
-              </div>
+                  {movie.comment && (
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-2 line-clamp-2 leading-relaxed">
+                      "{movie.comment}"
+                    </p>
+                  )}
+                </a>
+              </motion.div>
             ))}
           </div>
         </section>
-      </div>
+      </motion.div>
     </Wrap>
   );
 }
+
