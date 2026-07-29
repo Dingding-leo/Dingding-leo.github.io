@@ -44,6 +44,44 @@
   height: 480px;
   margin: 0 auto;
   touch-action: pan-y;
+  transform-origin: 50% 56%;
+  will-change: transform;
+}
+
+.projectStage::before {
+  position: absolute;
+  z-index: 0;
+  inset: 12% -7% 8%;
+  border-radius: 44% 56% 52% 48%;
+  content: '';
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse at 72% 30%,
+      rgba(241, 183, 115, 0.12),
+      transparent 42%
+    ),
+    radial-gradient(
+      ellipse at 22% 72%,
+      rgba(89, 142, 181, 0.16),
+      transparent 48%
+    );
+  filter: blur(24px);
+  opacity: 0.6;
+  transform: scale(0.96);
+}
+
+.projectCarousel[data-motion='enabled'] .projectStage {
+  animation: deckFloat 7.4s ease-in-out infinite alternate;
+}
+
+.projectCarousel[data-motion='enabled'][data-deck-moving='false']
+  .projectStage,
+.projectCarousel[data-motion='enabled'][data-deck-moving='false']
+  .projectBackCard,
+.projectCarousel[data-motion='enabled'][data-deck-moving='false']
+  .projectCardVisual::before {
+  animation-play-state: paused;
 }
 
 .projectActiveCard,
@@ -89,6 +127,14 @@
   z-index: 1;
   opacity: 0.54;
   transform: translate(-11px, 31px) scale(0.935) rotate(-2.7deg);
+}
+
+.projectCarousel[data-motion='enabled'] .projectBackOne {
+  animation: deckBackOne 8.6s ease-in-out infinite alternate;
+}
+
+.projectCarousel[data-motion='enabled'] .projectBackTwo {
+  animation: deckBackTwo 9.8s ease-in-out infinite alternate-reverse;
 }
 
 .projectBackCard::after {
@@ -142,6 +188,28 @@
   overflow: hidden;
   border-bottom: 1px solid rgba(231, 238, 242, 0.14);
   background: #0a111a;
+}
+
+.projectCardVisual::before {
+  position: absolute;
+  z-index: 1;
+  inset: -45% auto -45% -48%;
+  width: 32%;
+  content: '';
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    rgba(235, 243, 247, 0.11),
+    transparent
+  );
+  filter: blur(9px);
+  opacity: 0;
+  transform: skewX(-12deg);
+}
+
+.projectCarousel[data-motion='enabled'] .projectCardVisual::before {
+  animation: deckLightPass 10.8s ease-in-out infinite;
 }
 
 .projectCardVisual::after {
@@ -309,6 +377,20 @@
   transform: none;
 }
 
+.projectControls .autoplayControl {
+  width: 31px;
+  height: 31px;
+  margin-right: -2px;
+  border-color: rgba(231, 238, 242, 0.13);
+  background: rgba(5, 12, 20, 0.62);
+  color: rgba(229, 235, 238, 0.66);
+}
+
+.projectControls .autoplayControl:hover,
+.projectControls .autoplayControl:focus-visible {
+  color: var(--deck-deep);
+}
+
 .projectCounter {
   display: flex;
   width: 92px;
@@ -324,10 +406,27 @@
   font-weight: 500;
 }
 
-.projectCounter i {
-  width: 28px;
+.projectProgress {
+  position: relative;
+  width: 30px;
   height: 1px;
+  overflow: hidden;
   background: rgba(231, 238, 242, 0.2);
+}
+
+.projectProgress i {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background: var(--deck-amber);
+  opacity: 0.34;
+  transform: scaleX(0.12);
+  transform-origin: left center;
+}
+
+.projectProgress i.projectProgressRunning {
+  opacity: 0.9;
+  animation: deckProgress 6.2s linear forwards;
 }
 
 .projectControls small {
@@ -347,6 +446,68 @@
   border: 0;
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
+}
+
+@keyframes deckFloat {
+  0% {
+    transform: translate3d(-1px, 3px, 0) rotate(-0.12deg);
+  }
+
+  48% {
+    transform: translate3d(1.5px, -3px, 0) rotate(0.08deg);
+  }
+
+  100% {
+    transform: translate3d(-0.5px, 1px, 0) rotate(0.14deg);
+  }
+}
+
+@keyframes deckBackOne {
+  from {
+    transform: translate(17px, 17px) scale(0.968) rotate(2.4deg);
+  }
+
+  to {
+    transform: translate(19px, 15px) scale(0.971) rotate(2.85deg);
+  }
+}
+
+@keyframes deckBackTwo {
+  from {
+    transform: translate(-11px, 31px) scale(0.935) rotate(-2.7deg);
+  }
+
+  to {
+    transform: translate(-13px, 28px) scale(0.939) rotate(-3.15deg);
+  }
+}
+
+@keyframes deckLightPass {
+  0%,
+  56% {
+    left: -48%;
+    opacity: 0;
+  }
+
+  67% {
+    opacity: 0.62;
+  }
+
+  82%,
+  100% {
+    left: 122%;
+    opacity: 0;
+  }
+}
+
+@keyframes deckProgress {
+  from {
+    transform: scaleX(0.04);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
 }
 
 @media (max-width: 1180px) {
@@ -393,7 +554,7 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce), (update: slow) {
   .projectCarousel *,
   .projectCarousel *::before,
   .projectCarousel *::after {

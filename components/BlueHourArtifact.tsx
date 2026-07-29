@@ -29,15 +29,17 @@ export function BlueHourArtifact({
       data-scene={scene}
       aria-hidden="true"
     >
-      <img
-        src={`/assets/artifacts/${scene}-sticker.webp`}
-        alt=""
-        width={dimensions.width}
-        height={dimensions.height}
-        loading={priority ? 'eager' : 'lazy'}
-        fetchPriority={priority ? 'high' : 'auto'}
-        decoding="async"
-      />
+      <span className={artifactStyles.lens}>
+        <img
+          src={`/assets/artifacts/${scene}-sticker.webp`}
+          alt=""
+          width={dimensions.width}
+          height={dimensions.height}
+          loading={priority ? 'eager' : 'lazy'}
+          fetchPriority={priority ? 'high' : 'auto'}
+          decoding="async"
+        />
+      </span>
     </figure>
   );
 }

@@ -1,19 +1,151 @@
 .artifact {
   position: absolute;
   z-index: 3;
-  width: clamp(132px, 16vw, 220px);
+  width: clamp(104px, 11vw, 174px);
+  max-width: 174px;
+  aspect-ratio: 1;
   margin: 0;
+  opacity: var(--artifact-opacity, 0.72);
   pointer-events: none;
   transform: rotate(var(--artifact-rotate, -2deg));
-  transform-origin: 50% 82%;
-  filter: drop-shadow(0 22px 30px rgba(0, 0, 0, 0.28));
-  contain: layout paint;
+  transform-origin: 50% 74%;
+  filter: drop-shadow(0 20px 28px rgba(0, 0, 0, 0.22));
+  isolation: isolate;
+}
+
+.artifact::before {
+  position: absolute;
+  z-index: -1;
+  inset: 2.5%;
+  border: 1px solid rgba(198, 214, 225, 0.2);
+  border-radius: 48% 52% 46% 54% / 55% 43% 57% 45%;
+  content: '';
+  opacity: 0.58;
+  transform: rotate(-7deg) scale(1.035);
+  box-shadow:
+    0 0 0 5px rgba(128, 158, 182, 0.025),
+    0 0 42px rgba(108, 146, 178, 0.12);
+  animation: artifactContour 11s ease-in-out infinite alternate;
+}
+
+.artifact::after {
+  position: absolute;
+  z-index: 2;
+  right: -1%;
+  bottom: 17%;
+  width: 34%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(227, 170, 104, 0),
+    rgba(227, 170, 104, 0.62) 70%,
+    rgba(247, 193, 126, 0.94)
+  );
+  border-radius: 999px;
+  content: '';
+  opacity: 0.72;
+  transform: rotate(-5deg);
+  box-shadow: 9px 0 12px rgba(231, 171, 102, 0.16);
+}
+
+.lens {
+  position: absolute;
+  inset: 7%;
+  display: block;
+  overflow: hidden;
+  border: 1px solid rgba(214, 226, 234, 0.13);
+  border-radius: 51% 49% 46% 54% / 48% 55% 45% 52%;
+  background:
+    radial-gradient(
+      circle at 68% 25%,
+      rgba(176, 204, 224, 0.12),
+      transparent 35%
+    ),
+    rgba(6, 18, 30, 0.78);
+  opacity: 0.76;
+  box-shadow:
+    inset 0 0 0 1px rgba(8, 17, 25, 0.48),
+    inset 0 -28px 36px rgba(1, 7, 13, 0.36),
+    0 12px 34px rgba(0, 5, 11, 0.28);
+}
+
+.lens::before {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  background:
+    linear-gradient(
+      138deg,
+      rgba(5, 18, 32, 0.32) 8%,
+      transparent 44%,
+      rgba(231, 171, 102, 0.08) 82%,
+      rgba(9, 23, 36, 0.24)
+    ),
+    radial-gradient(
+      circle at 50% 50%,
+      transparent 54%,
+      rgba(1, 8, 14, 0.3) 100%
+    );
+  content: '';
+  mix-blend-mode: soft-light;
+}
+
+.lens::after {
+  position: absolute;
+  z-index: 3;
+  inset: 5%;
+  border: 1px solid rgba(222, 232, 239, 0.08);
+  border-radius: 48% 52% 54% 46% / 53% 47% 51% 49%;
+  content: '';
+  transform: rotate(4deg);
 }
 
 .artifact img {
+  position: absolute;
+  inset: -11%;
   display: block;
-  width: 100%;
-  height: auto;
+  width: 122%;
+  height: 122%;
+  object-fit: cover;
+  object-position: var(--artifact-focus, 50% 50%);
+  filter: saturate(0.7) contrast(1.08) brightness(0.82);
+  transform: translate3d(-0.8%, 0.7%, 0) scale(1.02);
+  animation: artifactDrift 13s cubic-bezier(0.42, 0, 0.25, 1) infinite
+    alternate;
+  will-change: transform;
+}
+
+.artifact[data-scene='lighthouse'] {
+  --artifact-focus: 47% 47%;
+}
+
+.artifact[data-scene='mountain'] {
+  --artifact-focus: 50% 49%;
+}
+
+.artifact[data-scene='tide'] {
+  --artifact-focus: 54% 52%;
+}
+
+.artifact[data-scene='waterfall'] {
+  --artifact-focus: 54% 47%;
+}
+
+.artifact[data-scene='afterlight'] {
+  --artifact-focus: 51% 52%;
+}
+
+.artifact[data-scene='lighthouse'] .lens,
+.artifact[data-scene='afterlight'] .lens {
+  border-radius: 48% 52% 55% 45% / 52% 47% 53% 48%;
+}
+
+.artifact[data-scene='tide'] .lens {
+  border-radius: 54% 46% 50% 50% / 47% 55% 45% 53%;
+}
+
+.artifact[data-scene='waterfall'] .lens {
+  border-radius: 47% 53% 46% 54% / 55% 45% 54% 46%;
 }
 
 @supports (animation-timeline: view()) {
@@ -27,21 +159,52 @@
 @keyframes artifactReveal {
   from {
     opacity: 0;
-    transform: translate3d(0, 20px, 0)
-      rotate(calc(var(--artifact-rotate, -2deg) - 3deg)) scale(0.93);
+    transform: translate3d(0, 16px, 0)
+      rotate(calc(var(--artifact-rotate, -2deg) - 2deg)) scale(0.95);
   }
 
   to {
-    opacity: var(--artifact-opacity, 0.9);
+    opacity: var(--artifact-opacity, 0.72);
     transform: translate3d(0, 0, 0) rotate(var(--artifact-rotate, -2deg))
       scale(1);
+  }
+}
+
+@keyframes artifactDrift {
+  from {
+    transform: translate3d(-0.8%, 0.7%, 0) scale(1.02);
+  }
+
+  to {
+    transform: translate3d(0.75%, -0.6%, 0) scale(1.055);
+  }
+}
+
+@keyframes artifactContour {
+  from {
+    opacity: 0.42;
+    transform: rotate(-7deg) scale(1.02);
+  }
+
+  to {
+    opacity: 0.64;
+    transform: rotate(-5deg) scale(1.055);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .artifact {
     animation: none;
-    opacity: var(--artifact-opacity, 0.9);
+    opacity: var(--artifact-opacity, 0.72);
     transform: rotate(var(--artifact-rotate, -2deg));
+  }
+
+  .artifact::before,
+  .artifact img {
+    animation: none;
+  }
+
+  .artifact img {
+    transform: scale(1.035);
   }
 }

@@ -789,11 +789,11 @@
 }
 
 .chapterArtifact {
-  --artifact-opacity: 0.78;
+  --artifact-opacity: 0.64;
   --artifact-rotate: 2deg;
   top: clamp(104px, 13svh, 148px);
   right: clamp(24px, 5vw, 82px);
-  width: clamp(126px, 11vw, 178px);
+  width: clamp(104px, 9vw, 148px);
   opacity: var(--artifact-opacity);
 }
 
@@ -1478,6 +1478,12 @@
     grid-template-columns: 70px 1fr 44px;
     height: 68px;
     padding: 0 16px;
+    background:
+      linear-gradient(180deg, rgba(4, 10, 17, 0.96), rgba(4, 10, 17, 0.88)),
+      rgba(4, 10, 17, 0.9);
+    box-shadow: 0 14px 32px rgba(1, 6, 11, 0.24);
+    backdrop-filter: blur(16px) saturate(118%);
+    -webkit-backdrop-filter: blur(16px) saturate(118%);
   }
 
   .desktopNav {
