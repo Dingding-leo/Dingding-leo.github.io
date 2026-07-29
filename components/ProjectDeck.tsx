@@ -24,7 +24,7 @@ const optimizedProjectArtwork: Record<string, string> = {
   Denki: 'denki',
 };
 
-const AUTO_ADVANCE_MS = 6200;
+const AUTO_ADVANCE_MS = 5600;
 
 type NetworkInformationLike = {
   saveData?: boolean;
@@ -97,6 +97,7 @@ function ProjectActiveCard({
   onSwipe,
   onDragStateChange,
   onInteraction,
+  onSettled,
 }: {
   project: Project;
   index: number;
@@ -106,6 +107,7 @@ function ProjectActiveCard({
   onSwipe: (direction: number) => void;
   onDragStateChange: (dragging: boolean) => void;
   onInteraction: () => void;
+  onSettled: () => void;
 }) {
   const reducedMotion = useReducedMotion();
   const didDrag = useRef(false);
@@ -141,33 +143,51 @@ function ProjectActiveCard({
           reducedMotion
             ? { opacity: 0 }
             : {
-                opacity: 0,
-                y: 18,
-                scale: 0.965,
-                rotate: travelDirection > 0 ? 2.4 : -2.4,
+                opacity: 1,
+                x: travelDirection > 0 ? 12 : -7,
+                y: travelDirection > 0 ? 12 : 25,
+                scale: travelDirection > 0 ? 0.98 : 0.945,
+                rotate: travelDirection > 0 ? 1.5 : -2.05,
               },
-        centre: {
-          opacity: 1,
-          x: 0,
-          y: 0,
-          scale: 1,
-          rotate: -0.65,
-          transition: reducedMotion
-            ? { duration: 0 }
-            : { type: 'spring', stiffness: 260, damping: 26, mass: 0.72 },
-        },
+        centre: reducedMotion
+          ? {
+              opacity: 1,
+              x: 0,
+              y: 0,
+              scale: 1,
+              rotate: -0.65,
+              transition: { duration: 0 },
+            }
+          : {
+              opacity: 1,
+              x: 0,
+              y: 0,
+              scale: 1,
+              rotate: -0.65,
+              transition: {
+                duration: 0.56,
+                ease: [0.16, 1, 0.3, 1],
+              },
+            },
         exit: (travelDirection: number) =>
           reducedMotion
             ? { opacity: 0, transition: { duration: 0 } }
             : {
-                opacity: 0,
-                x: travelDirection > 0 ? -560 : 560,
-                y: 34,
-                rotate: travelDirection > 0 ? -14 : 14,
-                scale: 0.94,
+                opacity: 1,
+                x: 0,
+                y: [0, -10, 14, 26, 30],
+                rotate: [
+                  -0.65,
+                  travelDirection > 0 ? -1.3 : 0.7,
+                  travelDirection > 0 ? 0.35 : -1.35,
+                  travelDirection > 0 ? -1.8 : 1.1,
+                  travelDirection > 0 ? -2.4 : 1.6,
+                ],
+                scale: [1, 1.006, 0.97, 0.95, 0.94],
                 transition: {
-                  duration: 0.42,
-                  ease: [0.32, 0.72, 0, 1],
+                  duration: 0.72,
+                  times: [0, 0.24, 0.62, 0.88, 1],
+                  ease: [0.4, 0, 0.2, 1],
                 },
               },
       }}
@@ -176,10 +196,10 @@ function ProjectActiveCard({
       exit="exit"
       drag={!reducedMotion && !disabled ? 'x' : false}
       dragConstraints={{ left: 0, right: 0 }}
-      dragElastic={0.68}
+      dragElastic={0.44}
       dragMomentum={false}
       dragSnapToOrigin
-      whileDrag={{ scale: 1.015, rotate: 3, cursor: 'grabbing' }}
+      whileDrag={{ scale: 1.01, rotate: 1.6, cursor: 'grabbing' }}
       onDragStart={() => {
         didDrag.current = false;
         onDragStateChange(true);
@@ -189,6 +209,9 @@ function ProjectActiveCard({
         if (Math.abs(info.offset.x) > 6) didDrag.current = true;
       }}
       onDragEnd={onDragEnd}
+      onAnimationComplete={(definition) => {
+        if (definition === 'centre') onSettled();
+      }}
       onClickCapture={(event) => {
         if (!didDrag.current) return;
         event.preventDefault();
@@ -473,6 +496,7 @@ export function ProjectDeck({
       data-motion={motionEnabled ? 'enabled' : 'disabled'}
       data-deck-moving={deckMoving ? 'true' : 'false'}
       data-autoplay-state={autoplayState}
+      data-turning={busy ? 'true' : 'false'}
       role="region"
       aria-roledescription="carousel"
       aria-label={label}
@@ -529,18 +553,14 @@ export function ProjectDeck({
                 offset === 1 ? styles.projectBackOne : styles.projectBackTwo
               }`}
               aria-hidden="true"
-              key={`${project.title}-${offset}`}
+              key={count > 2 ? project.title : `${project.title}-${offset}`}
             >
               <ProjectPicture project={project} decorative />
               <span>{project.title}</span>
             </div>
           );
         })}
-        <AnimatePresence
-          initial={false}
-          custom={direction}
-          onExitComplete={() => setBusy(false)}
-        >
+        <AnimatePresence initial={false} mode="wait" custom={direction}>
           <ProjectActiveCard
             key={activeProject.title}
             project={activeProject}
@@ -551,6 +571,7 @@ export function ProjectDeck({
             onSwipe={move}
             onDragStateChange={setIsDragging}
             onInteraction={resetAutoplay}
+            onSettled={() => setBusy(false)}
           />
         </AnimatePresence>
       </div>
