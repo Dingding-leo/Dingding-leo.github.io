@@ -256,6 +256,7 @@ export function ProjectDeck({
 }) {
   const reducedMotion = useReducedMotion();
   const carouselRef = useRef<HTMLDivElement>(null);
+  const lastInputWasPointer = useRef(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [direction, setDirection] = useState(1);
   const [busy, setBusy] = useState(false);
@@ -293,6 +294,23 @@ export function ProjectDeck({
     !isHovered &&
     (!hasFocusWithin || allowAutoplayWhileFocused) &&
     !isDragging;
+  const autoplayState = !motionEnabled
+    ? 'motion-disabled'
+    : userPaused
+      ? 'user-paused'
+      : isHovered
+        ? 'hover-paused'
+        : hasFocusWithin && !allowAutoplayWhileFocused
+          ? 'focus-paused'
+          : isDragging
+            ? 'drag-paused'
+            : !isInView
+              ? 'offscreen'
+              : !documentVisible
+                ? 'hidden'
+                : busy
+                  ? 'transitioning'
+                  : 'running';
 
   const resetAutoplay = useCallback(() => {
     setAutoplayEpoch((epoch) => epoch + 1);
@@ -356,6 +374,24 @@ export function ProjectDeck({
         'visibilitychange',
         updateDocumentVisibility,
       );
+  }, []);
+
+  useEffect(() => {
+    const notePointerInput = () => {
+      lastInputWasPointer.current = true;
+      setAllowAutoplayWhileFocused(true);
+    };
+    const noteKeyboardInput = () => {
+      lastInputWasPointer.current = false;
+      setAllowAutoplayWhileFocused(false);
+    };
+
+    document.addEventListener('pointerdown', notePointerInput, true);
+    document.addEventListener('keydown', noteKeyboardInput, true);
+    return () => {
+      document.removeEventListener('pointerdown', notePointerInput, true);
+      document.removeEventListener('keydown', noteKeyboardInput, true);
+    };
   }, []);
 
   useEffect(() => {
@@ -436,6 +472,7 @@ export function ProjectDeck({
       className={`${styles.projectCarousel} ${className ?? ''}`}
       data-motion={motionEnabled ? 'enabled' : 'disabled'}
       data-deck-moving={deckMoving ? 'true' : 'false'}
+      data-autoplay-state={autoplayState}
       role="region"
       aria-roledescription="carousel"
       aria-label={label}
@@ -447,11 +484,16 @@ export function ProjectDeck({
         duration: reducedMotion ? 0 : 0.75,
         ease: [0.16, 1, 0.3, 1],
       }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onPointerEnter={(event) => {
+        if (event.pointerType === 'mouse') setIsHovered(true);
+      }}
+      onPointerLeave={(event) => {
+        if (event.pointerType === 'mouse') setIsHovered(false);
+      }}
+      onPointerCancel={() => setIsHovered(false)}
       onFocusCapture={() => {
         setHasFocusWithin(true);
-        setAllowAutoplayWhileFocused(false);
+        setAllowAutoplayWhileFocused(lastInputWasPointer.current);
       }}
       onBlurCapture={(event) => {
         if (
@@ -521,6 +563,16 @@ export function ProjectDeck({
               const nextPaused = !userPaused;
               setUserPaused(nextPaused);
               setAllowAutoplayWhileFocused(!nextPaused);
+              if (!nextPaused) {
+                setIsHovered(false);
+                window.setTimeout(
+                  () => {
+                    setAllowAutoplayWhileFocused(true);
+                    setIsHovered(false);
+                  },
+                  0,
+                );
+              }
               resetAutoplay();
             }}
             aria-pressed={userPaused}
