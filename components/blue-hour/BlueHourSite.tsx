@@ -10,9 +10,12 @@ import {
 import Link from 'next/link';
 import {
   AnimatePresence,
+  type MotionValue,
   MotionConfig,
   motion,
   useReducedMotion,
+  useScroll,
+  useSpring,
 } from 'framer-motion';
 import {
   ArrowDown,
@@ -92,13 +95,62 @@ const scenes = [
 ] as const;
 
 const places = [
-  ['Adelaide', 'Riverbank light and Morialta stone', '/notes/adelaide'],
-  ['Melbourne', 'St Kilda dusk and Dandenong light', '/notes/melbourne'],
-  ['Shanghai', 'A performer held in stage light', '/notes/shanghai-memories'],
-  ['Beijing', 'Forty-eight hours at full volume', '/notes/beijing'],
-  ['Cairns', 'Rainforest rock and reef-blue water', '/notes/cairns'],
-  ['Great Ocean Road', 'Weather moving along the edge', '/notes/great-ocean-road'],
-  ['Sydney', 'The first Australian chapter', '/notes/sydney'],
+  {
+    name: 'Adelaide',
+    copy: 'Riverbank light and Morialta stone',
+    href: '/notes/adelaide',
+    image: 'adelaide-riverbank',
+    fallback: '/assets/gallery/adelaide-riverbank.jpg',
+    position: '50% 50%',
+  },
+  {
+    name: 'Melbourne',
+    copy: 'St Kilda dusk and Dandenong light',
+    href: '/notes/melbourne',
+    image: 'melbourne-stkilda',
+    fallback: '/assets/gallery/melbourne-stkilda.jpg',
+    position: '52% 50%',
+  },
+  {
+    name: 'Shanghai',
+    copy: 'A performer held in stage light',
+    href: '/notes/shanghai-memories',
+    image: 'shanghai-disney',
+    fallback: '/assets/gallery/shanghai-disney.jpg',
+    position: '46% 50%',
+  },
+  {
+    name: 'Beijing',
+    copy: 'Forty-eight hours at full volume',
+    href: '/notes/beijing',
+    image: 'beijing-tiananmen',
+    fallback: '/assets/gallery/beijing-tiananmen.jpg',
+    position: '50% 50%',
+  },
+  {
+    name: 'Cairns',
+    copy: 'Rainforest rock and reef-blue water',
+    href: '/notes/cairns',
+    image: 'cairns-barron',
+    fallback: '/assets/gallery/cairns-barron.jpg',
+    position: '50% 48%',
+  },
+  {
+    name: 'Great Ocean Road',
+    copy: 'Weather moving along the edge',
+    href: '/notes/great-ocean-road',
+    image: 'great-ocean-road',
+    fallback: '/assets/gallery/great-ocean-road.jpg',
+    position: '50% 50%',
+  },
+  {
+    name: 'Sydney',
+    copy: 'The first Australian chapter',
+    href: '/notes/sydney',
+    image: 'sydney-usyd',
+    fallback: '/assets/gallery/sydney-usyd.jpg',
+    position: '50% 50%',
+  },
 ] as const;
 
 const nowItems = [
@@ -113,11 +165,13 @@ function ScenePicture({
   active,
   eager,
   transitioning,
+  direction,
 }: {
   scene: (typeof scenes)[number];
   active: boolean;
   eager: boolean;
   transitioning: boolean;
+  direction: number;
 }) {
   const reducedMotion = useReducedMotion();
   const style = {
@@ -132,13 +186,18 @@ function ScenePicture({
         transitioning ? styles.sceneLayerTransitioning : ''
       }`}
       aria-hidden="true"
-      initial={{ opacity: 0, scale: 1.065 }}
+      initial={{
+        opacity: eager ? 0.72 : 0,
+        scale: reducedMotion ? 1.018 : 1.04,
+        y: reducedMotion ? 0 : direction > 0 ? 13 : -13,
+      }}
       animate={{
         opacity: active ? 1 : 0,
-        scale: active ? 1.025 : 1.065,
+        scale: active ? 1.018 : 1.002,
+        y: active ? 0 : direction > 0 ? -10 : 10,
       }}
       transition={{
-        duration: reducedMotion ? 0 : 1.55,
+        duration: reducedMotion ? 0 : 1.28,
         ease: [0.22, 1, 0.36, 1],
       }}
       style={style}
@@ -171,12 +230,21 @@ function ScenePicture({
 }
 
 function Weather({ type }: { type: (typeof scenes)[number]['weather'] }) {
+  const reducedMotion = useReducedMotion();
+
   return (
-    <div className={`${styles.weather} ${styles[type]}`} aria-hidden="true">
+    <motion.div
+      className={`${styles.weather} ${styles[type]}`}
+      aria-hidden="true"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 0.72 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: reducedMotion ? 0 : 0.9, ease: 'easeInOut' }}
+    >
       <span className={styles.weatherOne} />
       <span className={styles.weatherTwo} />
       <span className={styles.weatherThree} />
-    </div>
+    </motion.div>
   );
 }
 
@@ -191,6 +259,7 @@ function SceneBackdrop({
   const previousActive = useRef(active);
   const [renderedScenes, setRenderedScenes] = useState([active]);
   const [transitioning, setTransitioning] = useState(false);
+  const [direction, setDirection] = useState(1);
 
   useEffect(() => {
     const outgoing = previousActive.current;
@@ -207,12 +276,13 @@ function SceneBackdrop({
       return;
     }
 
+    setDirection(active > outgoing ? 1 : -1);
     setRenderedScenes([outgoing, active]);
     setTransitioning(true);
     const settleTimer = window.setTimeout(() => {
       setRenderedScenes([active]);
       setTransitioning(false);
-    }, 1650);
+    }, 1400);
 
     return () => window.clearTimeout(settleTimer);
   }, [active, reducedMotion]);
@@ -226,10 +296,38 @@ function SceneBackdrop({
           active={index === active}
           eager={index === 0}
           transitioning={transitioning}
+          direction={direction}
         />
       ))}
-      <Weather type={scenes[active].weather} />
+      <AnimatePresence initial={false} mode="sync">
+        <Weather key={scenes[active].id} type={scenes[active].weather} />
+      </AnimatePresence>
       <div className={styles.backdropTone} />
+      <AnimatePresence initial={false}>
+        {transitioning && (
+          <motion.div
+            key={`${active}-${direction}`}
+            className={styles.exposureEvent}
+            initial={{
+              opacity: 0,
+              y: direction > 0 ? '58vh' : '-58vh',
+            }}
+            animate={{
+              opacity: [0, 0.78, 0],
+              y:
+                direction > 0
+                  ? ['58vh', '0vh', '-58vh']
+                  : ['-58vh', '0vh', '58vh'],
+            }}
+            exit={{ opacity: 0 }}
+            transition={{
+              duration: reducedMotion ? 0 : 1.34,
+              times: [0, 0.48, 1],
+              ease: [0.65, 0, 0.35, 1],
+            }}
+          />
+        )}
+      </AnimatePresence>
       <div className={styles.backdropGrain} />
     </div>
   );
@@ -254,30 +352,196 @@ function ChapterKicker({
 function ChapterTitle({
   time,
   title,
-  children,
+  headingId,
+  lines,
+  description,
 }: {
   time: string;
   title: string;
-  children: React.ReactNode;
+  headingId: string;
+  lines: React.ReactNode[];
+  description: React.ReactNode;
 }) {
   const reducedMotion = useReducedMotion();
+  const container = {
+    hidden: {},
+    visible: {
+      transition: {
+        delayChildren: reducedMotion ? 0 : 0.04,
+        staggerChildren: reducedMotion ? 0 : 0.09,
+      },
+    },
+  };
+  const line = {
+    hidden: reducedMotion
+      ? { opacity: 0 }
+      : { opacity: 0, y: '108%', rotate: 1.2 },
+    visible: {
+      opacity: 1,
+      y: '0%',
+      rotate: 0,
+      transition: {
+        duration: reducedMotion ? 0 : 0.92,
+        ease: [0.16, 1, 0.3, 1] as const,
+      },
+    },
+  };
+
   return (
     <motion.header
       className={styles.chapterHeader}
-      initial={{ opacity: 0, y: 42 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      variants={container}
+      initial="hidden"
+      whileInView="visible"
       viewport={{ amount: 0.38, once: true }}
-      transition={{
-        duration: reducedMotion ? 0 : 0.9,
-        ease: [0.16, 1, 0.3, 1],
-      }}
     >
-      <p className={styles.sceneTime}>
+      <motion.p
+        className={styles.sceneTime}
+        variants={{
+          hidden: { opacity: 0, x: reducedMotion ? 0 : -12 },
+          visible: {
+            opacity: 1,
+            x: 0,
+            transition: { duration: reducedMotion ? 0 : 0.48 },
+          },
+        }}
+      >
         <span>{time}</span>
         <span>{title}</span>
-      </p>
-      {children}
+      </motion.p>
+      <h2 id={headingId}>
+        {lines.map((headingLine, index) => (
+          <span className={styles.titleLineMask} key={index}>
+            <motion.span className={styles.titleLine} variants={line}>
+              {headingLine}
+            </motion.span>
+          </span>
+        ))}
+      </h2>
+      <motion.p
+        variants={{
+          hidden: { opacity: 0, y: reducedMotion ? 0 : 15 },
+          visible: {
+            opacity: 1,
+            y: 0,
+            transition: {
+              duration: reducedMotion ? 0 : 0.72,
+              ease: [0.16, 1, 0.3, 1],
+            },
+          },
+        }}
+      >
+        {description}
+      </motion.p>
     </motion.header>
+  );
+}
+
+function MomentViewfinder({ activeIndex }: { activeIndex: number }) {
+  const reducedMotion = useReducedMotion();
+  const place = places[activeIndex];
+
+  useEffect(() => {
+    const saveData = (
+      navigator as Navigator & { connection?: { saveData?: boolean } }
+    ).connection?.saveData;
+    if (saveData) return;
+
+    const preload = () => {
+      places.slice(1).forEach((item) => {
+        const preview = new Image();
+        preview.src = `/assets/gallery/optimized-note/${item.image}-480.webp`;
+      });
+    };
+    const idleWindow = window as typeof window & {
+      requestIdleCallback?: (callback: () => void) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+    const idleId = idleWindow.requestIdleCallback?.(preload);
+    const timerId =
+      idleId == null ? window.setTimeout(preload, 900) : undefined;
+
+    return () => {
+      if (idleId != null) idleWindow.cancelIdleCallback?.(idleId);
+      if (timerId != null) window.clearTimeout(timerId);
+    };
+  }, []);
+
+  return (
+    <aside className={styles.momentViewfinder} aria-hidden="true">
+      <div className={styles.viewfinderFrame}>
+        <AnimatePresence initial={false}>
+          <motion.figure
+            key={place.name}
+            initial={
+              reducedMotion
+                ? { opacity: 0 }
+                : {
+                    opacity: 0,
+                    y: 14,
+                    scale: 1.025,
+                    clipPath: 'inset(100% 0 0 0)',
+                  }
+            }
+            animate={{
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              clipPath: 'inset(0% 0 0 0)',
+            }}
+            exit={
+              reducedMotion
+                ? { opacity: 0 }
+                : {
+                    opacity: 0,
+                    y: -8,
+                    scale: 0.992,
+                    clipPath: 'inset(0 0 100% 0)',
+                  }
+            }
+            transition={{
+              duration: reducedMotion ? 0 : 0.78,
+              ease: [0.16, 1, 0.3, 1],
+            }}
+          >
+            <picture>
+              <source
+                type="image/avif"
+                srcSet={`/assets/gallery/optimized-note/${place.image}-480.avif 480w, /assets/gallery/optimized-note/${place.image}-960.avif 960w`}
+                sizes="(max-width: 1180px) 310px, 420px"
+              />
+              <source
+                type="image/webp"
+                srcSet={`/assets/gallery/optimized-note/${place.image}-480.webp 480w, /assets/gallery/optimized-note/${place.image}-960.webp 960w`}
+                sizes="(max-width: 1180px) 310px, 420px"
+              />
+              <img
+                src={place.fallback}
+                alt=""
+                width={960}
+                height={1200}
+                loading={activeIndex === 0 ? 'eager' : 'lazy'}
+                decoding="async"
+                style={{ objectPosition: place.position }}
+              />
+            </picture>
+            <figcaption>
+              <span>
+                {String(activeIndex + 1).padStart(2, '0')} /{' '}
+                {String(places.length).padStart(2, '0')}
+              </span>
+              <strong>{place.name}</strong>
+              <small>{place.copy}</small>
+            </figcaption>
+          </motion.figure>
+        </AnimatePresence>
+        <span className={styles.viewfinderReticle} />
+      </div>
+      <p>
+        <span>Field frame</span>
+        Focus a place to develop the photograph
+      </p>
+    </aside>
   );
 }
 
@@ -396,8 +660,34 @@ function Header({
           AL<span>·</span>
         </a>
         <div className={styles.nowPlaying} aria-live="polite">
-          <span>{scenes[active].time}</span>
-          <strong>{scenes[active].title}</strong>
+          <AnimatePresence initial={false} mode="popLayout">
+            <motion.div
+              className={styles.nowPlayingValue}
+              key={scenes[active].id}
+              initial={
+                reducedMotion
+                  ? { opacity: 0 }
+                  : { opacity: 0, y: 13, clipPath: 'inset(100% 0 0 0)' }
+              }
+              animate={{
+                opacity: 1,
+                y: 0,
+                clipPath: 'inset(0% 0 0 0)',
+              }}
+              exit={
+                reducedMotion
+                  ? { opacity: 0 }
+                  : { opacity: 0, y: -12, clipPath: 'inset(0 0 100% 0)' }
+              }
+              transition={{
+                duration: reducedMotion ? 0 : 0.46,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+            >
+              <span>{scenes[active].time}</span>
+              <strong>{scenes[active].title}</strong>
+            </motion.div>
+          </AnimatePresence>
         </div>
         <nav className={styles.desktopNav} aria-label="Blue hour chapters">
           {scenes.map((scene, index) => (
@@ -481,12 +771,17 @@ function Header({
 function ProgressRail({
   active,
   onSelect,
+  progress,
 }: {
   active: number;
   onSelect: (index: number) => void;
+  progress: MotionValue<number>;
 }) {
   return (
     <aside className={styles.progressRail} aria-label="Chapter progress">
+      <span className={styles.progressTrack} aria-hidden="true">
+        <motion.i style={{ scaleY: progress }} />
+      </span>
       {scenes.map((scene, index) => (
         <button
           type="button"
@@ -506,13 +801,21 @@ function ProgressRail({
 
 export function BlueHourSite() {
   const reducedMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll();
+  const smoothScrollProgress = useSpring(scrollYProgress, {
+    stiffness: 115,
+    damping: 28,
+    mass: 0.24,
+  });
   const [active, setActive] = useState(0);
+  const [activePlace, setActivePlace] = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
   const chapterNodes = useRef<Array<HTMLElement | null>>([]);
   const experienceRef = useRef<HTMLDivElement>(null);
   const backdropRef = useRef<HTMLDivElement>(null);
   const pointerFrame = useRef(0);
   const pointerLastUpdate = useRef(0);
+  const scrollFrame = useRef(0);
   const setActiveChapter = useBlueHourChapterDispatch();
 
   const featuredProjects = useMemo(
@@ -621,10 +924,86 @@ export function BlueHourSite() {
   }, []);
 
   useEffect(() => {
+    const reducedMotionQuery = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    );
+    const slowUpdate = window.matchMedia('(update: slow)');
+    const wideScreen = window.matchMedia('(min-width: 821px)');
+    const saveData = (
+      navigator as Navigator & { connection?: { saveData?: boolean } }
+    ).connection?.saveData;
+    let listening = false;
+
+    const clearCamera = () => {
+      backdropRef.current?.style.removeProperty('--scroll-drift');
+      backdropRef.current?.style.removeProperty('--scroll-scale');
+    };
+
+    const updateCamera = () => {
+      window.cancelAnimationFrame(scrollFrame.current);
+      scrollFrame.current = window.requestAnimationFrame(() => {
+        const chapter = chapterNodes.current[active];
+        if (!chapter || !backdropRef.current) return;
+        const rect = chapter.getBoundingClientRect();
+        const travel = Math.max(1, rect.height + window.innerHeight);
+        const progress = Math.min(
+          1,
+          Math.max(0, (window.innerHeight - rect.top) / travel),
+        );
+        const centred = progress - 0.5;
+        backdropRef.current.style.setProperty(
+          '--scroll-drift',
+          `${(-centred * 12).toFixed(2)}px`,
+        );
+        backdropRef.current.style.setProperty(
+          '--scroll-scale',
+          `${(1.012 + progress * 0.012).toFixed(4)}`,
+        );
+      });
+    };
+
+    const updateListener = () => {
+      const shouldListen =
+        wideScreen.matches &&
+        !reducedMotionQuery.matches &&
+        !slowUpdate.matches &&
+        !saveData;
+      if (shouldListen === listening) {
+        if (shouldListen) updateCamera();
+        return;
+      }
+      listening = shouldListen;
+      if (listening) {
+        window.addEventListener('scroll', updateCamera, { passive: true });
+        window.addEventListener('resize', updateCamera, { passive: true });
+        updateCamera();
+      } else {
+        window.removeEventListener('scroll', updateCamera);
+        window.removeEventListener('resize', updateCamera);
+        clearCamera();
+      }
+    };
+
+    const queries = [reducedMotionQuery, slowUpdate, wideScreen];
+    updateListener();
+    queries.forEach((query) => query.addEventListener('change', updateListener));
+    return () => {
+      window.removeEventListener('scroll', updateCamera);
+      window.removeEventListener('resize', updateCamera);
+      queries.forEach((query) =>
+        query.removeEventListener('change', updateListener),
+      );
+      window.cancelAnimationFrame(scrollFrame.current);
+      clearCamera();
+    };
+  }, [active]);
+
+  useEffect(() => {
     const html = document.documentElement;
     html.classList.add('blue-hour-page');
     return () => {
       window.cancelAnimationFrame(pointerFrame.current);
+      window.cancelAnimationFrame(scrollFrame.current);
       html.classList.remove('blue-hour-page');
     };
   }, []);
@@ -645,13 +1024,21 @@ export function BlueHourSite() {
         style={{ '--active-chapter': active } as React.CSSProperties}
       >
       <SceneBackdrop active={active} backdropRef={backdropRef} />
-      <div className={styles.globalProgress} aria-hidden="true" />
+      <motion.div
+        className={styles.globalProgress}
+        aria-hidden="true"
+        style={{ scaleX: smoothScrollProgress }}
+      />
       <Header
         active={active}
         mobileOpen={mobileOpen}
         setMobileOpen={setMobileOpen}
       />
-      <ProgressRail active={active} onSelect={selectChapter} />
+      <ProgressRail
+        active={active}
+        onSelect={selectChapter}
+        progress={smoothScrollProgress}
+      />
 
       <main id="main-content" className={styles.main} tabIndex={-1}>
         <section
@@ -672,37 +1059,122 @@ export function BlueHourSite() {
             />
             <motion.div
               className={styles.heroCopy}
-              initial={{ opacity: 0, y: 36 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: reducedMotion ? 0 : 1.1,
-                delay: reducedMotion ? 0 : 0.35,
-                ease: [0.16, 1, 0.3, 1],
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: {},
+                visible: {
+                  transition: {
+                    delayChildren: reducedMotion ? 0 : 0.2,
+                    staggerChildren: reducedMotion ? 0 : 0.095,
+                  },
+                },
               }}
             >
-              <p className={styles.sceneTime}>
+              <motion.p
+                className={styles.sceneTime}
+                variants={{
+                  hidden: { opacity: 0, x: reducedMotion ? 0 : -12 },
+                  visible: {
+                    opacity: 1,
+                    x: 0,
+                    transition: { duration: reducedMotion ? 0 : 0.48 },
+                  },
+                }}
+              >
                 <span>19:31</span>
                 <span>Bearing</span>
-              </p>
+              </motion.p>
               <h1 id="bearing-title">
-                The last
-                <br />
-                <em>blue hour.</em>
+                <span className={styles.titleLineMask}>
+                  <motion.span
+                    className={styles.titleLine}
+                    variants={{
+                      hidden: reducedMotion
+                        ? { opacity: 0 }
+                        : { opacity: 0, y: '108%', rotate: 1.2 },
+                      visible: {
+                        opacity: 1,
+                        y: '0%',
+                        rotate: 0,
+                        transition: {
+                          duration: reducedMotion ? 0 : 1.04,
+                          ease: [0.16, 1, 0.3, 1],
+                        },
+                      },
+                    }}
+                  >
+                    The last
+                  </motion.span>
+                </span>
+                <span className={styles.titleLineMask}>
+                  <motion.em
+                    className={styles.titleLine}
+                    variants={{
+                      hidden: reducedMotion
+                        ? { opacity: 0 }
+                        : { opacity: 0, y: '108%', rotate: 1.2 },
+                      visible: {
+                        opacity: 1,
+                        y: '0%',
+                        rotate: 0,
+                        transition: {
+                          duration: reducedMotion ? 0 : 1.04,
+                          ease: [0.16, 1, 0.3, 1],
+                        },
+                      },
+                    }}
+                  >
+                    blue hour.
+                  </motion.em>
+                </span>
               </h1>
-              <p className={styles.heroChinese}>最后的蓝调时刻</p>
-              <p className={styles.heroLead}>
+              <motion.p
+                className={styles.heroChinese}
+                variants={{
+                  hidden: { opacity: 0, y: reducedMotion ? 0 : 12 },
+                  visible: {
+                    opacity: 1,
+                    y: 0,
+                    transition: { duration: reducedMotion ? 0 : 0.62 },
+                  },
+                }}
+              >
+                最后的蓝调时刻
+              </motion.p>
+              <motion.p
+                className={styles.heroLead}
+                variants={{
+                  hidden: { opacity: 0, y: reducedMotion ? 0 : 14 },
+                  visible: {
+                    opacity: 1,
+                    y: 0,
+                    transition: { duration: reducedMotion ? 0 : 0.7 },
+                  },
+                }}
+              >
                 I&apos;m Austin Liu — a builder, traveller, writer, and
                 photographer in Adelaide. This is a field guide to the things I
                 am making and the moments I want to keep.
-              </p>
-              <div className={styles.heroActions}>
+              </motion.p>
+              <motion.div
+                className={styles.heroActions}
+                variants={{
+                  hidden: { opacity: 0, y: reducedMotion ? 0 : 12 },
+                  visible: {
+                    opacity: 1,
+                    y: 0,
+                    transition: { duration: reducedMotion ? 0 : 0.62 },
+                  },
+                }}
+              >
                 <a href="#opening">
                   Begin the journey <ArrowDown size={16} />
                 </a>
                 <Link href="/projects">
                   View the index <ArrowUpRight size={15} />
                 </Link>
-              </div>
+              </motion.div>
             </motion.div>
             <motion.aside
               className={`${styles.fieldNote} ${styles.heroFieldNote}`}
@@ -742,18 +1214,22 @@ export function BlueHourSite() {
             />
             <div className={styles.projectShowcase}>
               <div className={styles.projectIntro}>
-                <ChapterTitle time="19:43" title="The Opening">
-                  <h2 id="projects-title">
-                    Useful things,
-                    <br />
-                    <em>built with intent.</em>
-                  </h2>
-                  <p>
+                <ChapterTitle
+                  time="19:43"
+                  title="The Opening"
+                  headingId="projects-title"
+                  lines={[
+                    'Useful things,',
+                    <em key="projects-emphasis">built with intent.</em>,
+                  ]}
+                  description={
+                    <>
                     Projects shaped by real needs: private chess training,
                     focused scholarship preparation, and memory that works with
                     you.
-                  </p>
-                </ChapterTitle>
+                    </>
+                  }
+                />
                 <p className={styles.projectDeckNote}>
                   Three independent builds. Pick one up, turn it over, keep
                   moving.
@@ -786,54 +1262,68 @@ export function BlueHourSite() {
               scene="tide"
               className={styles.chapterArtifact}
             />
-            <ChapterTitle time="19:55" title="What the Tide Kept">
-              <h2 id="moments-title">
-                Places return
-                <br />
-                <em>in fragments.</em>
-              </h2>
-              <p>
+            <ChapterTitle
+              time="19:55"
+              title="What the Tide Kept"
+              headingId="moments-title"
+              lines={[
+                'Places return',
+                <em key="moments-emphasis">in fragments.</em>,
+              ]}
+              description={
+                <>
                 Light on a riverbank. Rain over a road. A city louder at night.
                 Seven chapters, kept without trying to make them perfect.
-              </p>
-            </ChapterTitle>
-            <motion.div
-              className={styles.placeIndex}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
-              variants={{
-                hidden: {},
-                visible: {
-                  transition: {
-                    staggerChildren: reducedMotion ? 0 : 0.055,
-                    duration: reducedMotion ? 0 : undefined,
-                  },
-                },
-              }}
-            >
-              {places.map(([name, copy, href], index) => (
-                <MotionLink
-                  href={href}
-                  key={name}
+                </>
+              }
+            />
+            <div className={styles.momentsBody}>
+              <div className={styles.momentIndexColumn}>
+                <motion.div
+                  className={styles.placeIndex}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.2 }}
                   variants={{
-                    hidden: { opacity: 0, x: -18 },
-                    visible: { opacity: 1, x: 0 },
+                    hidden: {},
+                    visible: {
+                      transition: {
+                        staggerChildren: reducedMotion ? 0 : 0.055,
+                        duration: reducedMotion ? 0 : undefined,
+                      },
+                    },
                   }}
-                  transition={{ duration: reducedMotion ? 0 : 0.5 }}
                 >
-                  <span>{String(index + 1).padStart(2, '0')}</span>
-                  <strong>{name}</strong>
-                  <small>{copy}</small>
-                  <ArrowUpRight size={16} />
-                </MotionLink>
-              ))}
-            </motion.div>
-            <div className={styles.momentFooter}>
-              <span>07 places · 14 published frames</span>
-              <Link href="/moments">
-                Open the full visual journal <ArrowRight size={15} />
-              </Link>
+                  {places.map((place, index) => (
+                    <MotionLink
+                      href={place.href}
+                      key={place.name}
+                      className={
+                        index === activePlace ? styles.placeActive : undefined
+                      }
+                      onMouseEnter={() => setActivePlace(index)}
+                      onFocus={() => setActivePlace(index)}
+                      variants={{
+                        hidden: { opacity: 0, x: -18 },
+                        visible: { opacity: 1, x: 0 },
+                      }}
+                      transition={{ duration: reducedMotion ? 0 : 0.5 }}
+                    >
+                      <span>{String(index + 1).padStart(2, '0')}</span>
+                      <strong>{place.name}</strong>
+                      <small>{place.copy}</small>
+                      <ArrowUpRight size={16} />
+                    </MotionLink>
+                  ))}
+                </motion.div>
+                <div className={styles.momentFooter}>
+                  <span>07 places · 14 published frames</span>
+                  <Link href="/moments">
+                    Open the full visual journal <ArrowRight size={15} />
+                  </Link>
+                </div>
+              </div>
+              <MomentViewfinder activeIndex={activePlace} />
             </div>
           </div>
         </section>
@@ -854,17 +1344,21 @@ export function BlueHourSite() {
               scene="waterfall"
               className={styles.chapterArtifact}
             />
-            <ChapterTitle time="20:07" title="Water in the Dark">
-              <h2 id="notes-title">
-                Thinking,
-                <br />
-                <em>before it settles.</em>
-              </h2>
-              <p>
+            <ChapterTitle
+              time="20:07"
+              title="Water in the Dark"
+              headingId="notes-title"
+              lines={[
+                'Thinking,',
+                <em key="notes-emphasis">before it settles.</em>,
+              ]}
+              description={
+                <>
                 Three build journals and seven photographic field notes.
                 Written to notice what a system—or a frame—chooses to keep.
-              </p>
-            </ChapterTitle>
+                </>
+              }
+            />
             <div className={styles.noteList}>
               {homepageNotes.map((note, index) => (
                 <MotionLink
@@ -920,19 +1414,23 @@ export function BlueHourSite() {
               scene="afterlight"
               className={styles.chapterArtifact}
             />
-            <ChapterTitle time="20:19" title="One Window Left">
-              <h2 id="about-title">
-                A life with
-                <br />
-                <em>more than one room.</em>
-              </h2>
-              <p>
+            <ChapterTitle
+              time="20:19"
+              title="One Window Left"
+              headingId="about-title"
+              lines={[
+                'A life with',
+                <em key="about-emphasis">more than one room.</em>,
+              ]}
+              description={
+                <>
                 Born in China, based in Adelaide, always moving between
                 disciplines. No single pursuit gets the whole house.
                 Technology, design, photography, people, and the road outside
                 each leave a light on.
-              </p>
-            </ChapterTitle>
+                </>
+              }
+            />
             <div className={styles.finalGrid}>
               <motion.div
                 className={styles.aboutPanel}

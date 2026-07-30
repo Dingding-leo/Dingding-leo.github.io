@@ -193,9 +193,9 @@
 
 @media (max-width: 540px) {
   .audioDock {
-    top: max(82px, calc(env(safe-area-inset-top) + 74px));
+    top: auto;
     right: 14px;
-    bottom: auto;
+    bottom: max(14px, env(safe-area-inset-bottom));
     gap: 0;
   }
 
