@@ -185,6 +185,7 @@ function ScenePicture({
       className={`${styles.sceneLayer} ${active ? styles.sceneLayerActive : ''} ${
         transitioning ? styles.sceneLayerTransitioning : ''
       }`}
+      data-scene={scene.image}
       aria-hidden="true"
       initial={{
         opacity: eager ? 0.72 : 0,
@@ -237,7 +238,7 @@ function Weather({ type }: { type: (typeof scenes)[number]['weather'] }) {
       className={`${styles.weather} ${styles[type]}`}
       aria-hidden="true"
       initial={{ opacity: 0 }}
-      animate={{ opacity: 0.72 }}
+      animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: reducedMotion ? 0 : 0.9, ease: 'easeInOut' }}
     >
@@ -289,19 +290,36 @@ function SceneBackdrop({
 
   return (
     <div ref={backdropRef} className={styles.backdrop} aria-hidden="true">
-      {renderedScenes.map((index) => (
-        <ScenePicture
-          key={scenes[index].id}
-          scene={scenes[index]}
-          active={index === active}
-          eager={index === 0}
-          transitioning={transitioning}
-          direction={direction}
-        />
-      ))}
-      <AnimatePresence initial={false} mode="sync">
-        <Weather key={scenes[active].id} type={scenes[active].weather} />
-      </AnimatePresence>
+      {renderedScenes.map((index) => {
+        const isActive = index === active;
+        return (
+          <div
+            key={scenes[index].id}
+            className={`${styles.sceneMotionGroup} ${
+              isActive ? styles.sceneMotionGroupActive : ''
+            }`}
+            data-scene={scenes[index].image}
+          >
+            <div className={styles.sceneCamera}>
+              <ScenePicture
+                scene={scenes[index]}
+                active={isActive}
+                eager={index === 0}
+                transitioning={transitioning}
+                direction={direction}
+              />
+              <AnimatePresence initial={false} mode="sync">
+                {isActive && (
+                  <Weather
+                    key={scenes[index].id}
+                    type={scenes[index].weather}
+                  />
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        );
+      })}
       <div className={styles.backdropTone} />
       <AnimatePresence initial={false}>
         {transitioning && (

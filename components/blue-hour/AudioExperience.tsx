@@ -21,6 +21,10 @@ import {
   X,
 } from 'lucide-react';
 import styles from './AudioExperience.module.css';
+import {
+  RecordedAmbienceEngine,
+  chapterTracks,
+} from './RecordedAmbienceEngine';
 
 type AudioContextConstructor = typeof AudioContext;
 
@@ -41,13 +45,7 @@ const pianoVoicings = [
 ];
 
 const chapterFilters = [720, 580, 820, 490, 390];
-const chapterNames = [
-  'Bearing',
-  'The Opening',
-  'What the Tide Kept',
-  'Water in the Dark',
-  'One Window Left',
-];
+const chapterNames = chapterTracks.map((track) => track.chapter);
 const DEFAULT_VOLUME = 0.28;
 
 function readAudioPreference(key: string) {
@@ -614,7 +612,7 @@ export type AudioExperience = {
 };
 
 export function useBlueHourAudio(activeChapter: number): AudioExperience {
-  const engine = useRef<BlueHourEngine | null>(null);
+  const engine = useRef<RecordedAmbienceEngine | null>(null);
   const analyser = useRef<AnalyserNode | null>(null);
   const shouldResume = useRef(false);
   const desiredPlaying = useRef(false);
@@ -634,8 +632,20 @@ export function useBlueHourAudio(activeChapter: number): AudioExperience {
     };
     const Context = window.AudioContext || browserWindow.webkitAudioContext;
     if (!Context) return null;
-    engine.current = new BlueHourEngine(Context);
-    engine.current.scheduleAtmospherePreparation();
+    const browserNavigator = navigator as Navigator & {
+      connection?: { saveData?: boolean };
+      deviceMemory?: number;
+    };
+    const conserveResources =
+      Boolean(browserNavigator.connection?.saveData) ||
+      window.matchMedia('(max-width: 900px)').matches ||
+      (browserNavigator.deviceMemory !== undefined &&
+        browserNavigator.deviceMemory <= 4);
+    engine.current = new RecordedAmbienceEngine(
+      Context,
+      DEFAULT_VOLUME,
+      conserveResources,
+    );
     analyser.current = engine.current.analyser;
     engine.current.context.onstatechange = () => {
       const running =
@@ -865,6 +875,10 @@ export function BlueHourAudioProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (readAudioPreference('blue-hour-sound') === 'off') return;
+    const connection = (
+      navigator as Navigator & { connection?: { saveData?: boolean } }
+    ).connection;
+    if (connection?.saveData) return;
 
     const cleanup = () => {
       window.removeEventListener('click', onGesture, true);
@@ -882,6 +896,12 @@ export function BlueHourAudioProvider({ children }: { children: ReactNode }) {
         target instanceof Element &&
         target.closest('[data-blue-hour-audio-toggle]')
       ) {
+        cleanup();
+        return;
+      }
+
+      if (readAudioPreference('blue-hour-sound') === 'off') {
+        cleanup();
         return;
       }
 
@@ -1045,6 +1065,7 @@ export function AudioControl({
   const settingsButton = useRef<HTMLButtonElement>(null);
   const firstPanelControl = useRef<HTMLButtonElement>(null);
   const setPanelOpen = audio.setPanelOpen;
+  const track = chapterTracks[activeChapter] ?? chapterTracks[0];
   const effectiveMuted = audio.isMuted || audio.volume === 0;
   const volumeIcon =
     effectiveMuted ? (
@@ -1088,8 +1109,10 @@ export function AudioControl({
         >
           <div className={styles.audioPanelHead}>
             <div>
-              <span>Rain study</span>
-              <strong>Rain over {chapterNames[activeChapter]}</strong>
+              <span>
+                Field recording · {String(activeChapter + 1).padStart(2, '0')}
+              </span>
+              <strong>{track.title}</strong>
             </div>
             <button
               ref={firstPanelControl}
@@ -1123,7 +1146,15 @@ export function AudioControl({
               onChange={(event) => audio.setVolume(Number(event.target.value))}
             />
           </div>
-          <p>Original rain and piano, generated live in your browser.</p>
+          <p className={styles.audioDescription}>{track.description}</p>
+          <a
+            className={styles.audioCredit}
+            href={track.sourceUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {track.sourceName} · Mixkit
+          </a>
         </div>
       )}
       <div className={styles.audioQuick}>
@@ -1132,7 +1163,11 @@ export function AudioControl({
           className={styles.audioButton}
           data-blue-hour-audio-toggle
           onClick={() => audio.toggle().catch(() => {})}
-          aria-label={audio.isPlaying ? 'Pause rain and piano' : 'Play rain and piano'}
+          aria-label={
+            audio.isPlaying
+              ? `Pause ${track.title}`
+              : `Play ${track.title}`
+          }
           aria-pressed={audio.isPlaying}
         >
           <AudioOrb analyser={audio.analyser} active={audio.isPlaying} />
@@ -1140,7 +1175,7 @@ export function AudioControl({
             {effectiveMuted
               ? 'Muted'
               : audio.isPlaying
-                ? 'Rain + piano'
+                ? track.shortLabel
                 : 'Play ambience'}
           </span>
           {audio.isPlaying ? <Pause size={14} /> : <Play size={14} />}
