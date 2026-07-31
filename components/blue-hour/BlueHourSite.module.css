@@ -121,6 +121,8 @@
 }
 
 .sceneLayer picture {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
@@ -138,6 +140,30 @@
   height: 100%;
   object-fit: cover;
   object-position: var(--scene-position);
+}
+
+.sceneLayer[data-video='true'] picture img,
+.sceneVideo {
+  filter: brightness(0.7) saturate(0.76) contrast(1.08);
+}
+
+.sceneVideo {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  opacity: 0;
+  object-fit: cover;
+  object-position: var(--scene-position);
+  pointer-events: none;
+  transition: opacity 1.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sceneVideo[data-ready='true'] {
+  opacity: 1;
 }
 
 .sceneMotionGroupActive .sceneCamera {
@@ -159,6 +185,7 @@
   --ambient-end-x: 0.42%;
   --ambient-end-y: -0.22%;
   --ambient-origin: 67% 39%;
+  animation: none;
 }
 
 .sceneMotionGroupActive[data-scene='mountain'] .sceneCamera {
@@ -2283,6 +2310,10 @@
     object-position: var(--scene-mobile-position);
   }
 
+  .sceneVideo {
+    display: none;
+  }
+
   .weatherThree {
     display: none !important;
   }
@@ -2619,6 +2650,10 @@
 }
 
 @media (update: slow) {
+  .sceneVideo {
+    display: none;
+  }
+
   .weather > span {
     opacity: 0.22 !important;
     animation: none !important;
@@ -2664,6 +2699,10 @@
 
   .sceneLayer img {
     animation: none !important;
+  }
+
+  .sceneVideo {
+    display: none;
   }
 
   .weather > span {

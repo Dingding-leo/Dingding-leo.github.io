@@ -1,7 +1,7 @@
 /* Offline support: immutable build files, bounded media, fresh pages. */
-const STATIC_CACHE = 'al-blue-hour-static-v5';
-const MEDIA_CACHE = 'al-blue-hour-media-v5';
-const PAGE_CACHE = 'al-blue-hour-pages-v5';
+const STATIC_CACHE = 'al-blue-hour-static-v6';
+const MEDIA_CACHE = 'al-blue-hour-media-v6';
+const PAGE_CACHE = 'al-blue-hour-pages-v6';
 const CURRENT_CACHES = new Set([STATIC_CACHE, MEDIA_CACHE, PAGE_CACHE]);
 const CACHE_PREFIX = 'al-blue-hour-';
 const INDEPENDENT_APP_PATHS = ['/KnightClub/', '/Denki/'];
@@ -49,10 +49,14 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Let the browser own streamed audio and byte-range requests. A synthetic
+  // Let the browser own streamed audio/video and byte-range requests. A synthetic
   // service-worker response can break seeking or return a partial file as if it
   // were the whole recording.
-  if (url.pathname.startsWith('/assets/audio/') || request.headers.has('range')) {
+  if (
+    url.pathname.startsWith('/assets/audio/') ||
+    url.pathname.startsWith('/assets/video/') ||
+    request.headers.has('range')
+  ) {
     return;
   }
 

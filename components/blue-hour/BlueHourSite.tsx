@@ -36,16 +36,34 @@ import styles from './BlueHourSite.module.css';
 
 const MotionLink = motion.create(Link);
 
-const scenes = [
+type SceneWeather = 'coast' | 'mountain' | 'estuary' | 'gorge' | 'moor';
+
+type BlueHourScene = {
+  id: string;
+  time: string;
+  nav: string;
+  title: string;
+  image: string;
+  poster?: string;
+  video?: string;
+  alt: string;
+  position: string;
+  mobilePosition: string;
+  weather: SceneWeather;
+};
+
+const scenes: readonly BlueHourScene[] = [
   {
     id: 'bearing',
     time: '19:31',
     nav: 'Home',
     title: 'Bearing',
     image: 'lighthouse',
-    alt: 'A lighthouse shining across a storm-darkened coastal headland',
-    position: '54% 50%',
-    mobilePosition: '59% 50%',
+    poster: 'lighthouse-ocean-poster',
+    video: '/assets/video/blue-hour/lighthouse-ocean.mp4',
+    alt: 'A lighthouse standing beyond a coast of breaking waves',
+    position: '58% 50%',
+    mobilePosition: '61% 50%',
     weather: 'coast',
   },
   {
@@ -174,11 +192,85 @@ function ScenePicture({
   direction: number;
 }) {
   const reducedMotion = useReducedMotion();
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoEligible, setVideoEligible] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
+  const [videoFailed, setVideoFailed] = useState(false);
+  const poster = scene.poster ?? scene.image;
+  const shouldRenderVideo = Boolean(
+    scene.video && videoEligible && !videoFailed,
+  );
   const style = {
     '--scene-position': scene.position,
     '--scene-mobile-position': scene.mobilePosition,
-    '--scene-preview': `url('/assets/blue-hour/${scene.image}-preview.webp')`,
+    '--scene-preview': `url('/assets/blue-hour/${poster}-preview.webp')`,
   } as React.CSSProperties;
+
+  useEffect(() => {
+    if (!scene.video) return;
+
+    const desktop = window.matchMedia('(min-width: 821px)');
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const slowUpdate = window.matchMedia('(update: slow)');
+    const connection = (
+      navigator as Navigator & {
+        connection?: {
+          saveData?: boolean;
+          effectiveType?: string;
+          addEventListener?: (type: 'change', listener: () => void) => void;
+          removeEventListener?: (type: 'change', listener: () => void) => void;
+        };
+      }
+    ).connection;
+
+    const updateEligibility = () => {
+      const constrainedNetwork =
+        connection?.saveData ||
+        connection?.effectiveType === 'slow-2g' ||
+        connection?.effectiveType === '2g';
+      setVideoEligible(
+        desktop.matches &&
+          !reduced.matches &&
+          !slowUpdate.matches &&
+          !constrainedNetwork,
+      );
+    };
+
+    updateEligibility();
+    desktop.addEventListener('change', updateEligibility);
+    reduced.addEventListener('change', updateEligibility);
+    slowUpdate.addEventListener('change', updateEligibility);
+    connection?.addEventListener?.('change', updateEligibility);
+
+    return () => {
+      desktop.removeEventListener('change', updateEligibility);
+      reduced.removeEventListener('change', updateEligibility);
+      slowUpdate.removeEventListener('change', updateEligibility);
+      connection?.removeEventListener?.('change', updateEligibility);
+    };
+  }, [scene.video]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !shouldRenderVideo) return;
+
+    const syncPlayback = () => {
+      if (active && document.visibilityState === 'visible') {
+        video.play().catch(() => {
+          setVideoReady(false);
+        });
+      } else {
+        video.pause();
+      }
+    };
+
+    syncPlayback();
+    document.addEventListener('visibilitychange', syncPlayback);
+    return () => {
+      document.removeEventListener('visibilitychange', syncPlayback);
+      video.pause();
+    };
+  }, [active, shouldRenderVideo]);
 
   return (
     <motion.div
@@ -186,6 +278,7 @@ function ScenePicture({
         transitioning ? styles.sceneLayerTransitioning : ''
       }`}
       data-scene={scene.image}
+      data-video={scene.video ? 'true' : 'false'}
       aria-hidden="true"
       initial={{
         opacity: eager ? 0.72 : 0,
@@ -206,17 +299,17 @@ function ScenePicture({
       <picture>
         <source
           type="image/avif"
-          srcSet={`/assets/blue-hour/${scene.image}-720.avif 720w, /assets/blue-hour/${scene.image}-1200.avif 1200w, /assets/blue-hour/${scene.image}-1672.avif 1672w`}
+          srcSet={`/assets/blue-hour/${poster}-720.avif 720w, /assets/blue-hour/${poster}-1200.avif 1200w, /assets/blue-hour/${poster}-1672.avif 1672w`}
           sizes="100vw"
         />
         <source
           type="image/webp"
-          srcSet={`/assets/blue-hour/${scene.image}-720.webp 720w, /assets/blue-hour/${scene.image}-1200.webp 1200w, /assets/blue-hour/${scene.image}-1672.webp 1672w`}
+          srcSet={`/assets/blue-hour/${poster}-720.webp 720w, /assets/blue-hour/${poster}-1200.webp 1200w, /assets/blue-hour/${poster}-1672.webp 1672w`}
           sizes="100vw"
         />
         <img
-          src={`/assets/blue-hour/${scene.image}-1672.jpg`}
-          srcSet={`/assets/blue-hour/${scene.image}-720.jpg 720w, /assets/blue-hour/${scene.image}-1200.jpg 1200w, /assets/blue-hour/${scene.image}-1672.jpg 1672w`}
+          src={`/assets/blue-hour/${poster}-1672.jpg`}
+          srcSet={`/assets/blue-hour/${poster}-720.jpg 720w, /assets/blue-hour/${poster}-1200.jpg 1200w, /assets/blue-hour/${poster}-1672.jpg 1672w`}
           sizes="100vw"
           alt=""
           width={1672}
@@ -226,6 +319,26 @@ function ScenePicture({
           decoding="async"
         />
       </picture>
+      {shouldRenderVideo && scene.video && (
+        <video
+          ref={videoRef}
+          className={styles.sceneVideo}
+          data-ready={videoReady ? 'true' : 'false'}
+          src={scene.video}
+          poster={`/assets/blue-hour/${poster}-1200.jpg`}
+          muted
+          playsInline
+          autoPlay={active}
+          loop
+          preload="metadata"
+          tabIndex={-1}
+          onPlaying={() => setVideoReady(true)}
+          onError={() => {
+            setVideoReady(false);
+            setVideoFailed(true);
+          }}
+        />
+      )}
     </motion.div>
   );
 }
@@ -309,7 +422,7 @@ function SceneBackdrop({
                 direction={direction}
               />
               <AnimatePresence initial={false} mode="sync">
-                {isActive && (
+                {isActive && !scenes[index].video && (
                   <Weather
                     key={scenes[index].id}
                     type={scenes[index].weather}
@@ -1071,10 +1184,6 @@ export function BlueHourSite() {
         >
           <div className={styles.chapterInner}>
             <ChapterKicker index={0} label="Home / Direction" />
-            <BlueHourArtifact
-              scene="lighthouse"
-              className={styles.chapterArtifact}
-            />
             <motion.div
               className={styles.heroCopy}
               initial="hidden"
