@@ -1231,7 +1231,7 @@ export function BlueHourSite() {
                       },
                     }}
                   >
-                    The last
+                    Welcome to
                   </motion.span>
                 </span>
                 <span className={styles.titleLineMask}>
@@ -1252,7 +1252,7 @@ export function BlueHourSite() {
                       },
                     }}
                   >
-                    blue hour.
+                    my life.
                   </motion.em>
                 </span>
               </h1>
@@ -1267,7 +1267,7 @@ export function BlueHourSite() {
                   },
                 }}
               >
-                最后的蓝调时刻
+                欢迎来到我的生活
               </motion.p>
               <motion.p
                 className={styles.heroLead}
@@ -1281,8 +1281,8 @@ export function BlueHourSite() {
                 }}
               >
                 I&apos;m Austin Liu — a builder, traveller, writer, and
-                photographer in Adelaide. This is a field guide to the things I
-                am making and the moments I want to keep.
+                photographer in Adelaide. I build useful things, follow
+                unfamiliar roads, and keep the moments worth returning to.
               </motion.p>
               <motion.div
                 className={styles.heroActions}
