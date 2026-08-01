@@ -1280,9 +1280,7 @@ export function BlueHourSite() {
                   },
                 }}
               >
-                I&apos;m Austin Liu — a builder, traveller, writer, and
-                photographer in Adelaide. I build useful things, follow
-                unfamiliar roads, and keep the moments worth returning to.
+                I&apos;m Austin Liu — a dental student in Adelaide.
               </motion.p>
               <motion.div
                 className={styles.heroActions}
