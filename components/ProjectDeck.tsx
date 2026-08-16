@@ -283,7 +283,6 @@ export function ProjectDeck({
   const [activeIndex, setActiveIndex] = useState(0);
   const [direction, setDirection] = useState(1);
   const [busy, setBusy] = useState(false);
-  const [clientReady, setClientReady] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [hasFocusWithin, setHasFocusWithin] = useState(false);
   const [allowAutoplayWhileFocused, setAllowAutoplayWhileFocused] =
@@ -297,7 +296,7 @@ export function ProjectDeck({
   const [announcement, setAnnouncement] = useState('');
   const count = deckProjects.length;
   const activeProject = deckProjects[activeIndex];
-  const motionEnabled = clientReady && !reducedMotion && !conserveMotion;
+  const motionEnabled = reducedMotion === false && !conserveMotion;
   const temporarilyPaused =
     isHovered ||
     (hasFocusWithin && !allowAutoplayWhileFocused) ||
@@ -339,7 +338,6 @@ export function ProjectDeck({
     setAutoplayEpoch((epoch) => epoch + 1);
   }, []);
 
-  useEffect(() => setClientReady(true), []);
 
   useEffect(() => {
     const selectRequestedProject = (requested: string | null) => {

@@ -1,16 +1,20 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import { Check, Copy, Share2 } from 'lucide-react';
 import jumpStyles from '@/components/BlueHourJumpShell.module.css';
 
+const subscribeToShareSupport = () => () => undefined;
+const readShareSupport = () =>
+  typeof navigator !== 'undefined' && typeof navigator.share === 'function';
+
 export function NoteShare({ title }: { title: string }) {
   const [copied, setCopied] = useState(false);
-  const [canShare, setCanShare] = useState(false);
-
-  useEffect(() => {
-    setCanShare(typeof navigator !== 'undefined' && !!navigator.share);
-  }, []);
+  const canShare = useSyncExternalStore(
+    subscribeToShareSupport,
+    readShareSupport,
+    () => false,
+  );
 
   const copyLink = async () => {
     if (!navigator.clipboard) return;

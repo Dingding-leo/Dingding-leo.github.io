@@ -692,6 +692,8 @@ function Header({
   useEffect(() => {
     if (!mobileOpen) return;
 
+    const menuButtonElement = menuButton.current;
+    const navigationElement = mobileNavigation.current;
     const previousOverflow = document.body.style.overflow;
     const desktopViewport = window.matchMedia('(min-width: 821px)');
     let closedForDesktop = false;
@@ -712,7 +714,7 @@ function Header({
       audioRoot.setAttribute('aria-hidden', 'true');
     }
 
-    const firstLink = mobileNavigation.current?.querySelector<HTMLElement>('a');
+    const firstLink = navigationElement?.querySelector<HTMLElement>('a');
     const focusTimer = window.setTimeout(() => firstLink?.focus(), 60);
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -724,8 +726,8 @@ function Header({
       if (event.key !== 'Tab') return;
 
       const focusable = [
-        menuButton.current,
-        ...(mobileNavigation.current?.querySelectorAll<HTMLElement>('a, button') ?? []),
+        menuButtonElement,
+        ...(navigationElement?.querySelectorAll<HTMLElement>('a, button') ?? []),
       ].filter(Boolean) as HTMLElement[];
       if (!focusable.length) return;
 
@@ -776,7 +778,7 @@ function Header({
             ?.focus();
         });
       } else {
-        menuButton.current?.focus();
+        menuButtonElement?.focus();
       }
     };
   }, [mobileOpen, setMobileOpen]);

@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "validate:export": "node scripts/validate-export.mjs",
     "check": "npm run typecheck && npm run build && npm run validate:export",
-    "lint": "next lint"
+    "lint": "eslint app components config --max-warnings=0"
   },
   "dependencies": {
     "framer-motion": "^11.11.17",
@@ -26,6 +26,8 @@
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
     "autoprefixer": "^10.4.20",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.3.1",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.16",
     "typescript": "^5.7.2"
