@@ -32,7 +32,6 @@ export function BlueHourPicture({
     <picture
       className={styles.scenePicture}
       data-scene={scene}
-      aria-hidden="true"
       style={
         {
           '--jump-scene-position': focalPoint.desktop,

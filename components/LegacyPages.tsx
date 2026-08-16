@@ -214,9 +214,9 @@ export function AboutPage() {
       <div className={styles.aboutSplit}>
         <div>
           <p className={styles.aboutLead}>
-            A builder and traveller from China, now based in Adelaide — making
-            small digital tools, collecting places, and keeping a public record
-            of the things that hold my attention.
+            A dental student, builder, and traveller from China, now based in
+            Adelaide — making small digital tools, collecting places, and keeping
+            a public record of the things that hold my attention.
           </p>
           <div className={styles.stats}>
             <div className={styles.statCard}>

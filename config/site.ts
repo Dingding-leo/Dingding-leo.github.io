@@ -114,9 +114,9 @@ export const site = {
   email: 'austinliu234@gmail.com',
   location: 'Adelaide, Australia',
   description:
-    'Austin Liu’s personal space for building useful products, travelling with a camera, writing field notes, and paying attention to a wider life.',
+    'Austin Liu is a dental student and independent builder in Adelaide, making useful software and keeping a visual record of places, ideas, and ordinary days.',
   identity:
-    'Builder, traveller, writer, and photographer based in Adelaide, making useful tools and keeping a record of places, ideas, and ordinary days.',
+    'Dental student, builder, traveller, writer, and photographer based in Adelaide, making useful tools and keeping a record of places, ideas, and ordinary days.',
   nav: navItems,
   interests: [
     ['Dentistry', 'Precision, patience, and care in progress.'],
