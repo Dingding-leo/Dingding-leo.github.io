@@ -21,7 +21,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
       - name: Apply focused patch
         run: python3 scripts/apply-site-trust-performance.py
@@ -31,7 +31,9 @@ jobs:
         env:
           NEXT_PUBLIC_BUILD_ID: ${{ github.sha }}
         run: npm run check
-      - name: Commit verified changes
+      - name: Keep workflow edits for the connector
+        run: git restore .github/workflows/ci.yml .github/workflows/deploy.yml
+      - name: Commit verified application changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
