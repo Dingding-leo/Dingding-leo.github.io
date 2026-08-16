@@ -1,4 +1,4 @@
-name: Audit site dependencies
+name: Repair site dependencies
 
 on:
   push:
@@ -7,10 +7,11 @@ on:
       - .github/workflows/apply-site-trust-performance.yml
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  audit:
+  repair-and-verify:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch
@@ -22,7 +23,24 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - name: Install dependencies
+      - name: Install locked dependencies
         run: npm ci
-      - name: Report production dependency audit
-        run: npm audit --omit=dev --json || true
+      - name: Apply compatible security updates
+        run: npm audit fix
+      - name: Verify complete static export
+        env:
+          NEXT_PUBLIC_BUILD_ID: ${{ github.sha }}
+        run: npm run check
+      - name: Require a clean production audit
+        run: npm audit --omit=dev --audit-level=high
+      - name: Commit verified dependency metadata
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json
+          if git diff --cached --quiet; then
+            echo "No dependency changes to commit"
+            exit 0
+          fi
+          git commit -m "fix(deps): resolve production security advisories"
+          git push origin HEAD:refactor/site-trust-performance
