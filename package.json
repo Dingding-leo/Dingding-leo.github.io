@@ -1,17 +1,17 @@
 {
   "name": "austin-liu-space",
   "version": "1.0.0",
-  "description": "Personal site and project showcase built with Next.js 15, React 19, and static export.",
+  "description": "Personal site and project showcase built with Next.js 16, React 19, and static export.",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "build:sites": "npm run build && node scripts/build-sites.mjs",
     "start": "next start",
+    "lint": "eslint app components config --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "validate:export": "node scripts/validate-export.mjs",
-    "check": "npm run typecheck && npm run build && npm run validate:export",
-    "lint": "eslint app components config --max-warnings=0"
+    "check": "npm run lint && npm run typecheck && npm run build && npm run validate:export"
   },
   "dependencies": {
     "framer-motion": "^11.11.17",
