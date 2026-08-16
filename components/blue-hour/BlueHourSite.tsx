@@ -1280,7 +1280,7 @@ export function BlueHourSite() {
                   },
                 }}
               >
-                I&apos;m Austin Liu — a dental student in Adelaide.
+                I&apos;m Austin Liu — a dental student in Adelaide, building useful software and keeping a record of places.
               </motion.p>
               <motion.div
                 className={styles.heroActions}

@@ -8,6 +8,9 @@
     "build": "next build",
     "build:sites": "npm run build && node scripts/build-sites.mjs",
     "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "validate:export": "node scripts/validate-export.mjs",
+    "check": "npm run typecheck && npm run build && npm run validate:export",
     "lint": "next lint"
   },
   "dependencies": {

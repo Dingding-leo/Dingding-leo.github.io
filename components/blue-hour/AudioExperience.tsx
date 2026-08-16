@@ -657,7 +657,7 @@ export function useBlueHourAudio(activeChapter: number): AudioExperience {
   }, []);
 
   useEffect(() => {
-    if (readAudioPreference('blue-hour-sound') === 'off') return;
+    if (readAudioPreference('blue-hour-sound') !== 'on') return;
     const connection = (
       navigator as Navigator & { connection?: { saveData?: boolean } }
     ).connection;
@@ -874,7 +874,7 @@ export function BlueHourAudioProvider({ children }: { children: ReactNode }) {
   }, [audio.isPlaying, audio.start]);
 
   useEffect(() => {
-    if (readAudioPreference('blue-hour-sound') === 'off') return;
+    if (readAudioPreference('blue-hour-sound') !== 'on') return;
     const connection = (
       navigator as Navigator & { connection?: { saveData?: boolean } }
     ).connection;
@@ -900,7 +900,7 @@ export function BlueHourAudioProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      if (readAudioPreference('blue-hour-sound') === 'off') {
+      if (readAudioPreference('blue-hour-sound') !== 'on') {
         cleanup();
         return;
       }

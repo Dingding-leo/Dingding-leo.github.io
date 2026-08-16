@@ -1,14 +1,27 @@
 /* Offline support: immutable build files, bounded media, fresh pages. */
-const STATIC_CACHE = 'al-blue-hour-static-v6';
-const MEDIA_CACHE = 'al-blue-hour-media-v6';
-const PAGE_CACHE = 'al-blue-hour-pages-v6';
+const VERSION =
+  new URL(self.location.href).searchParams.get('v')?.replace(/[^a-zA-Z0-9_-]/g, '') ||
+  'local';
+const STATIC_CACHE = `al-blue-hour-static-${VERSION}`;
+const PAGE_CACHE = `al-blue-hour-pages-${VERSION}`;
+const MEDIA_CACHE = 'al-blue-hour-media-v7';
 const CURRENT_CACHES = new Set([STATIC_CACHE, MEDIA_CACHE, PAGE_CACHE]);
 const CACHE_PREFIX = 'al-blue-hour-';
 const INDEPENDENT_APP_PATHS = ['/KnightClub/', '/Denki/'];
 const MEDIA_LIMIT = 180;
+const SHELL = ['/', '/404.html', '/manifest.webmanifest', '/icon.svg'];
 
-self.addEventListener('install', () => {
-  self.skipWaiting();
+async function cacheIndividually(cache, urls) {
+  await Promise.allSettled(urls.map((url) => cache.add(url)));
+}
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches
+      .open(PAGE_CACHE)
+      .then((cache) => cacheIndividually(cache, SHELL))
+      .then(() => self.skipWaiting()),
+  );
 });
 
 self.addEventListener('activate', (event) => {
@@ -32,7 +45,26 @@ self.addEventListener('activate', (event) => {
 async function trimCache(cache, limit) {
   const keys = await cache.keys();
   if (keys.length <= limit) return;
-  await Promise.all(keys.slice(0, keys.length - limit).map((key) => cache.delete(key)));
+  await Promise.all(
+    keys.slice(0, keys.length - limit).map((key) => cache.delete(key)),
+  );
+}
+
+async function cacheSuccessfulResponse(cacheName, request, response) {
+  if (!response.ok || response.type !== 'basic') return response;
+  const cache = await caches.open(cacheName);
+  await cache.put(request, response.clone());
+  return response;
+}
+
+async function navigationFallback(request) {
+  const cache = await caches.open(PAGE_CACHE);
+  return (
+    (await cache.match(request)) ||
+    (await cache.match('/')) ||
+    (await cache.match('/404.html')) ||
+    Response.error()
+  );
 }
 
 self.addEventListener('fetch', (event) => {
@@ -67,8 +99,7 @@ self.addEventListener('fetch', (event) => {
         const hit = await cache.match(request);
         if (hit) return hit;
         const response = await fetch(request);
-        if (response.ok) await cache.put(request, response.clone());
-        return response;
+        return cacheSuccessfulResponse(STATIC_CACHE, request, response);
       }),
     );
     return;
@@ -80,7 +111,7 @@ self.addEventListener('fetch', (event) => {
     const hitPromise = cachePromise.then((cache) => cache.match(request));
     const refreshPromise = cachePromise.then(async (cache) => {
       const response = await fetch(request);
-      if (response.ok) {
+      if (response.ok && response.type === 'basic') {
         await cache.put(request, response.clone());
         await trimCache(cache, MEDIA_LIMIT);
       }
@@ -100,13 +131,9 @@ self.addEventListener('fetch', (event) => {
   // Pages and everything else: prefer the network so deploys show up immediately.
   event.respondWith(
     fetch(request)
-      .then(async (response) => {
-        if (response.ok) {
-          const cache = await caches.open(PAGE_CACHE);
-          await cache.put(request, response.clone());
-        }
-        return response;
-      })
-      .catch(() => caches.open(PAGE_CACHE).then((cache) => cache.match(request))),
+      .then((response) =>
+        cacheSuccessfulResponse(PAGE_CACHE, request, response),
+      )
+      .catch(() => navigationFallback(request)),
   );
 });
