@@ -1,4 +1,4 @@
-name: Repair site dependencies
+name: Upgrade and verify site dependencies
 
 on:
   push:
@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 jobs:
-  repair-and-verify:
+  upgrade-and-verify:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
@@ -23,10 +23,10 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - name: Install locked dependencies
+      - name: Install current dependencies
         run: npm ci
-      - name: Apply compatible security updates
-        run: npm audit fix
+      - name: Upgrade the framework to the patched release
+        run: npm install --save-exact next@16.3.1
       - name: Verify complete static export
         env:
           NEXT_PUBLIC_BUILD_ID: ${{ github.sha }}
@@ -42,5 +42,5 @@ jobs:
             echo "No dependency changes to commit"
             exit 0
           fi
-          git commit -m "fix(deps): resolve production security advisories"
+          git commit -m "fix(deps): upgrade Next.js to the patched release"
           git push origin HEAD:refactor/site-trust-performance
